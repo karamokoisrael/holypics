@@ -9,3 +9,10 @@ services:
       - './models:/models'
     command: --model_config_file=/models/models.config
 
+  web:
+    restart: always
+    build: ./web/app
+    ports:
+      - 5501:5501
+    volumes:
+      - ./web/app:/code
