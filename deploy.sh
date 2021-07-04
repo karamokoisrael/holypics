@@ -1,4 +1,4 @@
-model_name="model";
+model_name="holypics";
 sudo rm -r shared
 sudo mkdir models
 sudo cp -r model.config models/
