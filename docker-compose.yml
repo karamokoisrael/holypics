@@ -1,0 +1,11 @@
+version: '3.3'
+services:
+  server:
+    image: tensorflow/serving
+    container_name: holypics
+    ports:
+      - '8501:8501'
+    volumes:
+      - './models:/models'
+    command: --model_config_file=/models/models.config
+

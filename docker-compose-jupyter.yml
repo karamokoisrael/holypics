@@ -1,0 +1,13 @@
+version: '2.0'
+
+services:
+    pytest-python3.5:
+      image: python:3.5
+      container_name: myjupyterlab
+      command: bash -c "apt-get install -y python3-opencv;python3 -m pip install --upgrade pip;pip3 install -r requirements-first.txt;jupyter-lab --ip='*' --port=8888 --allow-root --no-browser"
+      volumes:
+        - .:/app
+      working_dir: /app
+      ports:
+        - 8888:8888
+        - 6000:6000

@@ -1,0 +1,15 @@
+numpy
+matplotlib
+tensorflow
+tensorflow_hub
+jupyterlab
+Pillow
+ipywidgets
+gdown
+imutils
+pytube
+numpy
+pytube
+opencv-python
+scipy
+

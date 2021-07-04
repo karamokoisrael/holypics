@@ -1,0 +1,259 @@
+.App {
+    text-align: center;
+    width: 100vw !important;
+    overflow-y: auto !important;
+    height: auto !important;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  
+  .App-logo {
+    height: 40vmin;
+    pointer-events: none;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  } 
+  
+  @media (prefers-reduced-motion: no-preference) {
+    .App-logo {
+      animation: App-logo-spin infinite 20s linear;
+    }
+  }
+  
+  .App-header {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+  }
+
+  .blured{
+        filter: blur(20px) !important;
+        -webkit-filter: blur(20px) !important;
+    }
+  
+  .App-link {
+    color: #61dafb;
+  }
+  
+  @keyframes App-logo-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  
+  .file-display-container {
+    position: fixed;
+    width: 805px;
+  }
+  
+  .file-status-bar{
+    width: 100%;
+    vertical-align:top;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    position: relative;
+    line-height: 50px;
+    height: 50px;
+  }
+  
+  .file-status-bar > div {
+    overflow: hidden;
+  }
+  
+  .file-type {
+    display: inline-block!important;
+    position: absolute;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 13px;
+    margin-top: 25px;
+    padding: 0 4px;
+    border-radius: 2px;
+    box-shadow: 1px 1px 2px #abc;
+    color: #fff;
+    background: #0080c8;
+    text-transform: uppercase;
+  }
+  
+  .file-name {
+    display: inline-block;
+    vertical-align:top;
+    margin-left: 50px;
+    color: #4aa1f3;
+  }
+  
+  .file-error {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 50px;
+    color: #9aa9bb;
+  }
+  
+  .file-error-message {
+    color: red;
+  }
+  .navbar
+  
+  .file-type-logo {
+    width: 50px;
+    height: 50px;
+    /* background: url(../images/generic.png) no-repeat center center;  */
+    background-size: 100%;
+    position: absolute;
+  }
+  
+  .file-size {
+    display:inline-block;
+    vertical-align:top;
+    color:#30693D;
+    margin-left:10px;
+    margin-right:5px;
+    margin-left: 10px;
+    color: #444242;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  
+  .file-remove  {
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    line-height: 15px;
+    cursor: pointer;
+    color: red;
+    margin-right: -10px;
+  }
+  
+  
+  
+  .file-item-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+  
+  .file-item img{
+    width: 400px;
+    height: 400px;
+  }
+  
+  .my-masonry-grid {
+    display: -webkit-box; /* Not needed if autoprefixing */
+    display: -ms-flexbox; /* Not needed if autoprefixing */
+    display: flex;
+    margin-left: -30px; /* gutter size offset */
+    width: auto;
+  }
+  .my-masonry-grid_column {
+    padding-left: 30px; /* gutter size */
+    background-clip: padding-box;
+  }
+  
+  /* Style your items */
+  .my-masonry-grid_column > div { /* change div to reference your elements you put in <Masonry> */
+    /* background: grey; */
+    margin-bottom: 30px;
+  }
+  
+  .dropzone-content{
+    height: 100px;
+    width: 100px;
+    background-color: red;
+  }
+  
+  .dropzone-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+  
+  
+  .dropzone-content.activated{
+    background-color: green;
+  }
+  
+  .file-img{
+    width: 100%;
+    height: 350px;
+  }
+  
+  .controls-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin-bottom: 200px;
+  }
+  
+
+  .file-img[hiddenblind="true"]{
+    filter: blur(8px) !important;
+    -webkit-filter: blur(8px) !important;
+  }
+
+
+  .own-toaster, .flex{
+    display: flex; 
+    align-items: center; 
+    justify-content: space-around
+  }
+
+  .footer{
+    width: 100%;
+    /* background-color: #f8f9fa; */
+    height: 20px;
+    /* display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-direction: column; */
+  }
+
+  .up-button{
+    position: fixed;
+    right: 0;
+    font-size: 40px;
+  }
+
+  .scroll {
+    opacity: 0.3;
+    background-color: #0a58ca;
+    width: 40px;
+    height: 40px;
+    position: fixed;
+    bottom: 10px;
+    right: 20px;
+    border-radius: 5px;
+    border: none;
+  }
+
+  .arrow-up {
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -20px;
+    margin-left: -18px;
+  }
+  
+  @media (max-width:900px)  {
+     
+    .controls-container{
+        flex-direction: column !important;
+      }
+  }
+
+  

@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+gdown = "*"
+imutils = "*"
+tensorflow-hub = "*"
+pytube = "*"
+numpy = "*"
+scipy = "==1.6.2"
+tensorflow = "*"
+matplotlib = "*"
+Pillow = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"
