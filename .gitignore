@@ -116,6 +116,10 @@ images_saves/
 
 images_deploy/
 
+images_backup/
+
+images_new/
+
 images*.zip
 
 shared.zip
