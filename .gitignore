@@ -135,3 +135,4 @@ nsfw_data_scraper/
 
 .ipynb_checkpoints/
 archive.zip
+models/base/*
