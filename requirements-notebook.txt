@@ -6,3 +6,4 @@ scikit-learn
 tensorflow_addons
 matplotlib
 imutils
+pandas
