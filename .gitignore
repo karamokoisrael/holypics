@@ -136,3 +136,5 @@ nsfw_data_scraper/
 .ipynb_checkpoints/
 archive.zip
 models/base/*
+logs/train logs/validation
+logs/fit/*
