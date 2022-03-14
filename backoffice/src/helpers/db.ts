@@ -28,14 +28,11 @@ export const getDumpList = (callBack: Function)=>{
 }
 
 export const deleteBackup = (id: string, callBack: Function)=>{
-    fs.unlink(`./database/${id}`, callBack)
+    fs.unlink(`../../database/${id}`, callBack())
 }
 
 
 export const dump = ()=>{
-    const dumpName = new Date().toString().replace(/ /g,'_').replace(".sql", "");
- 
-    
     mysqldump({
         connection: {
             host: process.env.DB_HOST as string,
@@ -43,11 +40,11 @@ export const dump = ()=>{
             password: process.env.DB_PASSWORD as string,
             database: process.env.DB_DATABASE as string,
         },
-        dumpToFile: `./database/${dumpName}.sql`,
+        dumpToFile: `./database/${new Date()}.sql`,
     });
 }
 
-export const restore = ( fileName: string = 'dump')=>{
+export const restore = ( fileName: string = './dump.sql')=>{
         const importer = new Importer({host: process.env.DB_HOST, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: process.env.DB_DATABASE});
         // New onProgress method, added in version 5.0!
         importer.onProgress((progress: any)=>{
@@ -55,7 +52,7 @@ export const restore = ( fileName: string = 'dump')=>{
         console.log(`${percent}% Completed`);
         });
     
-        importer.import(`./database/${fileName.replace(".sql", "")}.sql`).then(()=>{
+        importer.import(fileName).then(()=>{
 
             var files_imported = importer.getImported();
 

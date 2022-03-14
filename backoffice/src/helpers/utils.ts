@@ -1,3 +1,4 @@
+import { CustomObject } from '../models/object';
 import { Request } from 'express';
 import _ from "lodash";
 
@@ -15,8 +16,8 @@ export const getHost =  (req: Request, type="hostUrl")=>{
     return output;
 };
 
-export const objectToCamelCase = (object: Record<string, any>)=> {
-    const newObject:Record<string, any> = {};
+export const objectToCamelCase = (object: CustomObject)=> {
+    const newObject:CustomObject = {};
     Object.keys(object).forEach((key)=>{
         newObject[_.camelCase(key)] = object[key];
     })

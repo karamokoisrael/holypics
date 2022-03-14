@@ -11,14 +11,22 @@ export const getTemplate = (fileName: string, callback: Function)=> {
         callback({textData: textData, error: error})
     });
 }
+export const renderTemplate = async (type="liquid", data: JsonObject, fileName="custom", lang = "intl"): Promise<any>=>{
+    const availableLanguages = [ "intl", "en-US"];
+    if(!availableLanguages.includes(lang)) lang =  availableLanguages[1];
 
-export const renderTemplate = async (callBack: Function=()=>{}, data: Record<string, any>={},fileName="default", type="html", lang = "intl"): Promise<any>=>{
-    // const availableLanguages = [ "intl", "en-US"];
-    // if(!availableLanguages.includes(lang)) lang =  availableLanguages[1];
-    getTemplate(`${type}/${lang}/${fileName}.${type}`, async ({textData, error} : templateValue)=>{
-        Object.keys(data).forEach(key => {
-            textData = textData.replace(new RegExp(`{{${key}}}`,"g"), data[key]); 
-        });
-        callBack(textData)   
-    })
+    
+    switch (type) {
+        case "liquid":
+            getTemplate(`${lang}/${fileName}.${type}`, ({textData, error} : templateValue)=>{
+                const engine = new Liquid()
+                const tpl = engine.parse(textData);
+                return engine.render(tpl, data)
+            })
+        default:
+            return new Promise<any>((resolve, reject) => {
+                reject("failure")
+            });
+        break;
+    }
 }

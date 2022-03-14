@@ -1,24 +1,24 @@
-import { Router, Request, Response, NextFunction } from "express";
-import { JsonObject } from "../../@types/global";
-import { sendMail } from "../../helpers/mailer"
 const customExceptions = require("../../helpers/exceptions");
-import * as Joi from "joi";
-import { v4 } from "uuid";
-import { hash, compare } from "bcryptjs";
-import { random } from "../../helpers/string";
-import * as authHandler from "../../helpers/auth";
+const Joi = require("joi");
+const { v4: uuidv4 } = require('uuid');
+const bcrypt = require("bcryptjs");
+const string = require("../../helpers/string");
+const mailer = require("../../helpers/mailer");
+const utils = require("../../helpers/utils");
+const authHandler = require("../../helpers/auth");
 
-module.exports =  (router: Router, { services, exceptions, getSchema, database, env }: Record<string, any>) => {
-    router.post('/register', async (req: Request, res: Response, next: NextFunction) => {
+module.exports =  (router, { services, exceptions, getSchema, database, env }) => {
+    router.post('/register', async (req, res, next) => {
         try {
+            // return customExceptions.throwError(res, "maintenance", 500);
 
             const validationSchema = Joi.object({
 
-                first_name: Joi.string().label("Veuillez un prénom correcte").required(),
+                first_name: Joi.string().label("Veuillez un prénom correcte"),
 
-                last_name: Joi.string().label("Veuillez un nom correcte").required(),
+                last_name: Joi.string().label("Veuillez un nom correcte"),
 
-                city: Joi.number().label("Veuillez sélectionner une ville").required(),
+                city: Joi.number().label("Veuillez sélectionner une ville"),
 
                 email: Joi.string()
                 .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
@@ -38,8 +38,13 @@ module.exports =  (router: Router, { services, exceptions, getSchema, database, 
     
             const validationResult = validationSchema.validate(req.body);
     
-            //@ts-ignore
             if(validationResult.error) return customExceptions.throwError(res, validationResult.error.details[0].context.label, 400);
+    
+            // const connection = db.getConnection();
+            // connection.query(`SELECT * FROM users WHERE email=?`, [req.body.email],  (error, results, fields)=>{
+            //     if(error != null) { errorMessage = "unhandled sql error"; return;}
+            //     if(results != undefined && results.length > 0) {console.log("working"); resJson.statusCode = 409; resJson.message="email  déjà pris par un autre utilisateur"};
+            // })
     
             const memeEmails = await database('users').where('email', '=', req.body.email).count({ total: 'id' });
             if(memeEmails.length > 0 && memeEmails[0].total >0 ) return customExceptions.throwError(res, "email déjà pris par un autre utilisateur", 409); 
@@ -48,24 +53,22 @@ module.exports =  (router: Router, { services, exceptions, getSchema, database, 
             if(memePhones.length > 0 && memePhones[0].total >0 ) return customExceptions.throwError(res, "numéro de téléphone déjà pris par un autre utilisateur", 409); 
    
 
-            const encryptedPassword = await hash(req.body.password, 10);
-            const otp = random(5, "number");
-            await database('users').insert({email: req.body.email.toLowerCase(), phone: req.body.phone, password: encryptedPassword, first_name: req.body.first_name, last_name: req.body.last_name, city: req.body.city,  public_key: v4(), otp: otp})
+            const encryptedPassword = await bcrypt.hash(req.body.password, 10);
+ 
+            await database('users').insert({email: req.body.email.toLowerCase(), phone: req.body.phone, password: encryptedPassword, first_name: req.body.first_name, last_name: req.body.last_name, city: req.body.city,  public_key: uuidv4(), otp: string.random(5, "number")})
 
-            const mailService = new services.MailService(await getSchema())
-            const mailData = { title: "", headerText: "Confirmation d'email", content: "Cliquez sur le bouton ci-dessous pour confirmer votre email", btnText: "Confirmer mon email", btnUrl: process.env.DIRECTUS_URL+`/views/confirm-email?email=${req.body.email}&otp=${otp}` };
-           
-            await sendMail(mailService, req.body.email, "Confirmation d'email", mailData)
-            
+            // const directusMailder = new services.MailService(await getSchema())
+            // const mailData = { title: "", headerText: "Confirmation d'email", content: "Cliquez sur le bouton ci-dessous pour confirmer votre email", btnText: "Confirmer mon email", btnUrl: process.env.DIRECTUS_URL+"/views/" };
+            // mailer.sendCustomEmail(directusMailder, "mstx777@gmail.com", "Confirmation de compte", mailData);
+
             return customExceptions.successMessage(res, "Inscription réussie. Veuillez vous connecter");
-            
         } catch (error) {
             console.log(error);
             return customExceptions.throwError(res); 
         }
 	}); 
 
-    router.post('/login', async (req: Request, res: Response, next: NextFunction) => {
+    router.post('/login', async (req, res, next) => {
         try {
 
             const validationSchema = Joi.object({
@@ -79,8 +82,7 @@ module.exports =  (router: Router, { services, exceptions, getSchema, database, 
             })
     
             const validationResult = validationSchema.validate(req.body);
-            
-            //@ts-ignore
+    
             if(validationResult.error) return customExceptions.throwError(res, validationResult.error.details[0].context.label, 400);
     
     
@@ -91,7 +93,7 @@ module.exports =  (router: Router, { services, exceptions, getSchema, database, 
 
             if(foundUsers == 0 || foundUsers.length < 0) return customExceptions.throwError(res, "Mauvais nom d'utilisateur ou mot de passe", 403);
             const user =  foundUsers[0];
-            if(! await compare(req.body.password, user.password) ){
+            if(! await bcrypt.compare(req.body.password, user.password)){
                 return customExceptions.throwError(res, "Mauvais nom d'utilisateur ou mot de passe", 403);
             }
 
@@ -103,43 +105,16 @@ module.exports =  (router: Router, { services, exceptions, getSchema, database, 
         }
 	}); 
 
-    router.get('/getData', async (req: Request, res: Response, next: NextFunction) => {
+    router.get('/getData', async (req, res, next) => {
         try { 
-           const decoded:any = authHandler.decodeToken(req);
+           const decoded = authHandler.decodeToken(req);
            const users = await database('users')
             .where("id", "=", decoded.id)
             .select()
-            users[0].password=null;
-            users[0]["public_key"] = req.headers["x-access-token"];
             return res.json(users[0]);
         } catch (error) {
             console.log(error);
             return customExceptions.throwError(res); 
         }
 	}); 
-
-
-
-	router.get('/test', async (req: any, res: Response, next: NextFunction) => {
-        const mailService = new services.MailService(await getSchema())
-        await sendMail(mailService, "mstx777@gmail.com", "Test", {title: "Testing out", headerText: "ok", content: "Nous testons les mails", btnText: "retourner à l'admin", btnUrl:"https://cryptomarket-ci.com"})
-        res.json({})
-	});
-
-
-    // const { ItemsService,  } = services;
-	// const { ServiceUnavailableException } = exceptions;
-
-    // router.get('/test', (req: any, res: Response, next: NextFunction) => {
-        
-    //     console.log(req.query.fields);
-	// 	const recipeService = new ItemsService('users', { schema: req.schema, accountability: req.accountability });
-
-	// 	recipeService
-	// 		.readByQuery(req.query)
-	// 		.then((results: any) => res.json(results))
-	// 		.catch((error: any) => {
-	// 			return next(new ServiceUnavailableException(error.message));
-	// 		});
-	// });
 };

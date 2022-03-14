@@ -1,6 +1,8 @@
 import GlobalAppContext from "./context";
 
-export type JsonObject=Record<string, any>;
+export type JsonObject={
+    [key: string]: any
+}
 
 export type ObjectWithLabelAndValue={
     value: string

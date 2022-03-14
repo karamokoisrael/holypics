@@ -9,28 +9,18 @@ export const customStringify = (query: JsonObject)=>{
 }
 
 
-export const customFetch = (url: string, options: JsonObject={}, xAccessToken=null, bearerToken = null)=>{
+export const customFetch = (url: string, options: JsonObject={}, loader=true)=>{
   if(options.header == undefined){
     options.headers = new Headers({ Accept: 'application/json' });  
   }else{
     options.headers.set('Accept', 'application/json');
   }
   
-
   options.headers.set('Content-Type', 'application/json'); 
   options.headers.set('Access-Control-Allow-Credentials', true); 
   options.headers.set('Access-Control-Expose-Headers', '*');
   options.headers.set('Access-Control-Allow-Origin', '*');
   options.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-
-  if(xAccessToken != null){
-    options.headers.set('x-access-token', xAccessToken); 
-  }
-
-  if(bearerToken != null){
-    options.headers.set('Authorization', `Bearer ${bearerToken}`); 
-  }
-
 
   const promise = fetch(url, options)
   
