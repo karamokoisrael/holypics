@@ -3,11 +3,36 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getConnection = exports.restore = exports.dump = void 0;
+exports.getConnection = exports.restore = exports.dump = exports.deleteBackup = exports.getDumpList = void 0;
 const mysql_1 = __importDefault(require("mysql"));
 const mysqldump_1 = __importDefault(require("mysqldump"));
 // import { Importer } from "mysql-import";
 const Importer = require('mysql-import');
+const path = require('path');
+const fs = require('fs');
+//joining path of directory 
+const getDumpList = (callBack) => {
+    const directoryPath = path.join(__dirname, '../../database');
+    const dumpList = [];
+    //passsing directoryPath and callback function
+    fs.readdir(directoryPath, function (err, files) {
+        //handling error
+        if (err) {
+            return dumpList;
+        }
+        //listing all files using forEach
+        files.forEach(function (file) {
+            // Do whatever you want to do with the file
+            dumpList.push(file);
+        });
+        callBack(dumpList);
+    });
+};
+exports.getDumpList = getDumpList;
+const deleteBackup = (id, callBack) => {
+    fs.unlink(`../../database/${id}`, callBack());
+};
+exports.deleteBackup = deleteBackup;
 const dump = () => {
     (0, mysqldump_1.default)({
         connection: {
@@ -16,18 +41,18 @@ const dump = () => {
             password: process.env.DB_PASSWORD,
             database: process.env.DB_DATABASE,
         },
-        dumpToFile: `./extensions/backup/${new Date()}.sql`,
+        dumpToFile: `./database/${new Date()}.sql`,
     });
 };
 exports.dump = dump;
-const restore = () => {
+const restore = (fileName = './dump.sql') => {
     const importer = new Importer({ host: process.env.DB_HOST, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: process.env.DB_DATABASE });
     // New onProgress method, added in version 5.0!
     importer.onProgress((progress) => {
         var percent = Math.floor(progress.bytes_processed / progress.total_bytes * 10000) / 100;
         console.log(`${percent}% Completed`);
     });
-    importer.import('./dump.sql').then(() => {
+    importer.import(fileName).then(() => {
         var files_imported = importer.getImported();
         console.log(`${files_imported.length} SQL file(s) imported.`);
     }).catch((e) => {

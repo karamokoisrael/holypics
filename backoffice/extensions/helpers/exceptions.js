@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.throwJsonError = exports.throwError = exports.successMessage = void 0;
 const successMessage = (res, message = "Opération effectuée avec succès") => {
     return res.status(200).send({
-        "message": message
+        "message": message,
     });
 };
 exports.successMessage = successMessage;
