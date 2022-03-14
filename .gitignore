@@ -120,6 +120,8 @@ images_backup/
 
 images_new/
 
+images_backup_lite/
+
 images*.zip
 
 shared.zip
@@ -138,3 +140,11 @@ archive.zip
 models/base/*
 logs/train logs/validation
 logs/fit/*
+
+.env
+proxy/.env
+application/config/*.json
+config/environment/*
+config/letsencrypt/*
+config/proxymanager/*
+config/portainer-data/*
