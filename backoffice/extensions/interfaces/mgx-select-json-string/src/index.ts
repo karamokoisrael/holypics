@@ -1,13 +1,25 @@
-import { defineInterface } from '@directus/extensions-sdk';
-import InterfaceComponent from './interface.vue';
+import { defineInterface } from '@directus/shared/utils';
+import InterfaceSelectDropdown from './select-dropdown.vue';
+
 
 export default defineInterface({
-	id: 'mgx-select-dropdown-json-string',
-	name: 'mgx-select-dropdown-json-string',
-	icon: 'box',
-	description: 'mgx-select-dropdown-json-string',
-	component: InterfaceComponent,
-	types: ['string'],
+	id: 'mgx-multiple-select-json-string',
+	name: 'mgx-multiple-select-json-string',
+	description: `select multiples items from a json string like 
+	[
+		{
+			"text": "ok",
+			"value": "ok"
+		},
+		{
+			"text": "test",
+			"value": "test"
+		}
+	]`,
+	icon: 'arrow_drop_down_circle',
+	component: InterfaceSelectDropdown,
+	types: ['string', 'integer', 'float', 'bigInteger'],
+	group: 'selection',
 	options: ({ field }) => [
 		{
 			field: 'choices',
@@ -17,35 +29,8 @@ export default defineInterface({
 				width: 'full',
 				interface: 'input-code',
 				options: {
-					placeholder: '$t:interfaces.select-dropdown.choices_placeholder',
-					template: '{{ text }}',
-					fields: [
-						{
-							field: 'text',
-							type: 'string',
-							name: '$t:text',
-							meta: {
-								interface: 'input',
-								width: 'half',
-								options: {
-									placeholder: '$t:interfaces.select-dropdown.choices_name_placeholder',
-								},
-							},
-						},
-						{
-							field: 'value',
-							type: field.type,
-							name: '$t:value',
-							meta: {
-								interface: 'input',
-								options: {
-									font: 'monospace',
-									placeholder: '$t:interfaces.select-dropdown.choices_value_placeholder',
-								},
-								width: 'half',
-							},
-						},
-					],
+					label: 'json',
+					language: "javascript"
 				},
 			},
 		},
@@ -101,4 +86,5 @@ export default defineInterface({
 			},
 		},
 	],
+	recommendedDisplays: ['mgx-multiple-select-json-string'],
 });

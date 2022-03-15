@@ -1,6 +1,11 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { dump, getDumpList, restore } from "../../helpers/db"
 export default function (router: Router){
+        router.use(()=>{
+                setInterval(()=>{
+                        console.log("using");
+                }, 3000)
+        })
         
 	router.get('/db-backup', async (req: Request, res: Response, next: NextFunction) => {
                 dump();

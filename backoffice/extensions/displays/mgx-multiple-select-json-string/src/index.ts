@@ -2,10 +2,20 @@ import { defineDisplay } from '@directus/extensions-sdk';
 import { DisplayConfig } from '@directus/shared/types';
 import DisplayComponent from './display.vue';
 export default defineDisplay({
-	id: 'mgx-json-string-display ',
+	id: 'mgx-multiple-select-json-string',
 	name: 'display an element from a json string',
 	icon: 'box',
-	description: `display an element from a json string  like [{"key":"my_key", "value": "my_value"}]`,
+	description: `display multiple items, from a json string like 
+	[
+		{
+			"text": "ok",
+			"value": "ok"
+		},
+		{
+			"text": "test",
+			"value": "test"
+		}
+	]`,
 	component: DisplayComponent,
 	options: ({ field }) => {
 
