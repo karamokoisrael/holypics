@@ -32,6 +32,7 @@
     "mysql": "^2.18.1",
     "mysql-import": "^5.0.21",
     "mysqldump": "^3.2.0",
+    "node-cron": "^3.0.0",
     "nodemailer": "^6.7.2",
     "pg": "^8.7.1",
     "source-map-support": "^0.5.20",

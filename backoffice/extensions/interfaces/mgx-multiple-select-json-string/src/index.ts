@@ -3,9 +3,9 @@ import InterfaceSelectDropdown from './select-dropdown.vue';
 
 
 export default defineInterface({
-	id: 'mgx-select-json-string',
-	name: 'mgx-select-json-string',
-	description: `select an item from a json string like 
+	id: 'mgx-multiple-select-json-string',
+	name: 'mgx-multiple-select-json-string',
+	description: `select multiple items from a json string like 
 	[
 		{
 			"text": "ok",
@@ -86,5 +86,5 @@ export default defineInterface({
 			},
 		},
 	],
-	recommendedDisplays: ['mgx-select-json-string'],
+	recommendedDisplays: ['mgx-multiple-select-json-string'],
 });

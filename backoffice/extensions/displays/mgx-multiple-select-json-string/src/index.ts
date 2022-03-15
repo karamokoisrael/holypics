@@ -3,7 +3,7 @@ import { DisplayConfig } from '@directus/shared/types';
 import DisplayComponent from './display.vue';
 export default defineDisplay({
 	id: 'mgx-multiple-select-json-string',
-	name: 'display an element from a json string',
+	name: 'display multiple items from a json string',
 	icon: 'box',
 	description: `display multiple items, from a json string like 
 	[

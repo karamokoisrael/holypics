@@ -10,12 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = require("../../helpers/db");
+const cron = require('node-cron');
+cron.schedule('* * * * *', () => {
+    console.log('running a task every minute');
+});
 function default_1(router) {
-    router.use(() => {
-        setInterval(() => {
-            console.log("using");
-        }, 3000);
-    });
     router.get('/db-backup', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         (0, db_1.dump)();
         return res.json({ message: "done" });
