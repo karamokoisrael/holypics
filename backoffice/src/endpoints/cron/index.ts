@@ -2,8 +2,8 @@ import { NextFunction, Request, Response, Router } from "express";
 import { dump, getDumpList, restore } from "../../helpers/db"
 const cron = require('node-cron');
 
-cron.schedule('* * * * *', () => {
-  console.log('running a task every minute');
+cron.schedule('0 0 5 * *', () => {
+  console.log('updating rentals on the 5 of each month');
 });
 
 export default function (router: Router){        

@@ -6,7 +6,7 @@
 		v-else
 		multiple
 		:model-value="value"
-		:items="choices"
+		:items="jsonChoices"
 		:disabled="disabled"
 		:show-deselect="allowNone"
 		:placeholder="placeholder"
@@ -28,7 +28,6 @@ import { sortBy } from 'lodash';
 type Option = {
 	text: string;
 	value: string | number | boolean;
-	children?: Option[];
 };
 
 export default defineComponent({
@@ -38,7 +37,7 @@ export default defineComponent({
 			default: false,
 		},
 		value: {
-			type: String,
+			type: Array as PropType<string[]>,
 			default: null,
 		},
 		choices: {
@@ -55,30 +54,22 @@ export default defineComponent({
 		},
 		placeholder: {
 			type: String,
-			default: () => "",
+			default: null,
 		},
 		allowOther: {
 			type: Boolean,
 			default: false,
 		},
 	},
-	// emits: ['input'],
-	// setup(props) {
-	// 	const choices:Array<Option> = JSON.parse(props.choices)
-	// 	const { t } = useI18n();
-	// 	return { choices, t };
-	// },
 	emits: ['input'],
 	setup(props, { emit }) {
 		const { t } = useI18n();
-		const choices:Array<Option> = JSON.parse(props.choices);
+		const jsonChoices: Array<Option> = JSON.parse(props.choices);
+		return { t, jsonChoices, updateValue };
 
-		return { t, updateValue };
-
-		
 		function updateValue(value: PropType<string[]>) {
 			const sortedValue = sortBy(value, (val) => {
-				const sortIndex = choices.findIndex((choice) => val === choice.value);
+				const sortIndex = jsonChoices.findIndex((choice) => val === choice.value);
 				return sortIndex !== -1 ? sortIndex : value.length;
 			});
 

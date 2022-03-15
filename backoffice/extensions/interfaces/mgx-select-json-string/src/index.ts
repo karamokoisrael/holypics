@@ -23,7 +23,7 @@ export default defineInterface({
 	options: ({ field }) => [
 		{
 			field: 'choices',
-			type: 'string',
+			type: 'json',
 			name: '$t:choices',
 			meta: {
 				width: 'full',

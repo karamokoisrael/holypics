@@ -31,7 +31,8 @@ export default defineComponent({
 			try {
 				const json: Array<Option> = JSON.parse(props.json);
 				const choices: Array<Option> = [];
-
+				const jsonValues: Array<any> = JSON.parse(props.value);
+				let text = "";
 				for (const choice of json) {
 					choices.push(choice);
 					if(choice.children != null && choice.children != undefined){
@@ -40,14 +41,13 @@ export default defineComponent({
 						}
 					}
 				}
-				const item = choices.find((choice)=> choice.value == props.value);
-				return item.text;
+				const items = choices.filter((choice)=> jsonValues.includes(choice.value));
+				for (let i = 0; i < items.length; i++) {
+					text+=`${items[i].text}${i < items.length -1 ? ", " : ""}`
+				}
 				
-				// if(json[props.value] != undefined){
-				// 	return json[props.value]
-				// }else{
-				// 	return props.value
-				// }
+				
+				return text;
 			} catch (error) {
 				return props.value;
 			}

@@ -4,7 +4,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { useApi, useStores } from '@directus/extensions-sdk';
 
 export default defineComponent({
 	props: {
@@ -13,16 +12,5 @@ export default defineComponent({
 			default: null,
 		},
 	},
-
-
-	setup(){
-		const stores = useStores();
-		console.log(stores);
-		
-		// const api = useApi();
-		
-		// const { useCollectionsStore } = useStores();
-		// const collectionsStore = useCollectionsStore();
-	}
 });
 </script>

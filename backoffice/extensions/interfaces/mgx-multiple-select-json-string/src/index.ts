@@ -1,6 +1,5 @@
 import { defineInterface } from '@directus/shared/utils';
-import InterfaceSelectDropdown from './select-dropdown.vue';
-
+import InterfaceSelectMultipleDropdown from './select-multiple-dropdown.vue';
 
 export default defineInterface({
 	id: 'mgx-multiple-select-json-string',
@@ -17,10 +16,10 @@ export default defineInterface({
 		}
 	]`,
 	icon: 'arrow_drop_down_circle',
-	component: InterfaceSelectDropdown,
+	component: InterfaceSelectMultipleDropdown,
 	types: ['string', 'integer', 'float', 'bigInteger'],
 	group: 'selection',
-	options: ({ field }) => [
+	options: [
 		{
 			field: 'choices',
 			type: 'string',
@@ -65,15 +64,6 @@ export default defineInterface({
 			},
 		},
 		{
-			field: 'icon',
-			name: '$t:icon',
-			type: 'string',
-			meta: {
-				width: 'half',
-				interface: 'select-icon',
-			},
-		},
-		{
 			field: 'placeholder',
 			name: '$t:placeholder',
 			type: 'string',
@@ -85,6 +75,16 @@ export default defineInterface({
 				},
 			},
 		},
+		{
+			field: 'icon',
+			name: '$t:icon',
+			type: 'string',
+			meta: {
+				width: 'half',
+				interface: 'select-icon',
+			},
+		},
 	],
 	recommendedDisplays: ['mgx-multiple-select-json-string'],
 });
+
