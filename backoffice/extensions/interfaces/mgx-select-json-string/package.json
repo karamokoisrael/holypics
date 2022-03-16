@@ -13,7 +13,7 @@
 		"host": "^9.5.0"
 	},
 	"scripts": {
-		"build": "directus-extension build",
+		"build": "npx directus-extension build",
 		"dev": "nodemon --watch 'src/**/*' --ext 'ts,js,json,vue' --exec 'directus-extension build && mv dist/* ./; cd ../../../ && npx directus start'",
 		"dev-no-serve": "nodemon --watch 'src/**/*' --ext 'ts,js,json,vue' --exec 'directus-extension build && mv dist/* ./'"
 	},
