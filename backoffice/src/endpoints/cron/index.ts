@@ -3,7 +3,12 @@ import { dump, getDumpList, restore } from "../../helpers/db"
 const cron = require('node-cron');
 
 cron.schedule('0 0 5 * *', () => {
-  console.log('updating rentals on the 5 of each month');
+        console.log('updating rentals on the 5 of each month');
+});
+
+cron.schedule('0 0 1 1/1 * ? *', () => {
+        console.log('saving databases everyday');
+        dump();
 });
 
 export default function (router: Router){        
@@ -17,8 +22,7 @@ export default function (router: Router){
                         return res.json(list);   
                 });
 
-                return [];   
-                
+                return [];     
 	});
 
         router.get('/db-restore', async (req: Request, res: Response, next: NextFunction) => {

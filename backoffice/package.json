@@ -1,12 +1,12 @@
 {
-  "name": "holypics",
+  "name": "mgx-db-manager",
   "version": "1.0.0",
   "description": "a cool directus extension to manager exported sql file in the database directory",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --watch 'src/**/*' --ext 'ts,json,vue' --ignore 'src/**/*.spec.ts' --exec npm run build-dev",
-    "build-dev": "tsc -p tsconfig.json && node node_modules/directus/dist/start",
+    "dev": "nodemon --watch src/**/* --ext ts,json,vue --ignore 'src/**/*.spec.ts' --exec \"tsc -p tsconfig.json && node node_modules/directus/dist/start\"",
     "create-extension": "npm init directus-extension",
+    "sync": "tsc -p tsconfig.json && cp -r src/templates extensions/",
     "build": "directus-extension-builder build && tsc -p tsconfig.json && cp -r src/templates extensions/",
     "start": "directus-extension-builder build && tsc -p tsconfig.json && npx directus start",
     "test": "echo \"Error: no test specified\" && exit 1"

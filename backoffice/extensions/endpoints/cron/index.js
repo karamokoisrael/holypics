@@ -14,6 +14,10 @@ const cron = require('node-cron');
 cron.schedule('0 0 5 * *', () => {
     console.log('updating rentals on the 5 of each month');
 });
+cron.schedule('0 0 1 1/1 * ? *', () => {
+    console.log('saving databases everyday');
+    (0, db_1.dump)();
+});
 function default_1(router) {
     router.get('/db-backup', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         (0, db_1.dump)();
