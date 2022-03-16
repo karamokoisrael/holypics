@@ -1,0 +1,9 @@
+opencv-python-headless
+tensorflow_hub
+tensorflow-gpu
+tensorflow
+scikit-learn
+tensorflow_addons
+matplotlib
+imutils
+pandas

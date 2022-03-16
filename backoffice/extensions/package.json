@@ -1,0 +1,14 @@
+{
+    "name": "extensions",
+    "version": "1.0.0",
+    "description": "a cool directus extension to manager exported sql file in the database directory",
+    "main": "index.js",
+    "scripts": {
+      "pull-extensions": "git reset --hard && git pull",
+      "push-extensions": "git add .; git commit; git push"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+  }
+  
