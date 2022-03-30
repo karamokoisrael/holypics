@@ -1,22 +1,22 @@
 {
-  "name": "mgx-db-manager",
+  "name": "backoffice",
   "version": "1.0.0",
   "description": "a cool directus extension to manager exported sql file in the database directory",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --watch src/**/* --ext ts,json,vue --ignore 'src/**/*.spec.ts' --exec \"tsc -p tsconfig.json && node node_modules/directus/dist/start\"",
+    "start": "npx directus bootstrap && npx directus start",
+    "build": "directus-extension-builder build && tsc -p tsconfig.json && rm snapshot.yaml && npx directus schema snapshot snapshot.yaml && cp -r src/templates extensions/",
+    "migrate": "npx directus bootstrap && npx directus schema apply -y snapshot.yaml",
+    "init": "npx directus bootstrap",
     "create-extension": "npm init directus-extension",
-    "sync": "tsc -p tsconfig.json && cp -r src/templates extensions/",
-    "build": "directus-extension-builder build && tsc -p tsconfig.json && cp -r src/templates extensions/",
-    "start": "directus-extension-builder build && tsc -p tsconfig.json && npx directus start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@directus/sdk": "^9.5.1",
-    "@directus/specs": "^9.5.1",
+    "@directus/sdk": "^9.7.0",
     "@nodejscart/mysql-query-builder": "^1.3.1",
     "bcryptjs": "^2.4.3",
     "directus": "^9.5.0",
@@ -30,11 +30,11 @@
     "mysql": "^2.18.1",
     "mysql-import": "^5.0.21",
     "mysqldump": "^3.2.0",
-    "node-cron": "^3.0.0",
     "nodemailer": "^6.7.2",
     "pg": "^8.7.1",
     "source-map-support": "^0.5.20",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "vue-command": "^23.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.15.8",
