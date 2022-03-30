@@ -1,13 +1,13 @@
 {
-	"name": "directus-extension-mgx-select-dropdown-json-string",
+	"name": "directus-extension-mgx-db-manager",
 	"version": "1.0.0",
 	"keywords": [
 		"directus",
 		"directus-extension",
-		"directus-custom-interface"
+		"directus-custom-module"
 	],
 	"directus:extension": {
-		"type": "interface",
+		"type": "module",
 		"path": "dist/index.js",
 		"source": "src/index.ts",
 		"host": "^9.5.0"
@@ -19,13 +19,10 @@
 	},
 	"devDependencies": {
 		"@directus/extensions-sdk": "9.5.0",
-		"typescript": "^4.6.2",
+		"typescript": "^4.5.5",
 		"vue": "^3.2.31"
 	},
 	"dependencies": {
-		"micromustache": "^8.0.3",
-		"sass": "^1.49.9",
-		"vue-i18n": "^9.1.9",
-		"vuedraggable": "^2.24.3"
+		"sass": "^1.49.9"
 	}
 }
