@@ -1,6 +1,6 @@
 import json
 from operator import mod
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, abort, make_response
 import requests
 from dotenv import load_dotenv
 from tinydb import TinyDB, Query
@@ -11,6 +11,7 @@ import imutils
 from PIL import Image 
 import numpy as np
 import cv2
+from random import randrange
 from cachetools import cached, LRUCache, TTLCache
 
 
@@ -28,19 +29,21 @@ load_dotenv()
 
 DATASET_API_ACCESS_TOKEN = os.getenv("DATASET_API_ACCESS_TOKEN")
 DATASET_ID = os.getenv("DATASET_ID")
-PORT = str(os.getenv("PORT"))
-MODELS_CACHE_MAX_SIZE = str(os.getenv("PORT"))
+PORT = int ( os.getenv("PORT") )
+MODELS_CACHE_MAX_SIZE = int( os.getenv("MODELS_CACHE_MAX_SIZE") )
+MODELS_CACHE_TTL = int( os.getenv("MODELS_CACHE_TTL") )
+
+PREDICTION_THRESHOLD = float( os.getenv("PREDICTION_THRESHOLD") )
 
 DB_FILE = "db.json"
-EPOCHS=30
-PATIENCE=3
-LR = 1e-4
 IMAGE_RES = 224
-dimensions = (IMAGE_RES, IMAGE_RES)
-MODELS_CACHE_MAX_SIZE=1024
-MODELS_CACHE_TTL=600
+DIMENSIONS = (IMAGE_RES, IMAGE_RES)
 MODELS = {}
+CONFIG={"prediction_threshold": PREDICTION_THRESHOLD}
 
+STATUS_CODE=500
+CODE="UNEXPECTED_ERROR"
+MESSAGE="Nous avons rencontré une erreur interne lors de l'opération"
 # funcs
 
 @cached(cache=TTLCache(maxsize=MODELS_CACHE_MAX_SIZE, ttl=MODELS_CACHE_TTL))
@@ -63,6 +66,28 @@ def load_model_sequence():
         }
     return models_dump
 
+
+@cached(cache=TTLCache(maxsize=MODELS_CACHE_MAX_SIZE, ttl=MODELS_CACHE_TTL))
+def get_configs():
+    configs = {"prediction_threshold": PREDICTION_THRESHOLD}
+    try:
+        dataset_api_url = "https://4tro8cx1.directus.app/items/configurations?access_token={0}"
+        r = requests.get(dataset_api_url.format(DATASET_API_ACCESS_TOKEN))
+        r_json = r.json()["data"]
+        configs = r_json
+    except Exception as wrong:
+        pass
+    
+    return configs
+    
+
+def make_custom_exception(message=MESSAGE, status_code=STATUS_CODE, code=CODE):
+    global STATUS_CODE, CODE, MESSAGE
+    MESSAGE=message
+    STATUS_CODE=status_code
+    CODE=code
+    raise Exception(message)
+
 def sequence_predict_raw(image_array):
     global MODELS
     predictions = {}
@@ -73,26 +98,32 @@ def sequence_predict_raw(image_array):
         prediction = model.predict(image_array)
         class_name = model_data["configs"]["base_class"]
         predictions[class_name] = prediction[0][0]
+
         try:
             prob_str = str(prediction[0][0]*100)[0:5]
         except Exception as wrong: 
               prob_str = str(prediction[0][0]*100)
-        to_print  += "{0} => {1}%; \n".format( class_name, prob_str)
+
+        config = get_config()
+
+        if prediction[0][0] > config["prediction_threshold"]:
+            to_print  += "{0}: {1}% \n".format( class_name, prob_str)
+
     return to_print, predictions
 
 def sequence_predict_single_image_from_url(url):
     image = imutils.url_to_image(url)
     imageRGB = cv2.cvtColor(image , cv2.COLOR_BGR2RGB)
-    image_resized = cv2.resize(imageRGB, dimensions, interpolation = cv2.INTER_AREA)/255
+    image_resized = cv2.resize(imageRGB, DIMENSIONS, interpolation = cv2.INTER_AREA)/255
     to_print, predictions = sequence_predict_raw(np.array([image_resized]))
-    return to_print, predictions, Image.fromarray(cv2.resize(imageRGB, dimensions, interpolation = cv2.INTER_AREA))
+    return to_print, predictions, Image.fromarray(cv2.resize(imageRGB, DIMENSIONS, interpolation = cv2.INTER_AREA))
 
 def sequence_predict_single_image_from_path(path, break_line=True):
     image = cv2.imread(path)
     imageRGB = cv2.cvtColor(image , cv2.COLOR_BGR2RGB)
-    image_resized = cv2.resize(imageRGB, dimensions, interpolation = cv2.INTER_AREA)/255
+    image_resized = cv2.resize(imageRGB, DIMENSIONS, interpolation = cv2.INTER_AREA)/255
     to_print, predictions = sequence_predict_raw(np.array([image_resized]))
-    return to_print, predictions, Image.fromarray(cv2.resize(imageRGB, dimensions, interpolation = cv2.INTER_AREA))
+    return to_print, predictions, Image.fromarray(cv2.resize(imageRGB, DIMENSIONS, interpolation = cv2.INTER_AREA))
 
 def sequence_predict_single_raw_image(image, break_line=True):
     to_print, predictions = sequence_predict_raw(image)
@@ -106,11 +137,11 @@ def sequence_predict_url_batch(urls, figsize=(30, 30), verbose=False, break_line
             image = imutils.url_to_image(url)
             # imageBGR = cv2.imdecode(image, cv2.IMREAD_COLOR)
             imageRGB = cv2.cvtColor(image , cv2.COLOR_BGR2RGB)
-            image_resized = cv2.resize(imageRGB, dimensions, interpolation = cv2.INTER_AREA)/255
+            image_resized = cv2.resize(imageRGB, DIMENSIONS, interpolation = cv2.INTER_AREA)/255
             images.append(np.array([image_resized]))
         except Exception as wrong:
             pass
-            
+
 
 @app.route('/downloadModels')
 def download_models():
@@ -158,47 +189,109 @@ def download_models():
             }
         return jsonify(payload)
 
-
-@app.route("/predictFromUrl", methods=['GET'])
+@app.route("/predictFromUrl", methods=['POST'])
 def predict_from_url():
+    global STATUS_CODE
     try: 
         global MODELS
         MODELS = load_model_sequence()
-        
-
-        image_url = "https://images.unsplash.com/photo-1621609764095-b32bbe35cf3a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxfHx8ZW58MHx8fHw%3D&w=1000&q=80"
-        to_print, predictions, image = sequence_predict_single_image_from_url(image_url)
+        url = request.json["url"]
+        to_print, predictions, image = sequence_predict_single_image_from_url(url)
         prediction_data = json.dumps(str(predictions))
-        return jsonify({"to_print": to_print, "predictions": prediction_data, image_url: image_url})
+        return jsonify({"to_print": to_print, "predictions": prediction_data, "url": url})
 
-    
     except Exception as wrong: 
-        payload = {
+        return jsonify(
+            {
                 "errors": [
                     {
-                        "message": str(wrong),
+                        "message": MESSAGE,
                         "extensions": {
-                            "code": "UNEXPECTED_ERROR"
+                            "code": CODE
                         }
                     }
                 ]
             }
-        return jsonify(payload)
+        ), STATUS_CODE
 
-    
-@app.route('/predict')
-def predict():
+@app.route("/predictFromRandomUrl", methods=['POST'])
+def predict_from_random_url():
+    global STATUS_CODE
     try: 
         global MODELS
         MODELS = load_model_sequence()
+        collections = [
+            "8909560",
+            "1242151", #https://unsplash.com/collections/1242151/sexy
+            "1785701",
+            "8991200", #https://unsplash.com/collections/8991200/sexy
+            "5052004"
+        ]
+        url = "https://source.unsplash.com/collection/{}".format(collections[randrange(len(collections)-1)])
+        redirects = requests.get(url)
+        url = redirects.url
+        to_print, predictions, image = sequence_predict_single_image_from_url(url)
+        prediction_data = json.dumps(str(predictions))
+        return jsonify({"to_print": to_print, "predictions": prediction_data, "url": url})
+
+    except Exception as wrong: 
+        return jsonify(
+            {
+                "errors": [
+                    {
+                        "message": MESSAGE,
+                        "extensions": {
+                            "code": CODE
+                        }
+                    }
+                ]
+            }
+        ), STATUS_CODE
+
+@app.route("/leaveFeedback", methods=['POST'])
+def leave_feedback():
+    global STATUS_CODE
+    try: 
+        rating = request.json["rating"]
+        comment = request.json["comment"]
+        prediction_data = request.json["prediction_data"]
+        image_url = request.json["image_url"]
+        payload = {
+            "rating": rating,
+            "comment": comment,
+            "prediction_data": prediction_data,
+            "dataset_id": DATASET_ID,
+            "image_url": image_url
+        }
         
 
-        image_url = "https://images.unsplash.com/photo-1621609764095-b32bbe35cf3a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxfHx8ZW58MHx8fHw%3D&w=1000&q=80"
-        to_print, predictions, image = sequence_predict_single_image_from_url(image_url)
-        prediction_data = json.dumps(str(predictions))
-        return jsonify({"to_print": to_print, "predictions": prediction_data, image_url: image_url})
+        req_url = "https://4tro8cx1.directus.app/items/feedbacks"
+        headers = {"Content-Type": "application/json", "Authorization": "Bearer {}".format(DATASET_API_ACCESS_TOKEN)}
+        r = requests.post(req_url, data=json.dumps(payload), headers=headers)
+        res_json = r.json()
+        print(res_json)
+        return jsonify({"message": "Effectuée avec succès"})
 
-    
+    except Exception as wrong: 
+        print(wrong)
+        return jsonify(
+            {
+                "errors": [
+                    {
+                        "message": MESSAGE,
+                        "extensions": {
+                            "code": CODE
+                        }
+                    }
+                ]
+            }
+        ), STATUS_CODE
+
+@app.route('/getConfigs', methods=['GET'])
+def get_api_configs():
+    try: 
+        configs = get_configs()
+        return jsonify(configs)
     except Exception as wrong: 
         payload = {
                 "errors": [
@@ -213,4 +306,4 @@ def predict():
         return jsonify(payload)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=PORT, debug=True)
+    app.run(host="0.0.0.0", port="{}".format(PORT), debug=True)
