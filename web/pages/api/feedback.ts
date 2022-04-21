@@ -1,5 +1,6 @@
+import type { NextApiRequest, NextApiResponse } from 'next'
 
-export default async (req, res) => {
+export default async (req: NextApiRequest, res: NextApiResponse<Record<string, any>>) => {
   if (req.method == 'POST') {
       try {
         const options = {
@@ -13,7 +14,7 @@ export default async (req, res) => {
         let response = await fetch(process.env.API_URL+ "/leaveFeedback", options)
         let json = await response.json()
         res.status(response.status).json(json)
-      } catch (error) {
+      } catch (error: any) {
         res.status(500).json({error: error.toString()})
       }
     

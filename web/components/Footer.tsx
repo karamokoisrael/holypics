@@ -1,14 +1,13 @@
 import React from "react";
-// import styles from '../styles/Home.module.css'
-import { ToastContainer, toast } from 'react-toastify';
 
-const Footer = (props)=>{
+const Footer = ()=>{
 
     return (
       <React.Fragment>
               <br/>< br/>< br/>< br/>< br/>< br/>< br/>< br/>< br/>< br/>< br/>< br/>
               <a title='Back to top' className='scroll' 
                 href="#top-bar">
+                  {/* @ts-ignore */}
                   <icon className='arrow-up fa fa-arrow-up'></icon>
                 </a>
               <div className="footer">

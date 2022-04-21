@@ -9,11 +9,11 @@ import Footer from "../components/Footer"
 const PredictionComponent = ()=>{ 
   
   const [predictData, setPredictionData] = useState({to_print: "", date: new Date()})
-  const [predictionInterval, setPredictionInterval] = useState(parseInt(process.env.PREDICTION_INTERVAL))
+  const [predictionInterval, setPredictionInterval] = useState(parseInt(process?.env?.PREDICTION_INTERVAL || "3000"))
   const [currentDate, setCurrentDate] = useState(new Date())
-  const video = useRef(null)
+  const video = useRef<any | null>(null)
 
-  const predict = async (url)=>{
+  const predict = async (url: string)=>{
     const options = {
       method: 'POST',
       // agent: proxyAgent,
@@ -46,10 +46,11 @@ const PredictionComponent = ()=>{
     }  
   }
 
-  const captureImage = (video, scale=1) =>{
-    var canvas = document.createElement("canvas");
+  const captureImage = (video: any, scale=1) =>{
+    const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth * scale;
     canvas.height = video.videoHeight * scale;
+    // @ts-ignore
     canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
     var imageUrl = canvas.toDataURL()
     return imageUrl
@@ -110,69 +111,6 @@ function TestVideo() {
       <Footer/>
     </main>
   )
-    
-    const [videoSrc, setVideoSrc] = React.useState('http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
-    const [currentVideoSrc, setCurrentVideoSrc] = useState('http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
-
-        
-
-      const onVideoUrlAdd = ()=>{
-          setCurrentVideoSrc(videoSrc)
-      }
-
-      const onFileAdd = (event)=>{
-        const reader = new FileReader();
-        reader.onload = function(e) { 
-            setCurrentVideoSrc(e.target.result)
-            toast("uploading done")
-          
-        };
-        reader.readAsDataURL(event.target.files[0]);
-  
-    
-      }
-
-      const Video = ()=>{
-        return(
-          <video id="my-video" autoPlay={true} controls={true} crossOrigin="anonymous" className="my-video" style={{position: "relative", zIndex: 0}}>
-                <source crossOrigin="anonymous" src={currentVideoSrc} type="video/mp4" className="my-video"/>
-          </video>
-        )
-      }  
-      
-    return (
-        <main className="App">
-            <Header/>
-            <div className="main-container">
-              
-            <div className="controls-container mb-4">
-              
-              <div className="url-uploader mb-4">
-                <h3 className="text-center">Enter your video url</h3>
-                <input type="email" className="form-control" id="activate" onChange={(event)=>{setVideoSrc(event.target.value);}} placeholder="Enter your video url"/>
-                <button className="btn btn-primary" onClick={onVideoUrlAdd}>Submit</button>
-              </div>
-
-              
-
-              <div className="url-uploader mb-4">
-                <h3 className="text-center">pick a video from your device</h3>
-                <input type="file" name="url-uploader" className="form-control" onChange={(e)=>{onFileAdd(e)}}/>
-              </div>
-
-              
-
-            </div>
-
-            </div>
-
-          <PredictionComponent/>
-          <Video/>
-          
-          
-          <Footer/>
-        </main>
-    )
 }
 
 export default TestVideo

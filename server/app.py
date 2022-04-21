@@ -26,7 +26,6 @@ load_dotenv()
 
 
 # consts
-
 DATASET_API_ACCESS_TOKEN = os.getenv("DATASET_API_ACCESS_TOKEN")
 DATASET_ID = os.getenv("DATASET_ID")
 PORT = int ( os.getenv("PORT") )
@@ -66,7 +65,6 @@ def load_model_sequence():
         }
     return models_dump
 
-
 @cached(cache=TTLCache(maxsize=MODELS_CACHE_MAX_SIZE, ttl=MODELS_CACHE_TTL))
 def get_configs():
     configs = {"prediction_threshold": PREDICTION_THRESHOLD}
@@ -104,7 +102,7 @@ def sequence_predict_raw(image_array):
         except Exception as wrong: 
               prob_str = str(prediction[0][0]*100)
 
-        config = get_config()
+        config = get_configs()
 
         if prediction[0][0] > config["prediction_threshold"]:
             to_print  += "{0}: {1}% \n".format( class_name, prob_str)
@@ -152,7 +150,7 @@ def download_models():
             print("no db, creating")
 
         dataset_api_url = "https://4tro8cx1.directus.app/{0}?access_token={1}{2}"
-        r = requests.get(dataset_api_url.format("items/models", DATASET_API_ACCESS_TOKEN, "&limit=-1&sort=-date_created"))
+        r = requests.get(dataset_api_url.format("items/models", DATASET_API_ACCESS_TOKEN, "&filter[status]=published&limit=-1&sort=-date_created"))
         models = r.json()["data"]
         saved_data =  []
         already_dowloaded = []
@@ -235,6 +233,7 @@ def predict_from_random_url():
         return jsonify({"to_print": to_print, "predictions": prediction_data, "url": url})
 
     except Exception as wrong: 
+        print(wrong)
         return jsonify(
             {
                 "errors": [

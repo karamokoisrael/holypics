@@ -1,8 +1,9 @@
 import '../styles/globals.css'
-import '../styles/Test.css';
+import '../styles/style.css';
 import 'react-toastify/dist/ReactToastify.css';
+import type { AppProps } from 'next/app'
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps }: AppProps) {
   return <Component {...pageProps} />
 }
 
