@@ -304,5 +304,6 @@ def get_api_configs():
             }
         return jsonify(payload)
 
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="{}".format(PORT), debug=True)

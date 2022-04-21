@@ -6,7 +6,7 @@ import cuid from "cuid";
 import Masonry from "react-masonry-css";
 import { toast } from "react-toastify";
 
-import * as NextImage from 'next/image';
+// import *  as NextImage from 'next/image';
 export type HolipicsImage = Record<string, any>;
 
 function Test() {
@@ -141,9 +141,8 @@ function Test() {
     const [imageData, setImageData] = useState(image);
 
     return (
-      <div key={`${imageData.rating}-${key}`}>
-        {/* @ts-ignore */}
-        <NextImage
+      <div key={parseInt(`${imageData.rating}${key}`)}>
+        <img
           alt={`img - ${imageData.id}`}
           src={imageData.url}
           className="file-img card-img-top"
@@ -206,7 +205,7 @@ function Test() {
               <div style={{ marginTop: 10 }}>
                 {[1, 2, 3, 4, 5].map((star) => (
                   <a
-                    key={`${star}-${image.rating}`}
+                    key={parseInt(`${star}${imageData.rating}`)}
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
@@ -216,7 +215,6 @@ function Test() {
                       } else {
                         setImageData({ ...imageData, rating: star });
                       }
-                      console.log(imageData.rating);
                     }}
                     className="star"
                   >

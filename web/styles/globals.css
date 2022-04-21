@@ -11,6 +11,15 @@ a {
   text-decoration: none;
 }
 
-* {
-  box-sizing: border-box;
+.star .star-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.star .star-icon.active {
+  color: rgb(247, 208, 0) !important;
+}
+
+.star .star-icon:hover {
+  color: rgb(247, 208, 0) !important;
 }

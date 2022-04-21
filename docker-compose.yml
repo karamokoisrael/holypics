@@ -1,16 +1,16 @@
 version: '3.4'
 services:
-  # server:
-  #   container_name: holypics_server
-  #   build: 
-  #     dockerfile: Dockerfile
-  #     context: server
-  #   restart: always
-  #   env_file:
-  #     - .env
-  #     - ./config/environment/server.env
-  #   ports:
-  #     - ${SERVER_PORT}:81
+  server:
+    container_name: holypics_server
+    build: 
+      dockerfile: Dockerfile
+      context: server
+    restart: always
+    env_file:
+      - .env
+      - ./config/environment/server.env
+    ports:
+      - ${SERVER_PORT}:81
 
   web:
     container_name: holypics_web
@@ -22,17 +22,17 @@ services:
       - ${WEBSITE_PORT}:3000
 
 
-  # filebrowser:
-  #   image: hurlenko/filebrowser
-  #   user: "${FILEBROWSER_UID}:${FILEBROWSER_GID}"
-  #   ports:
-  #     - ${FILEBROWSER_PORT}:8080
-  #   volumes:
-  #     - ./data:/data
-  #     # - /CONFIG_DIR:/config
-  #   environment:
-  #     - FB_BASEURL=/filebrowser
-  #   restart: always
+  filebrowser:
+    image: hurlenko/filebrowser
+    user: "${FILEBROWSER_UID}:${FILEBROWSER_GID}"
+    ports:
+      - ${FILEBROWSER_PORT}:8080
+    volumes:
+      - ./data:/data
+      # - /CONFIG_DIR:/config
+    environment:
+      - FB_BASEURL=/filebrowser
+    restart: always
 
   
 

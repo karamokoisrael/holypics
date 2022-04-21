@@ -19,17 +19,24 @@ const Header = (props: Record<string, any>)=>{
             key: 2
         },
         {
-            name: "TestVideo",
-            displayName: "Test Videos",
-            link: "test-video",
+            name: "Doc",
+            displayName: "Documentation",
+            link: process.env.DOCS_URL,
             key: 3
-        }
+        },
+        
+        // {
+        //     name: "TestVideo",
+        //     displayName: "Test Videos",
+        //     link: "test-video",
+        //     key: 3
+        // }
     ]
 
     const renderNavLinks = (navLink: Record<string, any>)=>(
         <li className="nav-item" key={navLink.key} >
-            <Link href={'/'+navLink.link}>
-                <a href="#" 
+            <Link href={navLink.link.includes("http") ? navLink.link : '/'+navLink.link}>
+                <a href={navLink.link.includes("http") ? navLink.link : "#"}
                     // onClick={()=>{router.push('/'+navLink.link, undefined, { shallow: true })}} 
                     key={navLink.key} className={`nav-link${props.currentNav == navLink.name ? "active": ""}`} aria-current="page">{navLink.displayName}</a>
             </Link>
