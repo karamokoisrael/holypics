@@ -34,6 +34,8 @@ MODELS_CACHE_TTL = int( os.getenv("MODELS_CACHE_TTL") )
 
 PREDICTION_THRESHOLD = float( os.getenv("PREDICTION_THRESHOLD") )
 
+APP_MODE= str( os.getenv("APP_MODE") )
+
 DB_FILE = "db.json"
 IMAGE_RES = 224
 DIMENSIONS = (IMAGE_RES, IMAGE_RES)
@@ -306,4 +308,9 @@ def get_api_configs():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port="{}".format(PORT), debug=True)
+    if APP_MODE == "production":
+        app.run(host="0.0.0.0", debug=True)
+    else:
+        app.run(host="0.0.0.0", port="{}".format(PORT), debug=True)
+    
+    

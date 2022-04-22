@@ -15,7 +15,7 @@ app.prepare().then(() => {
     server.use(cors())
 
     server.use('/externalApi', createProxyMiddleware({
-        target: dev ? "http://localhost:81" : "http://188.166.126.190:81",
+        target: dev ? "http://localhost:81" : "http://188.166.126.190:84",
         secure: false,
         changeOrigin: true,
         pathRewrite: {

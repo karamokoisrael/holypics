@@ -8,7 +8,7 @@ const env = {
     PREDICTION_INTERVAL: 3000
   },
   production: {
-    API_URL: "http://188.166.126.190:81",
+    API_URL: "http://188.166.126.190:84",
     PREDICTION_INTERVAL: 3000
   }
 }

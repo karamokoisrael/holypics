@@ -23,4 +23,4 @@ RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # CMD ["python", "app.py"]
-CMD [ "uwsgi", "--ini", "app.ini" ]
+CMD ["uwsgi", "app.ini"]
