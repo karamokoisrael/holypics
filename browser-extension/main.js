@@ -21,7 +21,7 @@ function writeOneImage(img, text) {
     ctx.drawImage(img, 0, 0, img.width, img.height);   
 
     if(text != "" && text != undefined){
-        ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
     
@@ -83,9 +83,8 @@ function requestAnalyse(){
                 )
             }
             console.log("running request");
-            img.setAttribute("holypicssuccessfullyproceeded", "true")
-            
             fetch(url, options).then((response)=>{
+                img.setAttribute("holypicssuccessfullyproceeded", "true")
                 response.json().then((json)=>{
                     // console.log(json)
                     if(json.error == undefined){
@@ -141,7 +140,7 @@ const doSomething = async () => {
   
 setInterval(()=>{
     requestAnalyse()
-}, 3000)
+}, 30000)
 
 window.onscroll =  (e)=> {  
     // console.log("processing with scroll event", e)
