@@ -1,14 +1,14 @@
 /** @type {import('next').NextConfig} */
 const env = {
   global: {
-    DOCS_URL: "https://postman.com"
+    DOCS_URL: "https://documenter.getpostman.com/view/16726391/UyrAEGLQ"
   },
   development: {
     API_URL: "http://localhost:81",
     PREDICTION_INTERVAL: 3000
   },
   production: {
-    API_URL: "http://localhost:81",
+    API_URL: "http://188.166.126.190:81",
     PREDICTION_INTERVAL: 3000
   }
 }
