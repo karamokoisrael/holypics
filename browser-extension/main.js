@@ -53,7 +53,7 @@ function cutArray(myArray, startPoint, endPoint){
 function requestAnalyse(){
    
     let imgs = document.querySelectorAll('img:not([holypicssuccessfullyproceeded="true"]');
-    let dataUrl, url  = "http://188.166.126.190:84/predictFromUrl";
+    let dataUrl, url  = "https://api-holipics.karamokoisrael.tech/predictFromUrl";
     const predLimit = 0.2;
     const listLimit = 300
     const listStart = 0

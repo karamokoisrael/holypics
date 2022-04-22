@@ -8,7 +8,7 @@ const env = {
     PREDICTION_INTERVAL: 3000
   },
   production: {
-    API_URL: "http://188.166.126.190:84",
+    API_URL: "https://api-holipics.karamokoisrael.tech",
     PREDICTION_INTERVAL: 3000
   }
 }
