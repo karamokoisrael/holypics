@@ -21,6 +21,7 @@ services:
       - ${SERVER_NGINX_PORT}:80
     depends_on:
       - server
+
   web:
     container_name: holypics_web
     restart: always

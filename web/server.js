@@ -16,12 +16,14 @@ app.prepare().then(() => {
 
     server.use('/externalApi', createProxyMiddleware({
         target: dev ? "http://localhost:81" : "http://188.166.126.190:84",
+        // target: dev ? "http://188.166.126.190:84" : "http://188.166.126.190:84",
         secure: false,
         changeOrigin: true,
         pathRewrite: {
-            [`^/externalApi/*`]: '',
+            [`^/externalApi/*`]: dev ? '' : '/',
         }
     }));
+
 
     server.all('*', (req, res) => {
         return handle(req, res)
