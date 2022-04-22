@@ -12,6 +12,7 @@ const env = {
     PREDICTION_INTERVAL: 3000
   }
 }
+
 const nextConfig = {
   reactStrictMode: true,
   env: process.env.NODE_ENV == "production" ? {...env.global, ...env.production} : {...env.global, ...env.development}

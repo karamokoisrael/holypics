@@ -73,7 +73,8 @@ function Test() {
 
     try {
       const requestUrl =
-        process.env.API_URL +
+        // process.env.API_URL +
+        "/externalApi" +
         (random != undefined ? "/predictFromRandomUrl" : "/predictFromUrl");
       let response = await fetch(requestUrl, options);
       let json = await response.json();
@@ -126,7 +127,10 @@ function Test() {
       }),
     };
 
-    const requestUrl = process.env.API_URL+ "/leaveFeedback"
+    const requestUrl = 
+    // process.env.API_URL + 
+    "/externalApi" +
+     "/leaveFeedback"
     try {
       let response = await fetch(requestUrl, options);
       let json = await response.json();
