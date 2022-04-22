@@ -1,6 +1,7 @@
 version: '3.4'
 services:
   server:
+    image: webapp-flask
     container_name: holypics_server
     build: 
       dockerfile: Dockerfile
