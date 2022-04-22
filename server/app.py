@@ -97,7 +97,8 @@ def sequence_predict_raw(image_array):
         model = model_data["model"]
         prediction = model.predict(image_array)
         class_name = model_data["configs"]["base_class"]
-        predictions[class_name] = prediction[0][0]
+        # predictions[class_name] = prediction[0][0]
+        predictions[class_name] = float(prediction[0][0])
 
         try:
             prob_str = str(prediction[0][0]*100)[0:5]
@@ -197,10 +198,11 @@ def predict_from_url():
         MODELS = load_model_sequence()
         url = request.json["url"]
         to_print, predictions, image = sequence_predict_single_image_from_url(url)
-        prediction_data = json.dumps(str(predictions))
-        return jsonify({"to_print": to_print, "predictions": prediction_data, "url": url})
+        output = {"to_print": to_print, "predictions": predictions, "url": url}
+        return jsonify(output)
 
     except Exception as wrong: 
+        print(wrong)
         return jsonify(
             {
                 "errors": [
@@ -270,7 +272,7 @@ def leave_feedback():
         headers = {"Content-Type": "application/json", "Authorization": "Bearer {}".format(DATASET_API_ACCESS_TOKEN)}
         r = requests.post(req_url, data=json.dumps(payload), headers=headers)
         res_json = r.json()
-        print(res_json)
+        # print(res_json)
         return jsonify({"message": "Effectuée avec succès"})
 
     except Exception as wrong: 
