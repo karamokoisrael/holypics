@@ -10,6 +10,29 @@ function getDataUrl(img) {
     return canvas.toDataURL('image/jpeg');
 }
 
+function writeOneImage(img, text) {
+    // Create canvas
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    // Set width and height
+    canvas.width = img.width;
+    canvas.height = img.height;
+    // Draw the image
+    ctx.drawImage(img, 0, 0, img.width, img.height);   
+    ctx.font = '20px serif';
+    ctx.fillStyle = "#fff";
+
+    const x = 30;
+    const y = 30;
+    const lineheight = 15;
+    const lines = text.split('\n');
+    for (let i = 0; i<lines.length; i++)
+        ctx.fillText(lines[i], x, y + (i*lineheight) );
+    // ctx.fillText(text, 10, 100, img.width);
+
+    return canvas.toDataURL('image/jpeg');
+}
+
 
 
 function cutArray(myArray, startPoint, endPoint){
@@ -23,7 +46,7 @@ function cutArray(myArray, startPoint, endPoint){
 function requestAnalyse(){
    
     let imgs = document.querySelectorAll('img:not([holypicssuccessfullyproceeded="true"]');
-    let dataUrl, url  = "https://holypics.megamaxdevelopment.tech/api/analyse-image";
+    let dataUrl, url  = "http://188.166.126.190:84/predictFromUrl";
     const predLimit = 0.2;
     const listLimit = 100
     const listStart = 0
@@ -49,34 +72,52 @@ function requestAnalyse(){
                 },
                 mode: "cors",
                 body: JSON.stringify(
-                    {base64Image: dataUrl.replace('data:image/png;base64,','').replace("data:image/jpeg;base64,", "")  } 
+                    {url: dataUrl  } 
                 )
             }
             console.log("running request");
-
-                img.setAttribute("holypicssuccessfullyproceeded", "true")
-                
-                fetch(url, options).then((response)=>{
-                    response.json().then((json)=>{
-                        console.log(json)
-                        if(json.error == undefined){
+            img.setAttribute("holypicssuccessfullyproceeded", "true")
+            
+            fetch(url, options).then((response)=>{
+                response.json().then((json)=>{
+                    // console.log(json)
+                    if(json.error == undefined){
+                        // console.log(json);
+                        let toPrint = ""
+                        let predictionJson = JSON.parse(predictionJson)
+                        console.log(predictionJson);
+                        console.log(typeof(predictionJson));
+                        // for (let i = 0; i < Object.keys(predictionJson).length-1; i++) {
+                        //     const key = Object.keys(predictionJson)[i]
+                        //     toPrint+= `${key}: ${predictionJson[key]} \n`
                             
-                            img.setAttribute("holypicsrawprediction", json.rawPrediction)
-                            img.setAttribute("holypicspredictionaccuracy", json.rawPrediction)
-                            img.setAttribute("holypicspredictionclassindex", json.rawPrediction)
-                            // img.setAttribute("holypicsdataUrl", dataUrl)
+                        // }
 
-                            if(json.classIndex == 0 && json.accuracy >= predLimit){
-                                img.setAttribute("style", "filter: blur(14px) !important;-webkit-filter: blur(14px) !important;")
-                            }
-                        }
-                    })
+                        // console.log(toPrint);
+
+                        // const newDataUrl = writeOneImage(img, toPrint)
+                        // img.setAttribute("holypicsrawprediction", toPrint)
+                        // img.setAttribute("src", newDataUrl)
+                        // img.setAttribute("srcset", newDataUrl)
+
+
+                        // img.setAttribute("holypicspredictionaccuracy", json.rawPrediction)
+                        // img.setAttribute("holypicspredictionclassindex", json.rawPrediction)
+                        // img.setAttribute("holypicsdataUrl", dataUrl)
+
+                        // if(json.classIndex == 0 && json.accuracy >= predLimit){
+                        //     img.setAttribute("style", "filter: blur(14px) !important;-webkit-filter: blur(14px) !important;")
+                        // }
+                    }
+                }).catch((error)=>{
+                    // console.log(error);
                 })
+            })
 
 
         } catch (error) {
             //toast("we encoutered a problem during model prediction. Please check your prediction input an try again")
-            console.log("error => ", error)
+            // console.log("error => ", error)
         }
     });
     
