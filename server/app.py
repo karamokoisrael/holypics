@@ -36,6 +36,10 @@ PREDICTION_THRESHOLD = float( os.getenv("PREDICTION_THRESHOLD") )
 
 APP_MODE= str( os.getenv("APP_MODE") )
 
+APP_THREADED= bool( os.getenv("APP_THREADED") )
+
+APP_PROCESSES= int( os.getenv("APP_PROCESSES") )
+
 DB_FILE = "db.json"
 IMAGE_RES = 224
 DIMENSIONS = (IMAGE_RES, IMAGE_RES)
@@ -311,7 +315,7 @@ def get_api_configs():
 
 if __name__ == "__main__":
     if APP_MODE == "production":
-        app.run(host="0.0.0.0", debug=True)
+        app.run(host="0.0.0.0", debug=True, threaded=APP_THREADED, processes=APP_PROCESSES)
     else:
         app.run(host="0.0.0.0", port="{}".format(PORT), debug=True)
     

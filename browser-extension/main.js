@@ -19,12 +19,20 @@ function writeOneImage(img, text) {
     canvas.height = img.height;
     // Draw the image
     ctx.drawImage(img, 0, 0, img.width, img.height);   
+
+    if(text != "" && text != undefined){
+        ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    
+
+
     ctx.font = '20px serif';
     ctx.fillStyle = "#fff";
 
     const x = 30;
     const y = 30;
-    const lineheight = 15;
+    const lineheight = 20;
     const lines = text.split('\n');
     for (let i = 0; i<lines.length; i++)
         ctx.fillText(lines[i], x, y + (i*lineheight) );
@@ -32,8 +40,6 @@ function writeOneImage(img, text) {
 
     return canvas.toDataURL('image/jpeg');
 }
-
-
 
 function cutArray(myArray, startPoint, endPoint){
     let newArray = [];
@@ -43,12 +49,13 @@ function cutArray(myArray, startPoint, endPoint){
 
     return newArray;
 }
+
 function requestAnalyse(){
    
     let imgs = document.querySelectorAll('img:not([holypicssuccessfullyproceeded="true"]');
     let dataUrl, url  = "http://188.166.126.190:84/predictFromUrl";
     const predLimit = 0.2;
-    const listLimit = 100
+    const listLimit = 300
     const listStart = 0
     
     if(imgs.length==0) return;
@@ -82,35 +89,27 @@ function requestAnalyse(){
                 response.json().then((json)=>{
                     // console.log(json)
                     if(json.error == undefined){
-                        // console.log(json);
-                        let toPrint = ""
-                        let predictionJson = JSON.parse(predictionJson)
-                        console.log(predictionJson);
-                        console.log(typeof(predictionJson));
-                        // for (let i = 0; i < Object.keys(predictionJson).length-1; i++) {
-                        //     const key = Object.keys(predictionJson)[i]
-                        //     toPrint+= `${key}: ${predictionJson[key]} \n`
-                            
-                        // }
+                        if(json.to_print!=""){
+                            const newDataUrl = writeOneImage(img, json.to_print)
+                            // img.setAttribute("holypicsrawprediction", JSON.stringify(json.predictions))
+                            if(img.hasAttribute("src")) img.setAttribute("src", newDataUrl)
+                            if(img.hasAttribute("srcset")) img.setAttribute("srcset", newDataUrl)
+                            if(img.hasAttribute("data-src")) img.setAttribute("data-src", newDataUrl)
+                
 
-                        // console.log(toPrint);
+                            // img.setAttribute("holypicspredictionaccuracy", json.rawPrediction)
+                            // img.setAttribute("holypicspredictionclassindex", json.rawPrediction)
+                            // img.setAttribute("holypicsdataUrl", dataUrl)
+                             // if(json.classIndex == 0 && json.accuracy >= predLimit){
+                            //     img.setAttribute("style", "filter: blur(14px) !important;-webkit-filter: blur(14px) !important;")
+                            // }
+                        }
+                        
 
-                        // const newDataUrl = writeOneImage(img, toPrint)
-                        // img.setAttribute("holypicsrawprediction", toPrint)
-                        // img.setAttribute("src", newDataUrl)
-                        // img.setAttribute("srcset", newDataUrl)
-
-
-                        // img.setAttribute("holypicspredictionaccuracy", json.rawPrediction)
-                        // img.setAttribute("holypicspredictionclassindex", json.rawPrediction)
-                        // img.setAttribute("holypicsdataUrl", dataUrl)
-
-                        // if(json.classIndex == 0 && json.accuracy >= predLimit){
-                        //     img.setAttribute("style", "filter: blur(14px) !important;-webkit-filter: blur(14px) !important;")
-                        // }
+                       
                     }
                 }).catch((error)=>{
-                    // console.log(error);
+                    console.log(error);
                 })
             })
 
@@ -128,24 +127,26 @@ function requestAnalyse(){
 console.log("initializing")
 requestAnalyse()
 
+
 const sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
-  }
+}
 
   
 const doSomething = async () => {
-    await sleep(10000)
-    //do stuff
-  }
+    await sleep(3000)
+}
   
   
   
+setInterval(()=>{
+    requestAnalyse()
+}, 3000)
 
 window.onscroll =  (e)=> {  
-    console.log("processing with scroll event", e)
+    // console.log("processing with scroll event", e)
     requestAnalyse()
     doSomething()
-    
 } 
  
     
