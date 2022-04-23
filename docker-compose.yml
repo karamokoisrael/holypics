@@ -11,6 +11,8 @@ services:
       - ./config/environment/server.env
     ports:
       - ${SERVER_PORT}:81
+    volumes:
+      -./uploads:/usr/src/app/uploads
     
   nginx:
     image: holypics_nginx
