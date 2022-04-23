@@ -1,7 +1,7 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import hotkeys from "hotkeys-js";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import cuid from "cuid";
 import Masonry from "react-masonry-css";
 import { toast } from "react-toastify";
@@ -10,10 +10,10 @@ import { toast } from "react-toastify";
 export type HolipicsImage = Record<string, any>;
 
 function Test() {
-  const [images, setImages] = React.useState<HolipicsImage[]>([]);
-  const [imageUrl, setImageUrl] = React.useState("");
-
-  React.useEffect(() => {
+  const [images, setImages] = useState<HolipicsImage[]>([]);
+  const [imageUrl, setImageUrl] = useState("");
+  const [classNames,  setClassNames] = useState<string[]>([]);
+  useEffect(() => {
     hotkeys("r", function (event, handler) {
       // Prevent the default refresh event under WINDOWS system
       event.preventDefault();
@@ -24,6 +24,20 @@ function Test() {
       event.preventDefault();
       if (event.key == "q") setImages([]);
     });
+
+    (async ()=>{
+      try {
+        const res = await fetch("/externalApi/getConfigs")
+        const json = await res.json()
+        if(json.error == undefined){
+          setClassNames(json.class_names)
+        }
+      } catch (error) {
+        
+      }
+    })()
+
+
   }, []);
 
   const breakpointColumnsObj = {
@@ -35,21 +49,20 @@ function Test() {
 
   const onFileAdd = (event: any) => {
     const reader = new FileReader();
-    // reader.onload = function(e) {
-    //   predict(e.target.result)
-    // };
-
-    reader.onloadend = function (e: any) {
-      predict(e.target.result);
+    reader.onload = function(e) {      
+      predict(e?.target?.result  as string)
     };
 
-    console.log(event.target.files.length);
+    // reader.onloadend = function (e: any) {
+    //   predict(e.target.result);
+    // };
+
     for (let i = 0; i < event.target.files.length; i++) {
       try {
         reader.readAsDataURL(event.target.files[i]);
       } catch (error) {
-        console.log(error);
-        console.log(event.target.files[i]);
+        // console.log(error);
+        // console.log(event.target.files[i]);
       }
     }
 
@@ -69,13 +82,13 @@ function Test() {
 
     if (url != "") {
       options.body = JSON.stringify({ url });
-    }
+    }    
 
     try {
       const requestUrl =
         // process.env.API_URL +
         "/externalApi" +
-        (random != undefined ? "/predictFromRandomUrl" : "/predictFromUrl");
+        (random != undefined && random != false ? "/predictFromRandomUrl" : "/predictFromUrl");
       let response = await fetch(requestUrl, options);
       let json = await response.json();
       if (json.error != undefined)
@@ -89,6 +102,7 @@ function Test() {
           src: url,
           hidden: false,
           ...json,
+          class_name:  "",
           comment: "",
           rating: 0,
           feedBackSent: false,
@@ -122,8 +136,9 @@ function Test() {
       body: JSON.stringify({
         rating: image.rating,
         comment: image.comment,
-        prediction_data: image.to_print.replace(/\n/g, "<br />"),
+        prediction_data: JSON.stringify(image.predictions),
         image_url: image.url,
+        class_name: image?.class_name,
       }),
     };
 
@@ -206,6 +221,26 @@ function Test() {
                   placeholder="insert a comment"
                 ></textarea>
               </div>
+
+
+              <div className="form-group mb-10">
+                <label htmlFor="exampleFormControlTextarea1">class name</label>
+                <select className="form-select" aria-label="Default select example" 
+                  onChange={(e) => {
+                    setImageData({ ...imageData, class_name: e.target.value });
+                  }}
+                  value={imageData.class_name}
+                  >
+                  <option defaultValue="">Select a class</option>
+                  {
+                    classNames.map((className: string)=>(
+                      <option key={className} value={className}>{className}</option>
+                      ))
+                  }
+                </select>
+              </div>
+
+              
               <div style={{ marginTop: 10 }}>
                 {[1, 2, 3, 4, 5].map((star) => (
                   <a

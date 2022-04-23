@@ -1,6 +1,6 @@
 import json
 from operator import mod
-from flask import Flask, jsonify, request, abort, make_response
+from flask import Flask, jsonify, request, abort, make_response, send_file
 import requests
 from dotenv import load_dotenv
 from tinydb import TinyDB, Query
@@ -8,6 +8,8 @@ import os
 import tensorflow as tf
 import tensorflow_hub as hub
 import imutils
+import shutil
+import uuid
 from PIL import Image 
 import numpy as np
 import cv2
@@ -74,6 +76,7 @@ def load_model_sequence():
 @cached(cache=TTLCache(maxsize=MODELS_CACHE_MAX_SIZE, ttl=MODELS_CACHE_TTL))
 def get_configs():
     configs = {"prediction_threshold": PREDICTION_THRESHOLD}
+    configs = {"model_eval_code": ""}
     try:
         dataset_api_url = "https://4tro8cx1.directus.app/items/configurations?access_token={0}"
         r = requests.get(dataset_api_url.format(DATASET_API_ACCESS_TOKEN))
@@ -81,10 +84,8 @@ def get_configs():
         configs = r_json
     except Exception as wrong:
         pass
-    
     return configs
     
-
 def make_custom_exception(message=MESSAGE, status_code=STATUS_CODE, code=CODE):
     global STATUS_CODE, CODE, MESSAGE
     MESSAGE=message
@@ -92,27 +93,50 @@ def make_custom_exception(message=MESSAGE, status_code=STATUS_CODE, code=CODE):
     CODE=code
     raise Exception(message)
 
+def value_to_prob(value):
+    try:
+        return str(value*100)[0:5]
+    except Exception as wrong: 
+        return str(value*100)
+
 def sequence_predict_raw(image_array):
     global MODELS
     predictions = {}
     to_print = ""
+    total_score = float(0)
+    total_count = 0
     for model_name in MODELS.keys():
+        total_score_plus = False
+        total_count_plus = False
         model_data = MODELS[model_name]
         model = model_data["model"]
         prediction = model.predict(image_array)
-        class_name = model_data["configs"]["base_class"]
-        # predictions[class_name] = prediction[0][0]
+        # class_name = model_data["configs"]["base_class"]
+        class_name = model_data["configs"]["base_class"].replace("female_", "")
         predictions[class_name] = float(prediction[0][0])
+
+        config = get_configs()
+        exec(config["model_eval_code"], globals())
+        total_score, total_count = compute_predictions_increment(predictions, class_name, total_score, total_count)
 
         try:
             prob_str = str(prediction[0][0]*100)[0:5]
         except Exception as wrong: 
-              prob_str = str(prediction[0][0]*100)
+            prob_str = str(prediction[0][0]*100)
 
-        config = get_configs()
+        
 
         if prediction[0][0] > config["prediction_threshold"]:
-            to_print  += "{0}: {1}% \n".format( class_name, prob_str)
+            to_print  += "{0}: {1}% \n".format( class_name, prob_str )
+
+    if total_count > 0:
+        predictions = compute_predictions(predictions, total_score, total_count)
+
+        if(predictions["sex_intent"] > config["prediction_threshold"]):
+            to_print  += "{0}: {1}% \n".format( "sex_intent", value_to_prob(predictions["sex_intent"]))
+
+        if( predictions["sex_intent"] < config["prediction_threshold"]):
+            to_print  += "{0}: {1}% \n".format( "normal", value_to_prob(predictions["normal"]))
 
     return to_print, predictions
 
@@ -237,8 +261,8 @@ def predict_from_random_url():
         redirects = requests.get(url)
         url = redirects.url
         to_print, predictions, image = sequence_predict_single_image_from_url(url)
-        prediction_data = json.dumps(str(predictions))
-        return jsonify({"to_print": to_print, "predictions": prediction_data, "url": url})
+        output = {"to_print": to_print, "predictions": predictions, "url": url}
+        return jsonify(output)
 
     except Exception as wrong: 
         print(wrong)
@@ -259,18 +283,8 @@ def predict_from_random_url():
 def leave_feedback():
     global STATUS_CODE
     try: 
-        rating = request.json["rating"]
-        comment = request.json["comment"]
-        prediction_data = request.json["prediction_data"]
-        image_url = request.json["image_url"]
-        payload = {
-            "rating": rating,
-            "comment": comment,
-            "prediction_data": prediction_data,
-            "dataset_id": DATASET_ID,
-            "image_url": image_url
-        }
-        
+        payload = request.json
+        payload["dataset_id"] = DATASET_ID
 
         req_url = "https://4tro8cx1.directus.app/items/feedbacks"
         headers = {"Content-Type": "application/json", "Authorization": "Bearer {}".format(DATASET_API_ACCESS_TOKEN)}
@@ -304,6 +318,58 @@ def get_api_configs():
                 "errors": [
                     {
                         "message": str(wrong),
+                        "extensions": {
+                            "code": "UNEXPECTED_ERROR"
+                        }
+                    }
+                ]
+            }
+        return jsonify(payload)
+
+
+@app.route('/downloadFeedbackData', methods=['GET'])
+def download_feedback_data():
+    try: 
+        dataset_api_url = "https://4tro8cx1.directus.app/items/feedbacks?access_token={0}&filter[seen][_eq]=0"
+        r = requests.get(dataset_api_url.format(DATASET_API_ACCESS_TOKEN))
+        r_json = r.json()["data"]
+        path_name = "uploads/{}".format(str(uuid.uuid1()))
+        zip_name = path_name+".zip"
+        os.mkdir(path_name)
+        for feedback in r_json:
+            r = requests.get(feedback["image_url"], allow_redirects=True)
+            file_name = "{0}/{1}-r{2}-{3}.jpg".format(path_name, feedback["class_name"], feedback["rating"], str(uuid.uuid1()) )
+            open(file_name, 'wb').write(r.content)
+            updated = {"seen": 1, "external_file_id": zip_name.replace("uploads/", "")}
+            headers = {"Content-Type": "application/json", "Authorization": "Bearer {}".format(DATASET_API_ACCESS_TOKEN)}
+            req_url = "https://4tro8cx1.directus.app/items/feedbacks/{}"
+            r = requests.patch(req_url.format(feedback["id"]), data=json.dumps(updated), headers=headers)
+
+        shutil.make_archive(zip_name.replace(".zip", ""), 'zip', path_name)
+        shutil.rmtree(path_name)
+        return send_file(zip_name, as_attachment=True)
+    except Exception as wrong: 
+        payload = {
+                "errors": [
+                    {
+                        "message": str(wrong),
+                        "extensions": {
+                            "code": "UNEXPECTED_ERROR"
+                        }
+                    }
+                ]
+            }
+        return jsonify(payload)
+
+@app.route('/downloadFile/<file_id>', methods=['GET'])
+def download_file(file_id):
+    try: 
+        return send_file("uploads/{}".format(file_id), as_attachment=True)
+    except Exception as wrong: 
+        payload = {
+                "errors": [
+                    {
+                        "message": "fichier introuvable",
                         "extensions": {
                             "code": "UNEXPECTED_ERROR"
                         }
