@@ -13,7 +13,7 @@ services:
       - ${SERVER_PORT}:81
     
   nginx:
-    image: webapp-nginx
+    image: holypics_nginx
     build: 
       dockerfile: Dockerfile-nginx
       context: server
