@@ -12,7 +12,7 @@ services:
     ports:
       - ${SERVER_PORT}:81
     volumes:
-      -./uploads:/usr/src/app/uploads
+      -./server/uploads:/usr/src/app/uploads
     
   nginx:
     image: holypics_nginx
