@@ -13,6 +13,9 @@ function getDataUrl(img) {
 function writeOneImage(img, text) {
     // Create canvas
     const canvas = document.createElement('canvas');
+
+    if(text == "" || text == undefined) return canvas.toDataURL('image/jpeg');
+
     const ctx = canvas.getContext('2d');
     // Set width and height
     canvas.width = img.width;
@@ -20,13 +23,9 @@ function writeOneImage(img, text) {
     // Draw the image
     ctx.drawImage(img, 0, 0, img.width, img.height);   
 
-    if(text != "" && text != undefined){
-        ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
     
-
-
+    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.font = '20px serif';
     ctx.fillStyle = "#fff";
 
@@ -36,6 +35,7 @@ function writeOneImage(img, text) {
     const lines = text.split('\n');
     for (let i = 0; i<lines.length; i++)
         ctx.fillText(lines[i], x, y + (i*lineheight) );
+    
     // ctx.fillText(text, 10, 100, img.width);
 
     return canvas.toDataURL('image/jpeg');
@@ -108,7 +108,7 @@ function requestAnalyse(){
                        
                     }
                 }).catch((error)=>{
-                    console.log(error);
+                    // console.log(error);
                 })
             })
 
