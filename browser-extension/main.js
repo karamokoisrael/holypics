@@ -1,3 +1,8 @@
+  
+const doSomething = async () => {
+    await sleep(3000)
+}
+
 function getDataUrl(img) {
     // Create canvas
     const canvas = document.createElement('canvas');
@@ -14,7 +19,7 @@ function writeOneImage(img, text) {
     // Create canvas
     const canvas = document.createElement('canvas');
 
-    if(text == "" || text == undefined) return canvas.toDataURL('image/jpeg');
+    // if(text == "" || text == undefined) return canvas.toDataURL('image/jpeg');
 
     const ctx = canvas.getContext('2d');
     // Set width and height
@@ -54,8 +59,7 @@ function requestAnalyse(){
    
     let imgs = document.querySelectorAll('img:not([holypicssuccessfullyproceeded="true"]');
     let dataUrl, url  = "https://api-holipics.karamokoisrael.tech/predictFromUrl";
-    const predLimit = 0.2;
-    const listLimit = 300
+    const listLimit = -1 //150
     const listStart = 0
     
     if(imgs.length==0) return;
@@ -83,39 +87,44 @@ function requestAnalyse(){
                 )
             }
             console.log("running request");
+            img.setAttribute("holypicssuccessfullyproceeded", "true")
             fetch(url, options).then((response)=>{
-                img.setAttribute("holypicssuccessfullyproceeded", "true")
+                
                 response.json().then((json)=>{
                     // console.log(json)
-                    if(json.error == undefined){
-                        if(json.to_print!=""){
-                            const newDataUrl = writeOneImage(img, json.to_print)
-                            // img.setAttribute("holypicsrawprediction", JSON.stringify(json.predictions))
-                            if(img.hasAttribute("src")) img.setAttribute("src", newDataUrl)
-                            if(img.hasAttribute("srcset")) img.setAttribute("srcset", newDataUrl)
-                            if(img.hasAttribute("data-src")) img.setAttribute("data-src", newDataUrl)
-                
+                    if(json.error == undefined) return;
+                    console.log(json.predictions);
+                    console.log(json.to_print.includes("normal"));
+                    if(json.to_print==undefined || json.to_print.includes("normal")) return;
+                    console.log("writing on image");
+                    const newDataUrl = writeOneImage(img, json.to_print)
+                    // img.setAttribute("holypicsrawprediction", JSON.stringify(json.predictions))
+                    if(img.hasAttribute("src")) img.setAttribute("src", newDataUrl)
+                    if(img.hasAttribute("srcset")) img.setAttribute("srcset", newDataUrl)
+                    if(img.hasAttribute("data-src")) img.setAttribute("data-src", newDataUrl)
+                    // img.setAttribute("holypicspredictionaccuracy", json.rawPrediction)
+                    // img.setAttribute("holypicspredictionclassindex", json.rawPrediction)
+                    // img.setAttribute("holypicsdataUrl", dataUrl)
+                        // if(json.classIndex == 0 && json.accuracy >= predLimit){
+                    //     img.setAttribute("style", "filter: blur(14px) !important;-webkit-filter: blur(14px) !important;")
+                    // }
 
-                            // img.setAttribute("holypicspredictionaccuracy", json.rawPrediction)
-                            // img.setAttribute("holypicspredictionclassindex", json.rawPrediction)
-                            // img.setAttribute("holypicsdataUrl", dataUrl)
-                             // if(json.classIndex == 0 && json.accuracy >= predLimit){
-                            //     img.setAttribute("style", "filter: blur(14px) !important;-webkit-filter: blur(14px) !important;")
-                            // }
-                        }
                         
-
-                       
-                    }
-                }).catch((error)=>{
-                    // console.log(error);
-                })
+            }).catch((error)=>{
+                console.log(error);
             })
+        })
 
 
         } catch (error) {
+            
             //toast("we encoutered a problem during model prediction. Please check your prediction input an try again")
             // console.log("error => ", error)
+        }finally{
+            (async()=>{
+
+                await sleep(3000)
+            })()
         }
     });
     
@@ -131,21 +140,18 @@ const sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
-  
-const doSomething = async () => {
-    await sleep(3000)
-}
-  
-  
-  
-setInterval(()=>{
-    requestAnalyse()
-}, 30000)
 
-window.onscroll =  (e)=> {  
+  
+  
+  
+// setInterval(()=>{
+//     requestAnalyse()
+// }, 30000)
+
+window.onscroll = async (e)=> {  
     // console.log("processing with scroll event", e)
     requestAnalyse()
-    doSomething()
+    await doSomething()
 } 
  
     

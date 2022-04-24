@@ -26,4 +26,19 @@ export default (router: Router, { services, exceptions, getSchema, database, env
         }
 	}); 
 
+    router.get('/file/:id', async (req: Request, res: Response) => {
+        try {   
+            const { access_token } = await getAdminTokens(database);
+            const directus = await getDirectusStatic(req, access_token)
+            const fileId = req.params["id"]
+            const [ file ]: Record<string, any>[] = await database("directus_files").where({id: fileId})
+            console.log(__dirname);
+            res.sendFile(`${__dirname.replace("extensions/endpoints/api", "")}/uploads/${file.filename_disk}`)
+            // res.json({})
+        } catch (error) {
+            console.log(error);
+            return throwError(res); 
+        }
+	}); 
+
 };
