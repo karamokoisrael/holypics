@@ -25,12 +25,12 @@ const Header = (props: Record<string, any>)=>{
             key: 3
         },
         
-        // {
-        //     name: "TestVideo",
-        //     displayName: "Test Videos",
-        //     link: "test-video",
-        //     key: 3
-        // }
+        {
+            name: "TestVideo",
+            displayName: "Test Videos",
+            link: "test-video",
+            key: 4
+        }
     ]
 
     const renderNavLinks = (navLink: Record<string, any>)=>(
