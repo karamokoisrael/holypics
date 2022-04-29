@@ -1,116 +1,169 @@
 import React, { useState, useEffect, useRef, Fragment } from "react";
+import { toast } from "react-toastify";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
-
-import { toast } from 'react-toastify';
-
-
-import Header from "../components/Header"
-import Footer from "../components/Footer"
-const PredictionComponent = ()=>{ 
-  
-  const [predictData, setPredictionData] = useState({to_print: "", date: new Date()})
-  const [predictionInterval, setPredictionInterval] = useState(parseInt(process?.env?.PREDICTION_INTERVAL || "3000"))
-  const [currentDate, setCurrentDate] = useState(new Date())
-  const video = useRef<any | null>(null)
-
-  const predict = async (url: string)=>{
-    const options = {
-      method: 'POST',
-      // agent: proxyAgent,
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin':'*'
-        },
-      body: JSON.stringify(
-        {"url": url } 
-      )
-  }
-    try { 
-        let response = await fetch("/api/analyse-image", options)
-        let json = await response.json()
-        console.log(json);
-        if(json.error==undefined){
-          const date = new Date()
-          console.log(predictionInterval);
-          if(currentDate == predictData.date){
-            console.log(json);
-            setPredictionData({...json, date: date})
-            setCurrentDate(date)
-          }
-        
-        }
-        
-    } catch (error) {
-        console.log(error)
-    }  
-  }
-
-  const captureImage = (video: any, scale=1) =>{
-    const canvas = document.createElement("canvas");
+const captureImage = (video: any, scale = 1) => {
+  try {
+    if (video == null) return;
+    const canvas: any = document.createElement("canvas");
     canvas.width = video.videoWidth * scale;
     canvas.height = video.videoHeight * scale;
-    // @ts-ignore
-    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-    var imageUrl = canvas.toDataURL()
-    return imageUrl
+    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imageUrl = canvas.toDataURL();
+    return imageUrl;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+
+function TestVideo() {
+  // const video = useRef<HTMLVideoElement | Element | null>(null)
+  const [videoSrc, setVideoSrc] = useState(
+    ""
+  );
+
+  //https://holipics-filebrowser.karamokoisrael.tech/filebrowser/api/public/dl/F5J3S180
+  const [videoUrl, setVideoUrl] = useState("");
+  const [lastFrameDate, setLastFrameDate] = useState(new Date())
+  const [prediction, setPrediction] = useState<Record<string, any>>({to_print: ""}) 
+  const onFileAdd = (event: any) => {
+    const toastId = toast.loading("File upload pending");
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      setVideoSrc(e?.target?.result as string);
+      toast.update(toastId, {
+        render: "File uploaded successfully",
+        type: "success",
+        isLoading: false,
+      });
+      
+    };
+    reader.readAsDataURL(event.target.files[0]);
+  };
+
+  const predict = async (url: string, random = false) => {
+
+    const date = new Date();
+
+    const options: Record<string, any> = {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+
+    if (url != "") {
+      options.body = JSON.stringify({ url });
+    }    
+
+    try {
+      const requestUrl =
+        // process.env.API_URL +
+        "/externalApi" +
+        (random != undefined && random != false ? "/predictFromRandomUrl" : "/predictFromUrl");
+      let response = await fetch(requestUrl, options);
+      let json = await response.json();
+      if (json.errors != undefined) return;
+      if(date < lastFrameDate) return;
+      setLastFrameDate(date)
+      console.log(json);
+  
+    
+    } catch (error: any) {
+      toast(
+        "we encoutered a problem during model prediction. Please check your prediction input an try again"
+      );
+      console.log({ error: error.toString() });
+    }
   };
 
   useEffect(() => {
-        
     if (process.browser) {
-      video.current = document.querySelector("#my-video");
-      
-      setInterval(async () => {
-        video.current = document.querySelector("#my-video")
-        console.log("processing");
-        if(video.current!=undefined && video.current!=null && !video.current.paused){
-            console.log("predicting");
-            const base64String = captureImage(video.current);
-            await predict(base64String)
-        }
-      }, predictionInterval);
-      
+      console.log("browser content loaded");
+      const currentVideo = document.querySelector("#video");
+      if (currentVideo == null) return;
+      console.log("video not null");
+
+      // currentVideo.addEventListener("progress", (e: any)=>{
+      //   console.log(e);
+      //   console.log("video player is progressing");
+      // })
+
+      currentVideo.addEventListener("start", (e: any) => {
+        console.log(e);
+        console.log("video player is starting");
+      });
+
+      currentVideo.addEventListener("timeupdate", async (e: any) => {
+        // console.log(e);
+        const frame = captureImage(currentVideo);
+        if(frame != null) await predict(frame)        
+      });
     }
-  }, []);
-  return (
-    <Fragment>
-      <div className="container">
-          <h3 className="text-center">Prediction Interval ( in seconds )</h3>
-          <input type="email" className="form-control" id="activate" defaultValue={predictionInterval} onChange={(event)=>{
-            // try {
-            //   setPredictionInterval(parseInt(event.target.value)*1000);
-            // } catch (error) {
-            // }
-          }} placeholder="Enter an interval"/>
-      </div>
-       <p key={predictData.to_print} dangerouslySetInnerHTML={{__html: predictData.to_print != undefined &&  predictData.to_print!="" ? predictData.to_print.replace(/\n/g, "<br />") : "clean"}}></p>
-    </Fragment>
-   
-  )
-}
-
-function TestVideo() {
-
+  }, [videoSrc]);
   return (
     <main className="App">
-        <Header/>
-        <div className="main-container">
-          
-          <div className="controls-container mb-4">
-            
-            {/* <div className="mb-4">
+      <Header />
+      <div className="main-container">
+        <div className="controls-container mb-4">
+          {/* <div className="mb-4">
               <h1>We are currently working on this page</h1>
             </div> */}
-  
 
+          <div className="d-flex flex-column">
+            <div className="url-uploader mb-4">
+              <h3 className="text-center">pick a video from your device</h3>
+              <input
+                type="file"
+                name="url-uploader"
+                className="form-control"
+                onChange={(e) => {
+                  onFileAdd(e);
+                }}
+              />
+            </div>
+            <div className="url-uploader mb-4">
+              <h3 className="text-center">Enter your video url</h3>
+              <input
+                type="email"
+                className="form-control"
+                id="activate"
+                onChange={(event) => {
+                  setVideoUrl(event.target.value);
+                }}
+                placeholder="Enter your video url"
+              />
+              <button
+                className="btn btn-primary"
+                onClick={() => setVideoSrc(videoSrc)}
+              >
+                Submit
+              </button>
+            </div>
+
+            <video
+              id="video"
+              src={videoSrc}
+              controls
+              height={400}
+              width={400}
+            ></video>
+            <p>
+              {
+                prediction.to_print.replace(/\n/g, "<br />")
+              }
+            </p>
           </div>
-
         </div>
-      
-      <Footer/>
+      </div>
+
+      <Footer />
     </main>
-  )
+  );
 }
 
-export default TestVideo
+export default TestVideo;

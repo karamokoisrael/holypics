@@ -2,7 +2,7 @@ const express = require('express')
 const next = require('next')
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const cors = require('cors')
-
+const nextConfig = require("./next.config")
 const port = 3000
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
@@ -15,8 +15,7 @@ app.prepare().then(() => {
     server.use(cors())
 
     server.use('/externalApi', createProxyMiddleware({
-        target: dev ? "http://localhost:81" : "https://api-holipics.karamokoisrael.tech",
-        // target: dev ? "http://188.166.126.190:84" : "http://188.166.126.190:84",
+        target: nextConfig.env.API_URL,
         secure: false,
         changeOrigin: true,
         pathRewrite: {
@@ -26,7 +25,6 @@ app.prepare().then(() => {
             console.log(error);
         }
     }));
-
 
     server.all('*', (req, res) => {
         return handle(req, res)

@@ -29,7 +29,7 @@ function Test() {
       try {
         const res = await fetch("/externalApi/getConfigs")
         const json = await res.json()
-        if(json.error == undefined){
+        if(json.errors == undefined){
           setClassNames(json.class_names)
         }
       } catch (error) {
@@ -91,7 +91,7 @@ function Test() {
         (random != undefined && random != false ? "/predictFromRandomUrl" : "/predictFromUrl");
       let response = await fetch(requestUrl, options);
       let json = await response.json();
-      if (json.error != undefined)
+      if (json.errors != undefined)
         return toast(
           "we encoutered a problem during model prediction. Please check your prediction input an try again"
         );
