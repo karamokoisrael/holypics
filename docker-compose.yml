@@ -1,7 +1,27 @@
 version: '3.4'
 services:
+  backoffice:
+    container_name: ${BACKOFFICE_CONTAINER_NAME}
+    restart: always
+    build: 
+      dockerfile: Dockerfile
+      context: backoffice
+    env_file:
+      - .env
+      - config/environment/backoffice.env
+    ports:
+      - ${BACKOFFICE_PORT}:8055
+    links:
+      - db:db
+    depends_on:
+      - db
+    volumes:
+      - ./backoffice/extensions:/app/extensions
+      - backoffice_uploads:/app/uploads
+      - backoffice_migration:/app/migration
+
   server:
-    container_name: holypics_server
+    container_name: ${SERVER_CONTAINER_NAME}
     build: 
       dockerfile: Dockerfile
       context: server
@@ -15,7 +35,7 @@ services:
       - ./server/uploads:/usr/src/app/uploads
     
   nginx:
-    image: holypics_nginx
+    image: ${NGINX_CONTAINER_NAME}
     build: 
       dockerfile: Dockerfile-nginx
       context: server
@@ -25,7 +45,7 @@ services:
       - server
 
   web:
-    container_name: holypics_web
+    container_name: ${WEB_CONTAINER_NAME}
     restart: always
     build:
       dockerfile: Dockerfile
@@ -34,7 +54,7 @@ services:
       - ${WEBSITE_PORT}:3000
 
   filebrowser:
-    container_name: holypics_filebrowser
+    container_name: ${FILE_BROWSER_CONTAINER_NAME}
     image: hurlenko/filebrowser
     user: "${FILEBROWSER_UID}:${FILEBROWSER_GID}"
     ports:
@@ -46,7 +66,8 @@ services:
       - FB_BASEURL=/filebrowser
     restart: always
 
-  
-
+volumes:
+  backoffice_uploads:
+  backoffice_migration:
 
 
