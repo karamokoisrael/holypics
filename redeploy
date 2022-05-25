@@ -7,3 +7,4 @@ if [ -f .env ]; then
     sudo docker-compose build --no-cache && sudo docker-compose up
 fi
 
+

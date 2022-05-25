@@ -3,7 +3,7 @@ const next = require('next')
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const cors = require('cors')
 const nextConfig = require("./next.config")
-const port = process.env.PORT || 3000
+const port = process.env.NODE_ENV !== 'production' ? 3001 : ( process.env.PORT || 3000 )
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
 const handle = app.getRequestHandler()
