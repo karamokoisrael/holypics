@@ -4,8 +4,8 @@ const env = {
     DOCS_URL: "https://documenter.getpostman.com/view/16726391/UyrAEGLQ"
   },
   development: {
-    // API_URL: "http://localhost:81",
-    API_URL: "https://api-holipics.karamokoisrael.tech",
+    API_URL: "http://localhost:81",
+    // API_URL: "https://api-holipics.karamokoisrael.tech",
     PREDICTION_INTERVAL: 3000
   },
   production: {

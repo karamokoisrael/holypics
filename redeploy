@@ -4,6 +4,6 @@ if [ -f .env ]; then
     # For instance, will be example_kaggle_key
     sudo git pull origin $MAIN_GIT_BRANCH
     #sh kill
-    sudo docker-compose up --build
+    sudo docker-compose build --no-cache && sudo docker-compose up
 fi
 
