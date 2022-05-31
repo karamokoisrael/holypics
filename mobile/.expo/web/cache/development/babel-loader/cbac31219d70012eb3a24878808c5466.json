@@ -1,1 +1,0 @@
-{"ast":null,"code":"export var maxSmallScreenWidth = 767;","map":{"version":3,"sources":["/Users/macpro/Desktop/computer-science/projects/laboutiik/mobile/constants/layout.ts"],"names":["maxSmallScreenWidth"],"mappings":"AAAA,OAAO,IAAMA,mBAAmB,GAAG,GAA5B","sourcesContent":["export const maxSmallScreenWidth = 767"]},"metadata":{},"sourceType":"module"}

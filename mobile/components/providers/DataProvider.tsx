@@ -17,30 +17,31 @@ import {
 } from "native-base";
 import { FontAwesome } from "@expo/vector-icons";
 import { ConditionalSuspense } from "../layout/ConditionalSuspense";
-import { Directus } from '@directus/sdk';
+
 export type Props = {
   children: JSX.Element;
 };
 
 const DataProvider: React.FC<Props> = ({ children }) => {
   const store = useStore();
-  
+  const categories = useStore((state) => state.configs.categories);
+
   const configsFetcher = async (...args: Parameters<typeof fetch>) => {
     const res = await fetch(...args);
     const resJson = await res.json();
-    // if (resJson.errors != undefined || resJson.data == undefined)
-    //   throw resJson.errors;
-    // store.setConfigs({
-    //   ...resJson.data,
-    //   appSettings: {
-    //     ...resJson.data?.appSettings,
-    //     currencies: JSON.parse(resJson.data?.appSettings?.currencies),
-    //   },
-    // });
+    if (resJson.errors != undefined || resJson.data == undefined)
+      throw resJson.errors;
+    store.setConfigs({
+      ...resJson.data,
+      appSettings: {
+        ...resJson.data?.appSettings,
+        currencies: JSON.parse(resJson.data?.appSettings?.currencies),
+      },
+    });
     return resJson.data;
   };
 
-  useSWR(formatUrl("models"), configsFetcher, {
+  useSWR(formatUrl("config"), configsFetcher, {
     revalidateOnFocus: false,
     shouldRetryOnError: true,
   });
@@ -141,7 +142,7 @@ const DataProvider: React.FC<Props> = ({ children }) => {
         }}
       >
         <ConditionalSuspense
-          condition={true}
+          condition={categories.length > 0}
           fallBack={<Loading />}
         >
           {children}
