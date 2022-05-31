@@ -12,7 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = require("../../helpers/db");
 function default_1({ filter, schedule, }, { services, exceptions, emitter, database }) {
     schedule('0 0 * * *', () => __awaiter(this, void 0, void 0, function* () {
-        (0, db_1.dump)();
+        try {
+            (0, db_1.dump)();
+        }
+        catch (error) {
+        }
     }));
     // schedule('* * * * *', async () => {
     //     console.log('notifying user');

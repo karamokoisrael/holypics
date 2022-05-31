@@ -2,8 +2,7 @@ import { sendSms } from './sms-sender';
 import { Directus, TypeMap } from '@directus/sdk';
 import { Notification } from '@directus/shared/types';
 import { MailService } from 'directus';
-import { Knex } from "knex"
-import moment from 'moment';
+import { Knex } from "knex";
 import { NotificationPayload } from "../@types/directus";
 import User from '../@types/user';
 import { sendMail } from './mailer';
@@ -12,28 +11,18 @@ export const notify = async (database: Knex, mailService: MailService | null = n
     try {
         const [ user ]: User[] = await database("directus_users").where({id: userId}).limit(1)
 
-        const storePayload = {
-            status: "published",
-            date_created: moment().format('YYYY-MM-DD HH:mm:ss'),
-            user_created: userId,
-            subject: subject,
-            message: message,
-        }
-
-        const [ notificationId ]: number[] = await database("notifications").insert(storePayload)
-
         const payload: NotificationPayload = {
             status: "inbox",
-            timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
+            timestamp: new Date().toISOString(),
             recipient: userId,
             sender: userId,
             subject: subject,
             message: message,
-            collection: collection ==  null ? "notifications" : collection,
-            item: item == null ? notificationId : item
+            collection: collection,
+            item: item
         }
 
-        const notification = await database("directus_notifications").insert({...payload})
+        await database("directus_notifications").insert({...payload})
         
         if(emailActivated && mailService != null) {
             const mailData = Object.keys(data).length > 0 ? data :  { headerText: subject, content: message, btnText: "", btnUrl: ""};

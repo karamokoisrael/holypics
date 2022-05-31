@@ -23,4 +23,13 @@ exports.default = (router, { database }) => {
             return (0, exceptions_1.throwError)(res);
         }
     }));
+    router.get('/tmp/download', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            res.sendFile(`${__dirname.replace("extensions/endpoints/file", "")}/uploads/tmp/${req.query.path}`);
+        }
+        catch (error) {
+            console.log(error);
+            return (0, exceptions_1.throwError)(res);
+        }
+    }));
 };

@@ -7,7 +7,12 @@ import { EventContext, RegisterFunctions } from "../../@types/directus";
 
 export default function({ filter, schedule, }: RegisterFunctions, { services, exceptions, emitter, database }: ApiExtensionContext){
     schedule('0 0 * * *', async () => {
-        dump()
+        try {
+            dump()
+        } catch (error) {
+            
+        }
+        
     })  
     
     // schedule('* * * * *', async () => {

@@ -12,6 +12,7 @@ export default function (router: Router, { services, exceptions, getSchema, data
 
         router.get('/getBackupList', async (req: Request, res: Response) => {
                 try {
+                        if (!process?.env?.DB_OPS_ENABLED) return res.status(400).json({ message: "You don't have the right to perform this action" })
                         const directus = await getDirectusStatic(req, req.query.access_token as string)
                         const settings = await directus.server.info()
                         if (settings.os == undefined) return res.status(400).json({ message: "You don't have the right to perform this action" })
@@ -26,6 +27,7 @@ export default function (router: Router, { services, exceptions, getSchema, data
 
         router.delete('/deleteBackup/:id', async (req: Request, res: Response) => {
                 try {
+                        if (!process?.env?.DB_OPS_ENABLED) return res.status(400).json({ message: "You don't have the right to perform this action" })
                         const directus = await getDirectusStatic(req, req.query.access_token as string)
                         const settings = await directus.server.info()
                         if (settings.os == undefined) return res.status(400).json({ message: "You don't have the right to perform this action" })
@@ -42,6 +44,7 @@ export default function (router: Router, { services, exceptions, getSchema, data
 
         router.post('/restore/:id', async (req: Request, res: Response) => {
                 try {
+                        if (!process?.env?.DB_OPS_ENABLED) return res.status(400).json({ message: "You don't have the right to perform this action" })
                         const directus = await getDirectusStatic(req, req.query.access_token as string)
                         const settings = await directus.server.info()
                         if (settings.os == undefined) return res.status(400).json({ message: "You don't have the right to perform this action" })
@@ -57,6 +60,7 @@ export default function (router: Router, { services, exceptions, getSchema, data
 
         router.get('/downloadBackup/:id', async (req: Request, res: Response) => {
                 try {
+                        if (!process?.env?.DB_OPS_ENABLED) return res.status(400).json({ message: "You don't have the right to perform this action" })
                         const directus = await getDirectusStatic(req, req.query.access_token as string)
                         const settings = await directus.server.info()
                         if (settings.os == undefined) return res.status(400).json({ message: "You don't have the right to perform this action" })
@@ -71,6 +75,7 @@ export default function (router: Router, { services, exceptions, getSchema, data
 
         router.get('/downloadUploads', async (req: Request, res: Response) => {
                 try {
+                        if (!process?.env?.DB_OPS_ENABLED) return res.status(400).json({ message: "You don't have the right to perform this action" })
                         const directus = await getDirectusStatic(req, req.query.access_token as string)
                         const settings = await directus.server.info()
                         if (settings.os == undefined) return res.status(400).json({ message: "You don't have the right to perform this action" })
@@ -89,6 +94,7 @@ export default function (router: Router, { services, exceptions, getSchema, data
 
         router.get('/dump', async (req: Request, res: Response) => {
                 try {
+                        if (!process?.env?.DB_OPS_ENABLED) return res.status(400).json({ message: "You don't have the right to perform this action" })
                         const directus = await getDirectusStatic(req, req.query.access_token as string)
                         const settings = await directus.server.info()
                         if (settings.os == undefined) return res.status(400).json({ message: "You don't have the right to perform this action" })
@@ -101,6 +107,7 @@ export default function (router: Router, { services, exceptions, getSchema, data
 
         router.post('/dump', async (req: Request, res: Response) => {
                 try {
+                        if (!process?.env?.DB_OPS_ENABLED) return res.status(400).json({ message: "You don't have the right to perform this action" })
                         const directus = await getDirectusStatic(req, req.query.access_token as string)
                         const settings = await directus.server.info()
                         if (settings.os == undefined) return res.status(400).json({ message: "You don't have the right to perform this action" })
@@ -113,6 +120,7 @@ export default function (router: Router, { services, exceptions, getSchema, data
 
         router.get('/downloadSqlite3', async (req: Request, res: Response) => {
                 try {
+                        if (!process?.env?.DB_OPS_ENABLED) return res.status(400).json({ message: "You don't have the right to perform this action" })
                         const directus = await getDirectusStatic(req, req.query.access_token as string)
                         const settings = await directus.server.info()
                         if (settings.os == undefined) return res.status(400).json({ message: "You don't have the right to perform this action" })
@@ -126,12 +134,13 @@ export default function (router: Router, { services, exceptions, getSchema, data
 
         router.post('/uploadSqlite3', multer().single('file'), async (req: Request, res: Response) => {
                 try {
+                        if (!process?.env?.DB_OPS_ENABLED) return res.status(400).json({ message: "You don't have the right to perform this action" })
                         const directus = await getDirectusStatic(req, req.query.access_token as string)
                         const settings = await directus.server.info()
                         if (settings.os == undefined) return res.status(400).json({ message: "You don't have the right to perform this action" })
-                        fs.unlink(`${process.env.DB_FILENAME}`, ()=>{
-                                fs.createWriteStream(process.env.DB_FILENAME).write(( req as Record<string, any>).file.buffer);
-                        })                        
+                        fs.unlink(`${process.env.DB_FILENAME}`, () => {
+                                fs.createWriteStream(process.env.DB_FILENAME).write((req as Record<string, any>).file.buffer);
+                        })
                         res.json({ message: "Opération effectuée avec succès" })
                 } catch (error) {
                         res.status(400).json({ message: "You don't have the right to perform this action" })
@@ -140,11 +149,12 @@ export default function (router: Router, { services, exceptions, getSchema, data
 
         router.post('/uploadSql', multer().single('file'), async (req: Request, res: Response) => {
                 try {
+                        if (!process?.env?.DB_OPS_ENABLED) return res.status(400).json({ message: "You don't have the right to perform this action" })
                         const directus = await getDirectusStatic(req, req.query.access_token as string)
                         const settings = await directus.server.info()
                         if (settings.os == undefined) return res.status(400).json({ message: "You don't have the right to perform this action" })
-                        await database.raw(( req as Record<string, any>).file.buffer.toString('utf8'));                    
-                        res.json({ message: "Opération effectuée avec succès" })
+                        const result = await database.raw((req as Record<string, any>).file.buffer.toString('utf8'));
+                        res.json({ message: "Opération effectuée avec succès", data: result })
                 } catch (error) {
                         console.log(error);
                         res.status(400).json({ message: "You don't have the right to perform this action" })

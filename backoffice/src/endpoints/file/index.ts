@@ -17,4 +17,13 @@ export default (router: Router, { database }: ApiExtensionContext) => {
             return throwError(res); 
         }
 	}); 
+
+    router.get('/tmp/download', async (req: Request, res: Response) => {
+        try {          
+            res.sendFile(`${__dirname.replace("extensions/endpoints/file", "")}/uploads/tmp/${req.query.path}`)
+        } catch (error) {
+            console.log(error);
+            return throwError(res); 
+        }
+	}); 
 };
