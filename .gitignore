@@ -108,6 +108,9 @@ images/
 
 dwds/
 
+# models/*
+
+# !models/models.config
 
 images_reinforce_test/
 

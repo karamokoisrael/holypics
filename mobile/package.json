@@ -1,5 +1,5 @@
 {
-  "name": "laboutiik",
+  "name": "megamaxdevelopment",
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
@@ -64,7 +64,6 @@
     "@types/knex": "^0.16.1",
     "@types/react": "~17.0.21",
     "@types/react-native": "~0.64.12",
-    "cypress": "^9.6.1",
     "jest": "^28.1.0",
     "jest-expo": "~44.0.1",
     "react-test-renderer": "17.0.1",

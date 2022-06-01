@@ -8,57 +8,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const request_handler_1 = require("./../../helpers/request-handler");
 const exceptions_1 = require("./../../helpers/exceptions");
-const directus_1 = require("directus");
-const fs = require('fs');
-const AdmZip = require("adm-zip");
-const utils_1 = require("../../helpers/utils");
-function default_1(router, { services, exceptions, getSchema, database, env }) {
-    router.post('/predict/:id', (req, res) => __awaiter(this, void 0, void 0, function* () {
+const endpoints_1 = require("../../helpers/endpoints");
+const axios_1 = __importDefault(require("axios"));
+function default_1(router, { database }) {
+    router.post('/predict/:model', (req, res) => __awaiter(this, void 0, void 0, function* () {
         try {
-            const host = (0, utils_1.getHost)(req);
-            const { accountability, schema } = (0, request_handler_1.getRequestParams)(req);
-            const itemsService = new directus_1.ItemsService('datasets', { knex: database, accountability, schema });
-            const [dataset] = yield itemsService.readByQuery({
-                filter: { name: { _eq: req.params.id } },
-                limit: 1
-            });
-            console.log(dataset.prediction_models);
-            // const modelsData = await database("models").whereIn("id", dataset.prediction_models);
-            // console.log(modelsData);
-            // for (let i = 0; i < modelsData.length; i++) {
-            //         const [file] = await database("directus_files").where({ id: modelsData[i].tfjs_file })
-            //         const modelDataPath = `./uploads/tmp/${file.id}`;
-            //         if (!fs.existsSync(modelDataPath)) {
-            //                 fs.mkdirSync(modelDataPath);
-            //                 const zipFile = new AdmZip(`./uploads/${file.id}.zip`);
-            //                 zipFile.extractAllTo(modelDataPath, true);
-            //         }  
-            //         const baseUrl = `${host}/file/tmp/download?path=${file.id}`             
-            //         const modelJsonUrl = `${baseUrl}/model.json`
-            //         const modelWeightsUrl = `${host}/file/${modelDataPath.replace("./", "")}/group1-shard1of3.bin`
-            //         const model =  await tf.loadLayersModel(
-            //                 // "https://storage.googleapis.com/tfjs-models/tfjs/iris_v1/model.json"
-            //                 modelJsonUrl
-            //         );
-            //         console.log(model.summary());
-            // }
-            // dataset.prediction_models = modelsData;
-            return res.json({ data: dataset });
+            const prediction = {};
+            let base64Image = "";
+            const configs = yield (0, endpoints_1.getConfigs)(database);
+            const dataset = configs.datasets.find((item) => item.name == req.params.model);
+            if (dataset === null || dataset === undefined)
+                return (0, exceptions_1.throwError)(res, "Veuillez sélectionner un dataset valide", 400);
+            if (req.body.base64Image !== undefined) {
+                base64Image = req.body.base64Image;
+            }
+            else {
+                return (0, exceptions_1.throwError)(res, "Veuillez sélectionner une image valide", 400);
+            }
+            for (const productionModel of dataset.production_models) {
+                const res = yield axios_1.default.post(`${process.env.TF_SERVING_API_URL}/v${productionModel.model.version}/models/${productionModel.model.name}:predict`, {
+                    instances: [base64Image]
+                });
+                if (res.data.predictions === undefined || res.data.predictions.length === 0 || res.data.predictions[0].length === 0)
+                    throw new Error(`Error while prediction ${productionModel.model.name}`);
+                prediction[productionModel.model.name] = res.data.predictions[0][0];
+            }
+            res.json(prediction);
         }
         catch (error) {
-            console.log(error);
-            return (0, exceptions_1.throwError)(res);
-        }
-    }));
-    router.get('/ok', (req, res) => __awaiter(this, void 0, void 0, function* () {
-        try {
-            return res.json({});
-        }
-        catch (error) {
-            console.log(error);
+            console.log("handled error => ", error);
             return (0, exceptions_1.throwError)(res);
         }
     }));

@@ -25,7 +25,6 @@ export type Props = {
 const DataProvider: React.FC<Props> = ({ children }) => {
   const store = useStore();
   const categories = useStore((state) => state.configs.categories);
-
   const configsFetcher = async (...args: Parameters<typeof fetch>) => {
     const res = await fetch(...args);
     const resJson = await res.json();

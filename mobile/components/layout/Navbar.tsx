@@ -81,7 +81,7 @@ export default function Navbar({
                 w="60"
                 h="12"
                 rounded="sm"
-                src={require("../../assets/images/logo-bg-square.png")}
+                src={require("../../assets/img/logo.png")}
               />
             </Pressable>
 

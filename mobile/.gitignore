@@ -9,7 +9,6 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
-!./assets/
-!./assets/images
+
 # macOS
 .DS_Store

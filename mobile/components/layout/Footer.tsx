@@ -6,6 +6,7 @@ const Footer: React.FC<ComponentWithNavigationProps> = ({
   navigation,
   route,
 }) => {
+  return null;
   return (
     <Box
       _light={{ bg: "bg.dark" }}

@@ -1,68 +1,40 @@
-import { getRequestParams } from './../../helpers/request-handler';
-import { getDirectusStatic } from './../../helpers/auth';
-import { responseWithId, responseWithSingleKey, throwError } from './../../helpers/exceptions';
-import { NextFunction, Request, Response, Router } from "express";
-import { deleteBackup, dump, getDumpList, restore } from "../../helpers/db";
+import { throwError } from './../../helpers/exceptions';
+import { Request, Response, Router } from "express";
 import { ApiExtensionContext } from '@directus/shared/types';
-import { ItemsService } from 'directus';
-const fs = require('fs');
-const AdmZip = require("adm-zip");
-import * as tf from "@tensorflow/tfjs-node"
-import { getHost } from '../../helpers/utils';
+import { getConfigs } from '../../helpers/endpoints';
+import axios from 'axios';
+export default function (router: Router, { database }: ApiExtensionContext) {
 
-export default function (router: Router, { services, exceptions, getSchema, database, env }: ApiExtensionContext) {
-
-        router.post('/predict/:id', async (req: Request, res: Response) => {
+        router.post('/predict/:model', async (req: Request, res: Response) => {
                 try {
-                        const host = getHost(req);
-                        const { accountability, schema } = getRequestParams(req);
-                        const itemsService = new ItemsService('datasets', { knex: database, accountability, schema });
-                        const [dataset] = await itemsService.readByQuery({
-                                filter: { name: { _eq: req.params.id } },
-                                limit: 1
-                        })
-                        console.log(dataset.prediction_models);
+                        const prediction:Record<string, any> = {};
+                        let base64Image = "";
+                        const configs = await getConfigs(database);
+                        const dataset = configs.datasets.find((item)=> item.name == req.params.model)
+                        if(dataset === null || dataset === undefined) return throwError(res, "Veuillez sélectionner un dataset valide", 400);   
                         
-                        // const modelsData = await database("models").whereIn("id", dataset.prediction_models);
+                        if(req.body.base64Image !== undefined){
+                                base64Image = req.body.base64Image;
+                        }else{
+                                return throwError(res, "Veuillez sélectionner une image valide", 400);    
+                        }
 
-                        // console.log(modelsData);
-                        
-                        // for (let i = 0; i < modelsData.length; i++) {
-                        //         const [file] = await database("directus_files").where({ id: modelsData[i].tfjs_file })
-                        //         const modelDataPath = `./uploads/tmp/${file.id}`;
-                        //         if (!fs.existsSync(modelDataPath)) {
-                        //                 fs.mkdirSync(modelDataPath);
-                        //                 const zipFile = new AdmZip(`./uploads/${file.id}.zip`);
-                        //                 zipFile.extractAllTo(modelDataPath, true);
-                        //         }  
-                        //         const baseUrl = `${host}/file/tmp/download?path=${file.id}`             
-                        //         const modelJsonUrl = `${baseUrl}/model.json`
-                        //         const modelWeightsUrl = `${host}/file/${modelDataPath.replace("./", "")}/group1-shard1of3.bin`
-                        //         const model =  await tf.loadLayersModel(
-                        //                 // "https://storage.googleapis.com/tfjs-models/tfjs/iris_v1/model.json"
-                        //                 modelJsonUrl
-                        //         );
+                        for (const productionModel of dataset.production_models) {
+                                const res = await axios.post(`${process.env.TF_SERVING_API_URL}/v${productionModel.model.version}/models/${productionModel.model.name}:predict`, {
+                                        instances: [base64Image]
+                                })
 
-                        //         console.log(model.summary());
-                                
-                        // }
-                        // dataset.prediction_models = modelsData;
-                        return res.json({ data: dataset });
+                                if(res.data.predictions === undefined || res.data.predictions.length === 0 || res.data.predictions[0].length === 0) throw new Error(`Error while prediction ${productionModel.model.name}`);
+                                prediction[productionModel.model.name] = res.data.predictions[0][0]
+                        } 
+                        res.json(prediction)
                 } catch (error) {
-                        console.log(error);
+                        console.log("handled error => ", error);
                         return throwError(res);
                 }
 
         });
 
-        router.get('/ok', async (req: Request, res: Response) => {
-                try {
-                        return res.json({})
-                } catch (error) {
-                        console.log(error);
-                        return throwError(res);
-                }
-
-        });
 }
+
 
