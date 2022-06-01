@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const auth_1 = require("./../../helpers/auth");
 const exceptions_1 = require("./../../helpers/exceptions");
 const endpoints_1 = require("../../helpers/endpoints");
 const axios_1 = __importDefault(require("axios"));
@@ -38,12 +39,15 @@ function default_1(router, { database }) {
                     throw new Error(`Error while prediction ${productionModel.model.name}`);
                 prediction[productionModel.model.name] = res.data.predictions[0][0];
             }
-            res.json(prediction);
+            res.json({ data: prediction });
         }
         catch (error) {
             console.log("handled error => ", error);
             return (0, exceptions_1.throwError)(res);
         }
+    }));
+    router.post('/test', (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const directus = yield (0, auth_1.getDirectusStatic)(req, "adsjkbhve");
     }));
 }
 exports.default = default_1;

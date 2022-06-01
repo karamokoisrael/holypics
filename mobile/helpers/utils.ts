@@ -1,4 +1,3 @@
-import Constants from "expo-constants"
 import environment from "../constants/environment"
 
 export const formatUrl = (path: string)=>{

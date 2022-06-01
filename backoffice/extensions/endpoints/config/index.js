@@ -15,7 +15,7 @@ function default_1(router, { database }) {
     router.get('/', (req, res) => __awaiter(this, void 0, void 0, function* () {
         try {
             const configs = yield (0, endpoints_1.getConfigs)(database);
-            return res.json(configs);
+            return res.json({ data: configs });
         }
         catch (error) {
             console.log(error);

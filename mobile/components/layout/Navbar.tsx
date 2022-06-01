@@ -3,23 +3,18 @@ import {
   Box,
   HStack,
   Icon,
-  Text,
-  VStack,
-  Avatar,
   Image,
   Input,
   Pressable,
   Button,
   IconButton,
-  Hidden,
-  Menu,
-  Spacer,
+  Hidden
 } from "native-base";
 
 import { Feather, FontAwesome, Ionicons } from "@expo/vector-icons";
 import { Hoverable } from "react-native-web-hover";
 import { ComponentWithNavigationProps } from "../../@types/component";
-import useStore from "../../context/store";
+import useStore from "../../stores/store";
 import { Category } from "../../@types/category";
 import { Store } from "../../@types/store";
 import { getImageUrl } from "../../helpers/utils";
@@ -32,13 +27,6 @@ export default function Navbar({
   navigation,
   route,
 }: ComponentWithNavigationProps) {
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  useEffect(() => {
-    useStore.subscribe((state: Store) => {
-      setCategories(state.configs.categories);
-    });
-  }, []);
 
   return (
     <Box
@@ -81,124 +69,9 @@ export default function Navbar({
                 w="60"
                 h="12"
                 rounded="sm"
-                src={require("../../assets/img/logo.png")}
+                src={require("../../assets/img/logo-dark.png")}
               />
             </Pressable>
-
-            <Hidden from="base" till="md">
-              <Box h="80%" w="90%" alignItems="flex-start">
-                <Menu
-                  w="100%"
-                  trigger={(triggerProps) => {
-                    return (
-                      <Button
-                        {...triggerProps}
-                        py="2"
-                        px="2"
-                        borderRadius="4"
-                        variant="subtle"
-                        _text={{
-                          _dark: { color: "text.50" },
-                          _light: { color: "text.50" },
-                          fontWeight: "normal",
-                        }}
-                        //@ts-ignore
-                        backgroundColor="primary.900"
-                        _hover={{ backgroundColor: "primary.700" }}
-                        endIcon={
-                          <Icon
-                            size="6"
-                            name="angle-down"
-                            as={FontAwesome}
-                            _light={{ color: "coolGray.800" }}
-                            _dark={{ color: "coolGray.50" }}
-                          />
-                        }
-                      >
-                        Catégories
-                      </Button>
-                    );
-                  }}
-                >
-                  {categories.map((category: Category) => {
-                    return (
-                      <Menu.Item key={category.id}>
-                        <Hoverable>
-                          {({ hovered }) => (
-                            <>
-                              <Pressable
-                                marginBottom={hovered ? 2 : 0}
-                                onPress={() =>
-                                  navigation.navigate(`Category`, {
-                                    id: category.id,
-                                  })
-                                }
-                              >
-                                <VStack
-                                  display={"flex"}
-                                  alignItems={"center"}
-                                  justifyContent={"flex-start"}
-                                  flexDirection={"row"}
-                                  width={"100%"}
-                                >
-                                  <Avatar
-                                    alignSelf="center"
-                                    size="md"
-                                    source={{
-                                      uri: getImageUrl(category.thumb),
-                                    }}
-                                  ></Avatar>
-                                  <Text marginLeft={10}>{category.name}</Text>
-                                </VStack>
-                              </Pressable>
-                              {hovered ? (
-                                <FlatList
-                                  data={category.sub_categories}
-                                  renderItem={({ item }) => (
-                                    <VStack
-                                      display={"flex"}
-                                      alignItems={"center"}
-                                      justifyContent={"flex-start"}
-                                      flexDirection={"row"}
-                                      width={"100%"}
-                                    >
-                                      {/* <Avatar alignSelf="center" size="xs" source={{uri: getImageUrl(item.thumb)}}></Avatar> */}
-                                      <Hoverable>
-                                        {(subCatHoverProps) => (
-                                          <Text
-                                            fontWeight={
-                                              subCatHoverProps.hovered
-                                                ? "bolder"
-                                                : "medium"
-                                            }
-                                          >
-                                            {item.name}
-                                          </Text>
-                                        )}
-                                      </Hoverable>
-                                      <Spacer />
-                                    </VStack>
-                                  )}
-                                ></FlatList>
-                              ) : // <PresenceTransition visible={hovered}
-                              // >
-                              //   <VStack display={'flex'} alignItems={'flex-start'} justifyContent={'flex-start'} flexDirection={'column'} width={'100%'}>
-                              //     <FlatList data={category.sub_categories} renderItem={(subCategory: Record<string, any>)=>(
-                              //        <Text >{subCategory.name}</Text>
-                              //     )}>
-
-                              //   </VStack>
-                              // </PresenceTransition>
-                              null}
-                            </>
-                          )}
-                        </Hoverable>
-                      </Menu.Item>
-                    );
-                  })}
-                </Menu>
-              </Box>
-            </Hidden>
           </HStack>
 
           <Hidden from="base" till="lg">

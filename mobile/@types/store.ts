@@ -1,9 +1,11 @@
+import { Config } from "./global"
+
 export type Store = {
     user: Record<string, any>,
     onBoardingPassed: boolean,
     colorMode: "light" | "dark",
     bottomBarSelectedIndex: number,
-    configs: Record<string, any>,
+    configs: Config,
     notifications: Record<string, any>[],
     socketConnId: string,
     socket: WebSocket | undefined,
@@ -14,9 +16,4 @@ export type Store = {
     setUser: Function,
     setNotifications: Function,
     setColorMode: Function
-}
-
-
-export type Config = {
-
 }

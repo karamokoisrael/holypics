@@ -1,41 +1,33 @@
-import {
-  NavigationContainer,
-  DefaultTheme,
-  DarkTheme,
-  Router,
-} from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import * as React from "react";
-import { ColorSchemeName, Platform } from "react-native";
-import Account from "../screens/account/Account";
-import Security from "../screens/account/Security";
-import ForgotPassword from "../screens/authentication/ForgotPassword";
-import ReinitPassword from "../screens/authentication/ReinitPassword";
-import Error from "../screens/error/Error";
-import Home from "../screens/home/Home";
-import Notifications from "../screens/notification/Notifications";
-import Checkout from "../screens/order/Checkout";
-import NotFound from "../screens/error/NotFound";
-import SignIn from "../screens/authentication/SignIn";
-import SignUp from "../screens/authentication/SignUp";
-import { RootStackParamList, RootTabParamList } from "../@types/types";
+import { Platform } from "react-native";
+import Error from "../../screens/error/Error";
+import Home from "../../screens/home/Home";
+import { RootStackParamList } from "../../@types/types";
 import { LinkingOptions } from "@react-navigation/native";
 import * as Linking from "expo-linking";
-import OtpVerification from "../screens/authentication/OtpVerification";
-import AccountLocked from "../screens/error/AccountLocked";
-import OnBoardingStep1 from "../screens/onBoarding/OnBoardingStep1";
-import OnBoardingStep3 from "../screens/onBoarding/OnBoardingStep2";
-import OnBoardingStep2 from "../screens/onBoarding/OnBoardingStep3";
-import TermsAndUse from "../screens/other/TermsAndUse";
-import { Hidden, Icon } from "native-base";
-import { darkTheme, lightTheme, theme } from "../constants/theme";
-import ShoppingCard from "../screens/order/ShoppingCard";
-import Search from "../screens/product/Search";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import useStore from "../context/store";
-import categories from "../screens/category/notification/Category";
-import Category from "../screens/category/notification/Category";
-import Categories from "../screens/category/notification/Categories";
+import AccountLocked from "../../screens/error/AccountLocked";
+import OnBoardingStep1 from "../../screens/onBoarding/OnBoardingStep1";
+import OnBoardingStep3 from "../../screens/onBoarding/OnBoardingStep2";
+import OnBoardingStep2 from "../../screens/onBoarding/OnBoardingStep3";
+import TermsAndUse from "../../screens/other/TermsAndUse";
+import { darkTheme, lightTheme, theme } from "../../constants/theme";
+import Search from "../../screens/product/Search";
+import useStore from "../../stores/store";
+import Category from "../../screens/category/notification/Category";
+import Categories from "../../screens/category/notification/Categories";
+import { bottomRoutes } from "../layout/BottomBar";
+import SignIn from "../../screens/authentication/SignIn";
+import OtpVerification from "../../screens/authentication/OtpVerification";
+import ForgotPassword from "../../screens/authentication/ForgotPassword";
+import SignUp from "../../screens/authentication/SignUp";
+import ReinitPassword from "../../screens/authentication/ReinitPassword";
+import Notifications from "../../screens/notification/Notifications";
+import Checkout from "../../screens/order/Checkout";
+import ShoppingCard from "../../screens/order/ShoppingCard";
+import Security from "../../screens/account/Security";
+import Account from "../../screens/account/Account";
 
 type Route = {
   path: string;
@@ -77,7 +69,7 @@ export const routes: Routes = {
       path: "/",
       component: Account,
       title: "Mon compte",
-      inDrawer: true,
+      // inDrawer: true,
     },
     { path: "security", component: Security, title: "Sécurité" },
   ],
@@ -87,7 +79,7 @@ export const routes: Routes = {
       path: "shopping-card",
       component: ShoppingCard,
       title: "Panier",
-      inDrawer: true,
+      // inDrawer: true,
     },
     { path: "checkout", component: Checkout, title: "Caisse" },
   ],
@@ -101,10 +93,9 @@ export const routes: Routes = {
       path: "/",
       component: Notifications,
       title: "Notifications",
-      inDrawer: true,
+      // inDrawer: true,
     },
   ],
-
 
   Category: [
     {
@@ -127,7 +118,7 @@ export const routes: Routes = {
       component: TermsAndUse,
       title: "Termes et conditions",
       inDrawer: true,
-    }
+    },
   ],
 
   Authentication: [
@@ -184,12 +175,7 @@ export const routes: Routes = {
 
 const Drawer = createDrawerNavigator<RootStackParamList>();
 
-export default function Navigation({
-  colorScheme,
-}: {
-  colorScheme: ColorSchemeName;
-}) {
-
+export default function Navigation() {
   const linking: LinkingOptions<RootStackParamList> = {
     prefixes: [Linking.makeUrl("/")],
     config: {
@@ -198,55 +184,40 @@ export default function Navigation({
   };
 
   const renderDrawer = (routeGroup: Route, routeName: string) => {
-  
     const store = useStore();
-    const bottomRoutes = [
-      {
-        id: 0,
-        path: "Home",
-      },
-      {
-        id: 1,
-        path: "Account",
-      },
-      {
-        id: 2,
-        path: "Search",
-      },
-      {
-        id: 3,
-        path: "ShoppingCard",
-      },
-    ];
-  
-  return (
+
+    return (
       <Drawer.Screen
         key={routeGroup.component.name}
         name={routeGroup.component.name as keyof RootStackParamList}
         component={routeGroup.component}
         options={{
-          drawerItemStyle: routeGroup.inDrawer == true ? {} : { height: 0 },
+          drawerItemStyle:
+            routeGroup.inDrawer === true ? {} : { display: "none" },
           headerShown: Platform.OS !== "web",
           title: routeGroup.title,
-          drawerIcon: routeGroup.icon != undefined ? routeGroup.icon : undefined,
+          drawerIcon:
+            routeGroup.icon != undefined ? routeGroup.icon : undefined,
           drawerActiveTintColor: theme.colors.text[600],
           drawerActiveBackgroundColor: theme.colors.primary[100],
           headerTintColor: theme.colors.primary[500],
         }}
-        listeners = {({navigation, route})=> ({
-          drawerItemPress: (e)=>{
-            bottomRoutes.forEach((currentRoute)=>{
-              if(route.name == currentRoute.path){
-                  store.setBottomBarSelectedIndex(currentRoute.id)
+        listeners={({ navigation, route }) => ({
+          drawerItemPress: (e) => {
+            let barSet = false;
+            bottomRoutes.forEach((currentRoute) => {
+              if (route.name == currentRoute.path) {
+                barSet = true;
+                store.setBottomBarSelectedIndex(currentRoute.id);
               }
               return;
-          })
-            
-          }
+            });
+            if(!barSet) store.setBottomBarSelectedIndex(10);
+          },
         })}
       />
     );
-  }
+  };
 
   Object.keys(routes).forEach((routeName: string) => {
     // @ts-ignore
@@ -281,7 +252,7 @@ export default function Navigation({
               // @ts-ignore
               <Drawer.Group screenOptions={{ presentation: "modal" }}>
                 {renderDrawer(routeGroup, routeName)}
-              </Drawer.Group> 
+              </Drawer.Group>
             ) : (
               renderDrawer(routeGroup, routeName)
             )

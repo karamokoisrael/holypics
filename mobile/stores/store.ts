@@ -1,15 +1,16 @@
-import { Category } from './../@types/category';
+import { Category } from '../@types/category';
 import create from "zustand";
 import { devtools } from "zustand/middleware"
 import { Store } from '../@types/store';
 import environment from '../constants/environment';
 import { Platform } from "react-native"
+import { Dataset } from '../@types/global';
 let store = (set: Function, get: Function): Store => ({
     user: {id: ""},
-    colorMode: "light",
+    colorMode: "dark",
     bottomBarSelectedIndex: 0,
     onBoardingPassed: false,
-    configs: { categories: [] as Category[] },
+    configs: { datasets: [] as Dataset[] },
     notifications: [],
     socketConnId: "",
     socket: undefined,

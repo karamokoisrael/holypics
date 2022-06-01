@@ -29,6 +29,7 @@
     "directus-extension-masked-interface": "^1.0.0",
     "directus-extension-svgmap-picker-interface": "^0.1.0",
     "ejs": "^3.1.7",
+    "expo-font": "^10.1.0",
     "find-remove": "^4.0.4",
     "immutable": "^4.0.0",
     "jest": "^28.1.0",

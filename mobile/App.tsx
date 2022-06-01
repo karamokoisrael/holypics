@@ -1,36 +1,54 @@
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-gesture-handler';
-import { NativeBaseProvider, Box } from "native-base";
-import theme from './constants/theme';
-import useCachedResources from './hooks/useCachedResources';
-import Navigation from './navigation';
-import DataProvider from './components/providers/DataProvider';
-import { Fragment, useEffect, useState } from 'react';
-import useStore from './context/store';
-export default function App() {
-  const isLoadingComplete = useCachedResources();
-  const [colorMode,  setColorMode] = useState<"light" | "dark">("light")
-  
-  useEffect(()=>{
-    (async ()=>{
-      useStore.subscribe(state=> {
-        setColorMode(state.colorMode)
-      });
-    })()
-  }, [])
+import { StatusBar } from "expo-status-bar";
+import "react-native-gesture-handler";
+import { NativeBaseProvider } from "native-base";
+import theme from "./constants/theme";
+import Navigation from "./components/navigation";
+import DataProvider from "./components/providers/DataProvider";
+import { Fragment } from "react";
+import useStore from "./stores/store";
+import {
+  useFonts,
+  Inter_100Thin,
+  Inter_200ExtraLight,
+  Inter_300Light,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  Inter_800ExtraBold,
+  Inter_900Black,
+} from "@expo-google-fonts/inter";
 
-  if (!isLoadingComplete) {
-    return null;
-  } else {
-    return (
-      <NativeBaseProvider theme={{...theme, config: {...theme.config, initialColorMode: colorMode}}}>
-        <DataProvider>
-          <Fragment>
-            <Navigation colorScheme={colorMode} />        
-            <StatusBar />
-          </Fragment>
-        </DataProvider>
-      </NativeBaseProvider>
-    );
+export default function App() {
+  const colorMode = useStore((state) => state.colorMode);
+  let [fontsLoaded] = useFonts({
+    Inter_100Thin,
+    Inter_200ExtraLight,
+    Inter_300Light,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    Inter_800ExtraBold,
+    Inter_900Black,
+  });
+
+  if (!fontsLoaded) {
+    return <></>;
   }
+  return (
+    <NativeBaseProvider
+      theme={{
+        ...theme,
+        config: { ...theme.config, initialColorMode: colorMode },
+      }}
+    >
+      <DataProvider>
+        <Fragment>
+          <Navigation />
+          <StatusBar />
+        </Fragment>
+      </DataProvider>
+    </NativeBaseProvider>
+  );
 }

@@ -2,20 +2,40 @@ import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { ComponentWithNavigationProps } from "../../@types/component";
 import { Box, Center, Icon, Pressable, Text } from "native-base";
 import React from "react";
-import useStore from "../../context/store";
+import useStore from "../../stores/store";
 
+export const bottomRoutes = [
+  {
+    id: 0,
+    title: "Accueil",
+    path: "Home",
+  },
+  {
+    id: 1,
+    title: "Mon compte",
+    path: "Account",
+  },
+  {
+    id: 2,
+    title: "Recherche",
+    path: "Search",
+  },
+  {
+    id: 3,
+    title: "Panier",
+    path: "ShoppingCard",
+  },
+];
 const BottomBar: React.FC<ComponentWithNavigationProps> = ({
   navigation,
   route,
 }) => {
   const store = useStore();
-  const selected = useStore(state => state.bottomBarSelectedIndex)
-  
+  const selected = useStore((state) => state.bottomBarSelectedIndex);
+
   const routes = [
     {
-      id: 0,
-      title: "Accueil",
-      path: "Home",
+      ...bottomRoutes[0],
       icon: (
         <Icon
           mb="1"
@@ -31,9 +51,7 @@ const BottomBar: React.FC<ComponentWithNavigationProps> = ({
       ),
     },
     {
-      id: 1,
-      title: "Mon compte",
-      path: "Account",
+      ...bottomRoutes[1],
       icon: (
         <Icon
           mb="1"
@@ -49,9 +67,7 @@ const BottomBar: React.FC<ComponentWithNavigationProps> = ({
       ),
     },
     {
-      id: 2,
-      title: "Recherche",
-      path: "Search",
+      ...bottomRoutes[2],
       icon: (
         <Icon
           mb="1"
@@ -63,9 +79,7 @@ const BottomBar: React.FC<ComponentWithNavigationProps> = ({
       ),
     },
     {
-      id: 3,
-      title: "Panier",
-      path: "ShoppingCard",
+      ...bottomRoutes[3],
       icon: (
         <Icon
           mb="1"
@@ -82,7 +96,6 @@ const BottomBar: React.FC<ComponentWithNavigationProps> = ({
       ),
     },
   ];
-
 
   return (
     <Box

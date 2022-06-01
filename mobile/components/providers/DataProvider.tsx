@@ -1,6 +1,6 @@
-import useStore from "../../context/store";
+import useStore from "../../stores/store";
 import { formatUrl } from "../../helpers/utils";
-import React, { Suspense } from "react";
+import React from "react";
 import useSWR, { SWRConfig } from "swr";
 import { Restart } from "fiction-expo-restart";
 import ErrorBoundary from "react-native-error-boundary";
@@ -24,18 +24,19 @@ export type Props = {
 
 const DataProvider: React.FC<Props> = ({ children }) => {
   const store = useStore();
-  const categories = useStore((state) => state.configs.categories);
+  const datasets = useStore((state) => state.configs.datasets);
+
   const configsFetcher = async (...args: Parameters<typeof fetch>) => {
     const res = await fetch(...args);
     const resJson = await res.json();
-    if (resJson.errors != undefined || resJson.data == undefined)
-      throw resJson.errors;
+    
+    if (resJson.errors !== undefined || resJson.data === undefined) throw new Error("No config found");
     store.setConfigs({
       ...resJson.data,
-      appSettings: {
-        ...resJson.data?.appSettings,
-        currencies: JSON.parse(resJson.data?.appSettings?.currencies),
-      },
+      // appSettings: {
+      //   ...resJson.data?.appSettings,
+      //   currencies: JSON.parse(resJson.data?.appSettings?.currencies),
+      // },
     });
     return resJson.data;
   };
@@ -119,7 +120,7 @@ const DataProvider: React.FC<Props> = ({ children }) => {
       justifyContent={"center"}
       alignItems={"center"}
     >
-      <HStack space={2} justifyContent="center" width={"width"}>
+      <HStack space={2} justifyContent="center">
         <Spinner accessibilityLabel="Chargement" />
         <Heading color="primary.500" fontSize="md">
           Chargement
@@ -141,7 +142,7 @@ const DataProvider: React.FC<Props> = ({ children }) => {
         }}
       >
         <ConditionalSuspense
-          condition={categories.length > 0}
+          condition={datasets.length > 0}
           fallBack={<Loading />}
         >
           {children}

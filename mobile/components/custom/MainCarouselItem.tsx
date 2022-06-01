@@ -61,8 +61,8 @@ const MainCarouselItem = ({
 
   return (
     <Pressable
-      w={width != undefined ? width : defaultProps.width}
-      h={height != undefined ? height : defaultProps.height}
+      // w={width != undefined ? width : defaultProps.width}
+      // h={height != undefined ? height : defaultProps.height}
       shadow={3}
       mb={paddingBottom != undefined ? paddingBottom : 0}
     >

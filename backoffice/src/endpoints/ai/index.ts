@@ -1,3 +1,4 @@
+import { getDirectusStatic } from './../../helpers/auth';
 import { throwError } from './../../helpers/exceptions';
 import { Request, Response, Router } from "express";
 import { ApiExtensionContext } from '@directus/shared/types';
@@ -27,12 +28,16 @@ export default function (router: Router, { database }: ApiExtensionContext) {
                                 if(res.data.predictions === undefined || res.data.predictions.length === 0 || res.data.predictions[0].length === 0) throw new Error(`Error while prediction ${productionModel.model.name}`);
                                 prediction[productionModel.model.name] = res.data.predictions[0][0]
                         } 
-                        res.json(prediction)
+                        res.json({data: prediction})
                 } catch (error) {
                         console.log("handled error => ", error);
                         return throwError(res);
                 }
 
+        });
+
+        router.post('/test', async (req: Request, res: Response) => {
+                const directus = await getDirectusStatic(req, "adsjkbhve")
         });
 
 }

@@ -6,7 +6,7 @@ import { ComponentWithNavigationProps } from "../../@types/component";
 import { Dimensions } from "react-native";
 import useSWR from "swr";
 import { Gallery } from "../../@types/gallery";
-import useStore from "../../context/store";
+import useStore from "../../stores/store";
 import { MAX_SMALL_SCREEN_WIDTH, WINDOW_HEIGHT } from "../../constants/layout";
 import { Product } from "../../@types/product";
 import { ConditionalSuspense } from "../../components/layout/ConditionalSuspense";
