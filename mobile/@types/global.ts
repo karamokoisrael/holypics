@@ -77,18 +77,20 @@ export type Config = {
 
 export type Dataset = {
     id: string;
-    status: string;
-    sort: null | string;
-    user_created: string;
-    date_created: number;
-    user_updated: string;
-    date_updated: number;
+    status?: string;
+    sort?: null | string;
+    user_created?: string;
+    date_created?: number;
+    user_updated?: string;
+    date_updated?: number;
     name: string;
     prediction_threshold: number;
     class_names: null | string[];
-    model_eval_code: null | string;
+    model_eval_code?: null | string;
     thumb: string | string;
     production_models: ProductionModel[];
+    description: string;
+    short_description: string;
 }
 
 export type ProductionModel = {

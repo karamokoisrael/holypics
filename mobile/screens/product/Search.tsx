@@ -1,15 +1,17 @@
-import Layout from "../../components/layout/Layout";
-import React, { Fragment } from "react";
-import { View, Text } from "react-native";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { Center, Icon, Text } from "native-base";
+import React from "react";
 import { ComponentWithNavigationProps } from "../../@types/component";
-import { Center } from "native-base";
+import Layout from "../../components/layout/Layout";
+import { WINDOW_HEIGHT } from "../../constants/layout";
 
-export default function Search({navigation, route}: ComponentWithNavigationProps){
-    return (
-        <Layout navigation={navigation} route={route}>
-            <Center alignItems="center" justifyContent="center" height="100%">
-                <Text>Search</Text>
-            </Center>
-        </Layout>
-    )
+export default function Search({navigation, route}: ComponentWithNavigationProps) {
+  return (
+    <Layout navigation={navigation} route={route}>
+      <Center alignItems="center" justifyContent="center" height={WINDOW_HEIGHT}>
+        <Text fontSize={"xl"} textAlign={'center'}><Icon as={FontAwesome5} name="wrench"/> Section "rechercher" en construction</Text>
+      </Center>
+    </Layout>
+  );
 }
+

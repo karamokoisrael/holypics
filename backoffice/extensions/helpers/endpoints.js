@@ -20,8 +20,12 @@ const getConfigs = (database) => __awaiter(void 0, void 0, void 0, function* () 
         });
         for (let u = 0; u < production_models.length; u++) {
             const [model] = yield database("models").where({ id: production_models[u].models_id }).limit(1);
+            if (model.config != null)
+                model.config = JSON.parse(model.config);
             production_models[u].model = model;
         }
+        if (datasets[i].class_names != null)
+            datasets[i].class_names = JSON.parse(datasets[i].class_names);
         datasets[i].production_models = production_models;
     }
     return configurations;

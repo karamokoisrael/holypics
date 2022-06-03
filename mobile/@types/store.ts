@@ -1,3 +1,4 @@
+import { Directus } from "@directus/sdk";
 import { Config } from "./global"
 
 export type Store = {
@@ -6,6 +7,7 @@ export type Store = {
     colorMode: "light" | "dark",
     bottomBarSelectedIndex: number,
     configs: Config,
+    directus: Directus<Record<string, any>>;
     notifications: Record<string, any>[],
     socketConnId: string,
     socket: WebSocket | undefined,

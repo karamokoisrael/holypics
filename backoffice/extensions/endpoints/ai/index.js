@@ -8,38 +8,41 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const auth_1 = require("./../../helpers/auth");
 const exceptions_1 = require("./../../helpers/exceptions");
-const endpoints_1 = require("../../helpers/endpoints");
-const axios_1 = __importDefault(require("axios"));
+const bodyParser = require('body-parser');
 function default_1(router, { database }) {
+    router.use(bodyParser.json({ limit: '50mb' }));
+    router.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
     router.post('/predict/:model', (req, res) => __awaiter(this, void 0, void 0, function* () {
         try {
-            const prediction = {};
-            let base64Image = "";
-            const configs = yield (0, endpoints_1.getConfigs)(database);
-            const dataset = configs.datasets.find((item) => item.name == req.params.model);
-            if (dataset === null || dataset === undefined)
-                return (0, exceptions_1.throwError)(res, "Veuillez sélectionner un dataset valide", 400);
-            if (req.body.base64Image !== undefined) {
-                base64Image = req.body.base64Image;
-            }
-            else {
-                return (0, exceptions_1.throwError)(res, "Veuillez sélectionner une image valide", 400);
-            }
-            for (const productionModel of dataset.production_models) {
-                const res = yield axios_1.default.post(`${process.env.TF_SERVING_API_URL}/v${productionModel.model.version}/models/${productionModel.model.name}:predict`, {
-                    instances: [base64Image]
-                });
-                if (res.data.predictions === undefined || res.data.predictions.length === 0 || res.data.predictions[0].length === 0)
-                    throw new Error(`Error while prediction ${productionModel.model.name}`);
-                prediction[productionModel.model.name] = res.data.predictions[0][0];
-            }
-            res.json({ data: prediction });
+            return res.json({});
+            // const prediction: Record<string, any> = {
+            //         id: uuidv4()
+            // };
+            // prediction.textData = "";
+            // let base64Image = "";
+            // const configs = await getConfigs(database);
+            // const dataset = configs.datasets.find((item) => item.name == req.params.model)
+            // if (dataset === null || dataset === undefined) return throwError(res, "Veuillez sélectionner un dataset valide", 400);
+            // if (req.body.base64Image !== undefined) {
+            //         base64Image = req.body.base64Image;
+            // } else {
+            //         return throwError(res, "Veuillez sélectionner une image valide", 400);
+            // }
+            // for (const productionModel of dataset.production_models) {
+            //         const res = await axios.post(`${process.env.TF_SERVING_API_URL}/v${productionModel.model.version}/models/${productionModel.model.name}:predict`, {
+            //                 instances: [base64Image],
+            //                 maxContentLength: 100000000,
+            //                 maxBodyLength: 1000000000
+            //         })
+            //         if (res.data.predictions === undefined || res.data.predictions.length === 0 || res.data.predictions[0].length === 0) throw new Error(`Error while prediction ${productionModel.model.name}`);
+            //         const predictionValue = res.data.predictions[0][0]
+            //         prediction[productionModel.model.name] = predictionValue
+            //         prediction.textData += `${productionModel.model.name}: ${predictionValue} \n`
+            // }
+            // res.json({ data: prediction })
         }
         catch (error) {
             console.log("handled error => ", error);

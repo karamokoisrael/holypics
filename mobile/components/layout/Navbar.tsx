@@ -19,6 +19,7 @@ import { Category } from "../../@types/category";
 import { Store } from "../../@types/store";
 import { getImageUrl } from "../../helpers/utils";
 import { FlatList } from "react-native-gesture-handler";
+import { APP_WITH_LIMIT } from "../../constants/layout";
 
 export type Props = {
   navigation: any;
@@ -46,7 +47,7 @@ export default function Navbar({
         <HStack
           alignItems="center"
           justifyContent="space-between"
-          maxW="1184px"
+          maxW={`${APP_WITH_LIMIT}px`}
           width="100%"
         >
           <HStack space="8" alignItems="center">

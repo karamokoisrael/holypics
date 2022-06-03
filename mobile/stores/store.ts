@@ -1,3 +1,4 @@
+import { Directus } from '@directus/sdk';
 import { Category } from '../@types/category';
 import create from "zustand";
 import { devtools } from "zustand/middleware"
@@ -14,6 +15,7 @@ let store = (set: Function, get: Function): Store => ({
     notifications: [],
     socketConnId: "",
     socket: undefined,
+    directus: new Directus(environment.apiUrl),
     setBottomBarSelectedIndex: (value: number)=> set((state: Store) => ({bottomBarSelectedIndex: value})),
     setConfigs: (value: Record<string, any>)=> set((state: Store) => ({configs: value})),
     setColorMode: (value: "light" | "dark")=>{ return set( () => ({colorMode: value})) },

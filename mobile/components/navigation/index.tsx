@@ -15,8 +15,8 @@ import TermsAndUse from "../../screens/other/TermsAndUse";
 import { darkTheme, lightTheme, theme } from "../../constants/theme";
 import Search from "../../screens/product/Search";
 import useStore from "../../stores/store";
-import Category from "../../screens/category/notification/Category";
-import Categories from "../../screens/category/notification/Categories";
+import Category from "../../screens/category/Category";
+import Categories from "../../screens/category/Categories";
 import { bottomRoutes } from "../layout/BottomBar";
 import SignIn from "../../screens/authentication/SignIn";
 import OtpVerification from "../../screens/authentication/OtpVerification";
@@ -28,6 +28,8 @@ import Checkout from "../../screens/order/Checkout";
 import ShoppingCard from "../../screens/order/ShoppingCard";
 import Security from "../../screens/account/Security";
 import Account from "../../screens/account/Account";
+import Dataset from "../../screens/ia/Dataset";
+import DatasetAnalyser from "../../screens/ia/Dataset";
 
 type Route = {
   path: string;
@@ -110,6 +112,15 @@ export const routes: Routes = {
       title: "Catégories",
       inDrawer: true,
     },
+  ],
+
+  IA: [
+    {
+      path: "/:id",
+      component: DatasetAnalyser,
+      title: "Dataset",
+      inDrawer: false,
+    }
   ],
 
   Other: [

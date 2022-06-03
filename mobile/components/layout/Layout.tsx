@@ -5,6 +5,7 @@ import { LayoutProps } from "../../@types/layout";
 import Navbar from "./Navbar";
 import BottomBar from "./BottomBar";
 import Footer from "./Footer";
+import { APP_WITH_LIMIT } from "../../constants/layout";
 
 const Layout: React.FC<LayoutProps> = ({
   title,
@@ -32,7 +33,7 @@ const Layout: React.FC<LayoutProps> = ({
         </Hidden>
 
         <VStack
-          maxW="1184px"
+          maxW={`${APP_WITH_LIMIT}px`}
           flex={1}
           width="100%"
           height="100%"
