@@ -6944,6 +6944,13 @@
   optionalDependencies:
     "expo-error-recovery" "~3.1.0"
 
+"express-formidable@^1.2.0":
+  "integrity" "sha512-w1vXjF3gb50UKTNkFaW8/4rqY4dUrKfZ1sAZzwAF9YxCAgj/29QZsycf71di0GkskrZOAkubk9pvGYfxyAMYiw=="
+  "resolved" "https://registry.npmjs.org/express-formidable/-/express-formidable-1.2.0.tgz"
+  "version" "1.2.0"
+  dependencies:
+    "formidable" "^1.0.17"
+
 "express-logging@^1.1.1":
   "integrity" "sha1-YoOWGMurW7NhDxocFIU1L+nSbCo="
   "resolved" "https://registry.npmjs.org/express-logging/-/express-logging-1.1.1.tgz"
@@ -7394,7 +7401,7 @@
     "combined-stream" "^1.0.6"
     "mime-types" "^2.1.12"
 
-"formidable@^1.2.2":
+"formidable@^1.0.17", "formidable@^1.2.2":
   "integrity" "sha512-KcpbcpuLNOwrEjnbpMC0gS+X8ciDoZE1kkqzat4a8vrprf+s9pKNQ/QIwWfbfs4ltgmFl3MD177SNTkve3BwGQ=="
   "resolved" "https://registry.npmjs.org/formidable/-/formidable-1.2.6.tgz"
   "version" "1.2.6"
@@ -8149,6 +8156,13 @@
   "integrity" "sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ=="
   "resolved" "https://registry.npmjs.org/ignore/-/ignore-5.2.0.tgz"
   "version" "5.2.0"
+
+"image-to-base64@^2.2.0":
+  "integrity" "sha512-Z+aMwm/91UOQqHhrz7Upre2ytKhWejZlWV/JxUTD1sT7GWWKFDJUEV5scVQKnkzSgPHFuQBUEWcanO+ma0PSVw=="
+  "resolved" "https://registry.npmjs.org/image-to-base64/-/image-to-base64-2.2.0.tgz"
+  "version" "2.2.0"
+  dependencies:
+    "node-fetch" "^2.6.0"
 
 "immutable@^4.0.0":
   "integrity" "sha512-zIE9hX70qew5qTUjSS7wi1iwj/l7+m54KWU247nhM3v806UdGj1yDndXj+IOYxxtW9zyLI+xqFNZjTuDaLUqFw=="

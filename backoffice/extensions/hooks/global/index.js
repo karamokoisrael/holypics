@@ -10,7 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require('fs');
-function default_1({ filter, action }, apiExtension) {
+const bodyParser = require('body-parser');
+function default_1({ init, action }, apiExtension) {
     action('server.start', (meta) => __awaiter(this, void 0, void 0, function* () {
         console.log("server has started");
         const dir = './uploads/tmp';

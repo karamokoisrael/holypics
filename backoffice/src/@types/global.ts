@@ -85,6 +85,7 @@ export type Dataset = {
     date_updated: number;
     name: string;
     prediction_threshold: number;
+    neutral_class_name: string;
     class_names: null | string[];
     model_eval_code: null | string;
     thumb: string | string;
@@ -107,6 +108,7 @@ export type Model = {
     user_updated: string;
     date_updated: number;
     name: string;
+    class_name: string;
     dataset_id: string;
     file: string;
     tfjs_file: string;

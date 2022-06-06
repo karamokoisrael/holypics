@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "megamaxdevlopment",
-    "slug": "megamaxdevlopment",
+    "name": "megamaxdevelopment",
+    "slug": "megamaxdevelopment",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/img/logo.png",
@@ -24,7 +24,7 @@
         "foregroundImage": "./assets/img/logo.png",
         "backgroundColor": "#000"
       },
-      "package": "com.megamaxdevlopment"
+      "package": "com.megamaxdevelopment"
     },
     "web": {
       "favicon": "./assets/img/logo.png"

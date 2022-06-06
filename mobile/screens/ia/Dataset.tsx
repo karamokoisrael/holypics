@@ -85,27 +85,39 @@ export default function DatasetAnalyser({
   });
 
   const [predictions, setPredictions] = useState<Prediction[]>([]);
+  const [imageUrl, setImageUrl] = useState("");
 
-  const predict = async (base64Image: string) => {
+  const predict = async (base64Image: string = null, url: string = null) => {
     try {
-      const res = await axios.post(formatUrl(`ai/predict/${dataset.name}`), {
-        base64Image: base64Image.split(",")[1]
-      });
+      const formData = new FormData();
+      if (base64Image != null) {
+        formData.append("base64Image", base64Image);
+      }
+      if (url != null) {
+        formData.append("imageUrl", url);
+      }
+      const res = await axios.post(
+        formatUrl(`ai/predict/${dataset.name}`),
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
-      // if (res.data.data === undefined) throw new Error("No data returned");
-      // const { id, textData } = res.data.data;
-      // setPredictions([
-      //   ...predictions,
-      //   {
-      //     id,
-      //     textData,
-      //     json: res.data.data,
-      //     uri: base64Image,
-      //     rating: -1,
-      //     comment: null,
-      //     classNames: [],
-      //   },
-      // ]);
+      if (res.data.data === undefined) throw new Error("No data returned");
+      const { id, textData } = res.data.data;
+      setPredictions([
+        ...predictions,
+        {
+          id,
+          textData,
+          json: res.data.data,
+          uri: res.data.data.base64Image,
+          rating: -1,
+          comment: null,
+          classNames: [],
+        },
+      ]);
     } catch (error) {
       console.log("handled error => ", error);
       toast.closeAll();
@@ -114,6 +126,7 @@ export default function DatasetAnalyser({
       });
     }
   };
+
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     try {
@@ -132,7 +145,8 @@ export default function DatasetAnalyser({
                 (result as Record<string, any>).uri,
                 { encoding: "base64" }
               );
-        
+        // console.log(base64);
+
         await predict(base64);
       }
     } catch (error) {
@@ -158,6 +172,45 @@ export default function DatasetAnalyser({
     // })
   }, []);
 
+  const PredictionControls = () => (
+    <Stack
+      direction={"column"}
+      alignItems={"center"}
+      justifyContent={"space-around"}
+    >
+      <Button onPress={() => predict()}>Prédiction au hazard</Button>
+
+      <Button onPress={pickImage} marginTop={2}>
+        Sélectionner une image depuis l'appareil
+      </Button>
+
+      <Box alignItems="center" marginTop={2} w={isSmallScreen ? "70%" : "50%"}>
+        <Input
+          type="text"
+          w="100%"
+          py="0"
+          InputRightElement={
+            <Button
+              size="xs"
+              rounded="none"
+              w="1/6"
+              h="full"
+              onPress={() => predict(null, imageUrl)}
+            >
+              <Icon as={FontAwesome5} name="check"></Icon>
+            </Button>
+          }
+          placeholder="Url de l'image"
+          onChangeText={(value: string) => setImageUrl(value)}
+        />
+      </Box>
+
+      <Button onPress={() => setPredictions([])} marginTop={2}>
+        Nettoyer
+      </Button>
+    </Stack>
+  );
+  
   return (
     <Layout navigation={navigation} route={route}>
       <>
@@ -359,15 +412,7 @@ export default function DatasetAnalyser({
           {dataset.description}
         </Text>
         <Heading margin={5}>Tester {dataset.name}</Heading>
-        <Stack
-          direction={"row"}
-          alignItems={"center"}
-          justifyContent={"space-around"}
-        >
-          <Button onPress={pickImage}>
-            Sélectionner une image depuis l'appareil
-          </Button>
-        </Stack>
+        <PredictionControls/>
         <Stack
           flex={1}
           alignItems={"center"}
@@ -406,21 +451,21 @@ export default function DatasetAnalyser({
                     <Button
                       size={"md"}
                       onPress={() => {
-                        const currentPredictions = predictions.filter((item)=> item.id !== prediction.id)
+                        const currentPredictions = predictions.filter(
+                          (item) => item.id !== prediction.id
+                        );
                         setPredictions(currentPredictions);
                       }}
                       height={7}
                       width={7}
                     >
-                      <Icon
-                        size={"xs"}
-                        as={FontAwesome5}
-                        name="trash"
-                      />
+                      <Icon size={"xs"} as={FontAwesome5} name="trash" />
                     </Button>
                   </Stack>
                 </Box>
-                <Box px="4">{prediction.textData}</Box>
+                <Box px="4" height={70}>
+                  {prediction.textData}
+                </Box>
                 <Box px="4" flex={1}>
                   <Button
                     onPress={() => {
@@ -435,13 +480,11 @@ export default function DatasetAnalyser({
             </Box>
           ))}
         </Stack>
-        {/* <Stack
-          alignItems="center"
-          justifyContent="space-around"
-          height={WINDOW_HEIGHT}
-        >
-        
-        </Stack> */}
+        {
+          predictions.length > 5 ?
+          <PredictionControls/>
+          : null
+        }
       </>
     </Layout>
   );
