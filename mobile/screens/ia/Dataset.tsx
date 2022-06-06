@@ -88,7 +88,9 @@ export default function DatasetAnalyser({
   const [imageUrl, setImageUrl] = useState("");
 
   const predict = async (base64Image: string = null, url: string = null) => {
+    const id = toast.show({title: "Prédiction en cours"})
     try {
+      
       const formData = new FormData();
       if (base64Image != null) {
         formData.append("base64Image", base64Image);
@@ -124,6 +126,8 @@ export default function DatasetAnalyser({
       toast.show({
         title: "Nous avons rencontré un problème lors de l'opération",
       });
+    }finally{
+      toast.close(id)
     }
   };
 
