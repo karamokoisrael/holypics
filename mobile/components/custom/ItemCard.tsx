@@ -38,7 +38,7 @@ const ItemCard = ({ image, text, secondText, onPress }: Props) => {
         height={isSmallScreen ? 300 : 370}
         width={isSmallScreen ? WINDOW_WIDTH - 26 : 380}
         source={{ uri: image }}
-        alt="sfonefwoini"
+        alt={text}
       />
       <Stack
         alignItems={"flex-start"}

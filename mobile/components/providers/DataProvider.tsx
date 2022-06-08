@@ -17,6 +17,11 @@ import {
 } from "native-base";
 import { FontAwesome } from "@expo/vector-icons";
 import { ConditionalSuspense } from "../layout/ConditionalSuspense";
+import {
+  getJsonData,
+  storeJsonData,
+} from "../../helpers/local-storage";
+import { CONFIG_KEY_NAME } from "../../constants/global";
 
 export type Props = {
   children: JSX.Element;
@@ -27,18 +32,22 @@ const DataProvider: React.FC<Props> = ({ children }) => {
   const datasets = useStore((state) => state.configs.datasets);
 
   const configsFetcher = async (...args: Parameters<typeof fetch>) => {
-    const res = await fetch(...args);
-    const resJson = await res.json();
-    
-    if (resJson.errors !== undefined || resJson.data === undefined) throw new Error("No config found");
-    store.setConfigs({
-      ...resJson.data,
-      // appSettings: {
-      //   ...resJson.data?.appSettings,
-      //   currencies: JSON.parse(resJson.data?.appSettings?.currencies),
-      // },
-    });
-    return resJson.data;
+    try {
+      const res = await fetch(...args);
+      const resJson = await res.json();
+
+      if (resJson.errors !== undefined || resJson.data === undefined)
+        throw new Error("No config found");
+
+      await storeJsonData(CONFIG_KEY_NAME, resJson.data);
+      store.setConfigs(resJson.data);
+      return resJson.data;
+    } catch (error) {
+      const data = await getJsonData(CONFIG_KEY_NAME);
+      console.log(data);
+      if (data === null) throw new Error("No local config");
+      store.setConfigs(data);
+    }
   };
 
   useSWR(formatUrl("config"), configsFetcher, {

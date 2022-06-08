@@ -21,6 +21,7 @@ import {
 
 export default function App() {
   const colorMode = useStore((state) => state.colorMode);
+  if(process.env.NODE_ENV !== "development") console.log = ()=>{} 
   let [fontsLoaded] = useFonts({
     Inter_100Thin,
     Inter_200ExtraLight,

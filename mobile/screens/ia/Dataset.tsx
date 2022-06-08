@@ -1,6 +1,5 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import {
-  Center,
   Icon,
   Text,
   Image,
@@ -17,9 +16,15 @@ import {
   TextArea,
   CheckIcon,
   Select,
-  WarningOutlineIcon,
   useToast,
+  View,
 } from "native-base";
+import * as tf from "@tensorflow/tfjs";
+import { fetch } from "@tensorflow/tfjs-react-native";
+import * as mobilenet from "@tensorflow-models/mobilenet";
+import Constants from "expo-constants";
+import * as Permissions from "expo-permissions";
+import * as jpeg from "jpeg-js";
 import React, { useEffect, useState } from "react";
 import { ComponentWithNavigationProps } from "../../@types/component";
 import { Dataset } from "../../@types/global";
@@ -37,28 +42,13 @@ import { Platform, Pressable } from "react-native";
 import axios from "axios";
 import environment from "../../constants/environment";
 import * as FileSystem from "expo-file-system";
+import { Camera } from "expo-camera";
+import { cameraWithTensors } from "@tensorflow/tfjs-react-native";
+
 export default function DatasetAnalyser({
   navigation,
   route,
 }: ComponentWithNavigationProps) {
-  const datasets = useStore((state) => state.configs.datasets);
-  const directus = useStore((state) => state.directus);
-  const toast = useToast();
-  const [dataset, setDataset] = useState<Dataset>({
-    id: "",
-    name: "",
-    description: "",
-    short_description: "",
-    prediction_threshold: 0.5,
-    class_names: [],
-    thumb: "",
-    production_models: [],
-  });
-
-  const uuid = (
-    key: number = Math.floor(Math.random() * (10000 - 100 + 1)) + 100
-  ) => `${Date.now().toFixed().toString()}-${key}`;
-
   type Prediction = {
     id: string;
     uri: any;
@@ -68,13 +58,29 @@ export default function DatasetAnalyser({
     comment: string | null;
     classNames: string[];
     predictionData?: Record<string, any> | null;
+    blurred?: boolean;
   };
 
+  const datasets = useStore((state) => state.configs.datasets);
+  const directus = useStore((state) => state.directus);
+  const toast = useToast();
+  const [tfReady, setTfReadyState] = useState(false);
+  const [cameraPermissionGranted, setCameraPermission] = useState(false);
+  const [dataset, setDataset] = useState<Dataset>({
+    id: "",
+    name: "",
+    description: "",
+    short_description: "",
+    prediction_threshold: 0.5,
+    class_names: [],
+    thumb: "",
+    production_models: [],
+    blur_radius: 7,
+  });
   const [isSmallScreen] = useMediaQuery({ maxWidth: MAX_SMALL_SCREEN_WIDTH });
   const [showModal, setShowModal] = useState(false);
-
   const [modalContent, setModalContent] = useState<Prediction>({
-    id: uuid(),
+    id: " ",
     uri: getImageUrl(dataset.thumb),
     textData: "",
     json: {},
@@ -83,14 +89,22 @@ export default function DatasetAnalyser({
     classNames: [],
     predictionData: null,
   });
-
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [imageUrl, setImageUrl] = useState("");
+  const [model, setModel] = useState<Record<string, any>>({});
+
+  const [predictionControls, setPredictionControls] = useState<
+    Record<string, any>
+  >({
+    cameraOn: false,
+  });
+  const uuid = (
+    key: number = Math.floor(Math.random() * (10000 - 100 + 1)) + 100
+  ) => `${Date.now().toFixed().toString()}-${key}`;
 
   const predict = async (base64Image: string = null, url: string = null) => {
-    const id = toast.show({title: "Prédiction en cours"})
+    const id = toast.show({ title: "Prédiction en cours" });
     try {
-      
       const formData = new FormData();
       if (base64Image != null) {
         formData.append("base64Image", base64Image);
@@ -107,7 +121,7 @@ export default function DatasetAnalyser({
       );
 
       if (res.data.data === undefined) throw new Error("No data returned");
-      const { id, textData } = res.data.data;
+      const { id, textData, blurred } = res.data.data;
       setPredictions([
         ...predictions,
         {
@@ -118,6 +132,7 @@ export default function DatasetAnalyser({
           rating: -1,
           comment: null,
           classNames: [],
+          blurred: blurred,
         },
       ]);
     } catch (error) {
@@ -126,8 +141,8 @@ export default function DatasetAnalyser({
       toast.show({
         title: "Nous avons rencontré un problème lors de l'opération",
       });
-    }finally{
-      toast.close(id)
+    } finally {
+      toast.close(id);
     }
   };
 
@@ -161,6 +176,46 @@ export default function DatasetAnalyser({
     }
   };
 
+  const imageToTensor = (rawImageData) => {
+    const TO_UINT8ARRAY = true;
+
+    const { width, height, data } = jpeg.decode(rawImageData);
+
+    // Drop the alpha channel info for mobilenet
+
+    const buffer = new Uint8Array(width * height * 3);
+
+    let offset = 0; // offset into original data
+
+    for (let i = 0; i < buffer.length; i += 3) {
+      buffer[i] = data[offset];
+
+      buffer[i + 1] = data[offset + 1];
+
+      buffer[i + 2] = data[offset + 2];
+
+      offset += 4;
+    }
+
+    return tf.tensor3d(buffer, [height, width, 3]);
+  };
+
+  const handleCameraStream = (images: any, updatePreview: any, gl: any) => {
+    const loop = async () => {
+      const nextImageTensor = images.next().value;
+
+      //
+      // do something with tensor here
+      //
+
+      // if autorender is false you need the following two lines.
+      // updatePreview();
+      // gl.endFrameEXP();
+
+      requestAnimationFrame(loop);
+    };
+    loop();
+  };
   useEffect(() => {
     if (route.params.id === undefined) return navigation.navigate("Home");
 
@@ -170,19 +225,48 @@ export default function DatasetAnalyser({
       return navigation.navigate("Home");
 
     setDataset(currentDataset);
-    // directus.items("categories").readByQuery().then((items)=>{
-    //   console.log("items => ", items);
 
-    // })
+    tf.ready()
+      .then(async () => {
+        const cameraPermission = await Camera.requestCameraPermissionsAsync();
+        if (cameraPermission.status !== "granted")
+          return alert(
+            "Désolé. Nous avons besoin de cette permission afin d'initialiser l'IA"
+          );
+        const currentModel = await mobilenet.load();
+        setModel(currentModel);
+        setCameraPermission(true);
+        setTfReadyState(true);
+      })
+      .catch((error: any) => {
+        console.log("tf not loaded => ", error);
+        setTfReadyState(false);
+      });
   }, []);
 
+  const TensorCamera = cameraWithTensors(Camera);
   const PredictionControls = () => (
     <Stack
       direction={"column"}
       alignItems={"center"}
       justifyContent={"space-around"}
     >
-      <Button onPress={() => predict()}>Prédiction au hazard</Button>
+      {cameraPermissionGranted ? (
+        <Button
+          onPress={() =>
+            setPredictionControls({
+              ...predictionControls,
+              cameraOn: !predictionControls.cameraOn,
+            })
+          }
+        >
+          {" "}
+          {predictionControls.cameraOn ? "Désactiver" : "  Activer"} la caméra
+        </Button>
+      ) : null}
+      <Button marginTop={2} onPress={() => predict()}>
+        Prédiction au hazard
+      </Button>
 
       <Button onPress={pickImage} marginTop={2}>
         Sélectionner une image depuis l'appareil
@@ -214,7 +298,7 @@ export default function DatasetAnalyser({
       </Button>
     </Stack>
   );
-  
+
   return (
     <Layout navigation={navigation} route={route}>
       <>
@@ -231,6 +315,9 @@ export default function DatasetAnalyser({
                       width={"100%"}
                       source={{ uri: modalContent.uri }}
                       alt={modalContent.id}
+                      blurRadius={
+                        modalContent.blurred === true ? dataset.blur_radius : 0
+                      }
                     />
                   </Box>
                   <Box px="4">{modalContent.textData}</Box>
@@ -416,7 +503,23 @@ export default function DatasetAnalyser({
           {dataset.description}
         </Text>
         <Heading margin={5}>Tester {dataset.name}</Heading>
-        <PredictionControls/>
+        <PredictionControls />
+
+        {cameraPermissionGranted && predictionControls.cameraOn ? (
+          <View>
+            <TensorCamera
+              // Standard Camera props
+              //  style={}
+              type={Camera.Constants.Type.front}
+              // Tensor related props
+              resizeHeight={200}
+              resizeWidth={152}
+              resizeDepth={3}
+              onReady={handleCameraStream}
+              autorender={true}
+            />
+          </View>
+        ) : null}
         <Stack
           flex={1}
           alignItems={"center"}
@@ -441,6 +544,9 @@ export default function DatasetAnalyser({
                     width={"100%"}
                     source={{ uri: prediction.uri }}
                     alt={prediction.id}
+                    blurRadius={
+                      prediction.blurred === true ? dataset.blur_radius : 0
+                    }
                   />
                   <Stack
                     top={4}
@@ -484,11 +590,7 @@ export default function DatasetAnalyser({
             </Box>
           ))}
         </Stack>
-        {
-          predictions.length > 5 ?
-          <PredictionControls/>
-          : null
-        }
+        {predictions.length > 5 ? <PredictionControls /> : null}
       </>
     </Layout>
   );

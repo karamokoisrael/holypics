@@ -30,8 +30,8 @@ export const storeJsonData = async (key: string, value: any) => {
 export const getJsonData = async (key: string) => {
     try {
         const data = await getData(key)
-        let jsonValue: Record<string, any> | null  = null;
-        if(data != null) jsonValue = JSON.parse(key);
+        let jsonValue: Record<string, any> | null  = null;        
+        if(data != null) jsonValue = JSON.parse(data);
         return jsonValue;
     } catch (e) {
         return null;

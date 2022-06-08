@@ -76,7 +76,7 @@ export default function Home({
             fallBack={
               <MapList
                 data={[...Array(8).keys()]}
-                render={(key) => <ItemCardSkeleton />}
+                render={(key) => <ItemCardSkeleton key={key} />}
               />
             }
           >

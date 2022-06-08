@@ -86,10 +86,11 @@ export type Dataset = {
     name: string;
     prediction_threshold: number;
     neutral_class_name: string;
-    class_names: null | string[];
+    class_names: string[];
     model_eval_code: null | string;
     thumb: string | string;
     production_models: ProductionModel[];
+    available_locally: boolean;
 }
 
 export type ProductionModel = {
@@ -113,7 +114,7 @@ export type Model = {
     file: string;
     tfjs_file: string;
     session_id: string;
-    config: string;
+    config: Record<string, any>;
     tflite_file: null | string;
     tf_serving_file: null | string;
     version: number;

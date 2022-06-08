@@ -51,6 +51,7 @@
     "nodemailer": "^6.7.2",
     "pg": "^8.7.3",
     "pg-escape": "^0.2.0",
+    "safe-eval": "^0.4.1",
     "serverless-http": "^3.0.1",
     "socket.io": "^4.4.1",
     "source-map-support": "^0.5.20",

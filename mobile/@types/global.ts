@@ -91,6 +91,7 @@ export type Dataset = {
     production_models: ProductionModel[];
     description: string;
     short_description: string;
+    blur_radius: number;
 }
 
 export type ProductionModel = {
