@@ -1,24 +1,20 @@
 version: '3.4'
 services:
-  # backoffice:
-  #   container_name: ${BACKOFFICE_CONTAINER_NAME}
-  #   restart: always
-  #   build: 
-  #     dockerfile: Dockerfile
-  #     context: backoffice
-  #   env_file:
-  #     - .env
-  #     - config/environment/backoffice.env
-  #   ports:
-  #     - ${BACKOFFICE_PORT}:8055
-  #   links:
-  #     - db:db
-  #   depends_on:
-  #     - db
-  #   volumes:
-  #     - ./backoffice/extensions:/app/extensions
-  #     - backoffice_uploads:/app/uploads
-  #     - backoffice_migration:/app/migration
+  backoffice:
+    container_name: ${BACKOFFICE_CONTAINER_NAME}
+    restart: always
+    build: 
+      dockerfile: Dockerfile
+      context: backoffice
+    env_file:
+      - .env
+      - config/environment/backoffice.env
+    ports:
+      - ${BACKOFFICE_PORT}:8055
+    volumes:
+      - ./backoffice/extensions:/app/extensions
+      - backoffice_uploads:/app/uploads
+      - backoffice_migration:/app/migration
 
   # server:
   #   container_name: ${SERVER_CONTAINER_NAME}
@@ -74,8 +70,8 @@ services:
     volumes:
       - './models:/models'
     command: --model_config_file=/models/models.config
-# volumes:
-#   backoffice_uploads:
-#   backoffice_migration:
+volumes:
+  backoffice_uploads:
+  backoffice_migration:
 
 
