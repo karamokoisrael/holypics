@@ -147,6 +147,7 @@ const DataProvider: React.FC<Props> = ({ children }) => {
       <SWRConfig
         value={{
           refreshInterval: 0,
+          revalidateOnFocus: false,
           fetcher: configsFetcher,
         }}
       >

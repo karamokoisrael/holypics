@@ -17,7 +17,7 @@ import {
   CheckIcon,
   Select,
   useToast,
-  View,
+  Center,
 } from "native-base";
 import * as tf from "@tensorflow/tfjs";
 import { fetch } from "@tensorflow/tfjs-react-native";
@@ -25,7 +25,8 @@ import * as mobilenet from "@tensorflow-models/mobilenet";
 import Constants from "expo-constants";
 import * as Permissions from "expo-permissions";
 import * as jpeg from "jpeg-js";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Dimensions, StyleSheet } from "react-native";
 import { ComponentWithNavigationProps } from "../../@types/component";
 import { Dataset } from "../../@types/global";
 import Layout from "../../components/layout/Layout";
@@ -40,15 +41,14 @@ import * as ImagePicker from "expo-image-picker";
 import { MapList } from "../../components/layout/MapList";
 import { Platform, Pressable } from "react-native";
 import axios from "axios";
-import environment from "../../constants/environment";
 import * as FileSystem from "expo-file-system";
 import { Camera } from "expo-camera";
-import { cameraWithTensors } from "@tensorflow/tfjs-react-native";
 
 export default function DatasetAnalyser({
   navigation,
   route,
 }: ComponentWithNavigationProps) {
+
   type Prediction = {
     id: string;
     uri: any;
@@ -64,8 +64,8 @@ export default function DatasetAnalyser({
   const datasets = useStore((state) => state.configs.datasets);
   const directus = useStore((state) => state.directus);
   const toast = useToast();
-  const [tfReady, setTfReadyState] = useState(false);
-  const [cameraPermissionGranted, setCameraPermission] = useState(false);
+  const [isSmallScreen] = useMediaQuery({ maxWidth: MAX_SMALL_SCREEN_WIDTH });
+
   const [dataset, setDataset] = useState<Dataset>({
     id: "",
     name: "",
@@ -77,32 +77,39 @@ export default function DatasetAnalyser({
     production_models: [],
     blur_radius: 7,
   });
-  const [isSmallScreen] = useMediaQuery({ maxWidth: MAX_SMALL_SCREEN_WIDTH });
-  const [showModal, setShowModal] = useState(false);
-  const [modalContent, setModalContent] = useState<Prediction>({
-    id: " ",
-    uri: getImageUrl(dataset.thumb),
-    textData: "",
-    json: {},
-    rating: -1,
-    comment: null,
-    classNames: [],
-    predictionData: null,
-  });
+  const [modalData, setModalData] = useState({
+    visible: false,
+    content: {
+      id: " ",
+      uri: "",
+      textData: "",
+      json: {},
+      rating: -1,
+      comment: null,
+      classNames: [],
+      predictionData: null,
+    } as Prediction
+  })
   const [predictions, setPredictions] = useState<Prediction[]>([]);
-  const [imageUrl, setImageUrl] = useState("");
-  const [model, setModel] = useState<Record<string, any>>({});
-
   const [predictionControls, setPredictionControls] = useState<
     Record<string, any>
   >({
     cameraOn: false,
+    tfReady: false,
+    cameraPermissionGranted: false,
+    cameraType: Camera.Constants.Type.front
   });
+
+  const cameraRef = useRef(null);
+  const formRef = useRef({
+    imageUrl: ""
+  })
+
   const uuid = (
     key: number = Math.floor(Math.random() * (10000 - 100 + 1)) + 100
   ) => `${Date.now().toFixed().toString()}-${key}`;
 
-  const predict = async (base64Image: string = null, url: string = null) => {
+  const predict = async (base64Image: string = null, url: string = null, live = false) => {
     const id = toast.show({ title: "Prédiction en cours" });
     try {
       const formData = new FormData();
@@ -122,19 +129,23 @@ export default function DatasetAnalyser({
 
       if (res.data.data === undefined) throw new Error("No data returned");
       const { id, textData, blurred } = res.data.data;
+      const predictionOutput = {
+        id,
+        textData,
+        json: res.data.data,
+        uri: res.data.data.base64Image,
+        rating: -1,
+        comment: null,
+        classNames: [],
+        blurred: blurred,
+      }
+
       setPredictions([
-        ...predictions,
-        {
-          id,
-          textData,
-          json: res.data.data,
-          uri: res.data.data.base64Image,
-          rating: -1,
-          comment: null,
-          classNames: [],
-          blurred: blurred,
-        },
+        ...[predictionOutput],
+        ...predictions
       ]);
+
+
     } catch (error) {
       console.log("handled error => ", error);
       toast.closeAll();
@@ -157,13 +168,12 @@ export default function DatasetAnalyser({
       });
 
       if (!result.cancelled) {
-        const base64: string =
-          Platform.OS == "web"
+        const base64: string = Platform.OS === "web"
             ? (result as Record<string, any>).uri
-            : await FileSystem.readAsStringAsync(
-                (result as Record<string, any>).uri,
-                { encoding: "base64" }
-              );
+            : `data:image/jpg;base64,${await FileSystem.readAsStringAsync(
+              (result as Record<string, any>).uri,
+              { encoding: "base64" }
+            )}`
         // console.log(base64);
 
         await predict(base64);
@@ -176,46 +186,13 @@ export default function DatasetAnalyser({
     }
   };
 
-  const imageToTensor = (rawImageData) => {
-    const TO_UINT8ARRAY = true;
-
-    const { width, height, data } = jpeg.decode(rawImageData);
-
-    // Drop the alpha channel info for mobilenet
-
-    const buffer = new Uint8Array(width * height * 3);
-
-    let offset = 0; // offset into original data
-
-    for (let i = 0; i < buffer.length; i += 3) {
-      buffer[i] = data[offset];
-
-      buffer[i + 1] = data[offset + 1];
-
-      buffer[i + 2] = data[offset + 2];
-
-      offset += 4;
-    }
-
-    return tf.tensor3d(buffer, [height, width, 3]);
+  const handleImageCapture = async () => {
+    const imageData = await cameraRef.current?.takePictureAsync({
+      base64: true,
+    });
+    await predict(imageData.base64, null, false)
   };
 
-  const handleCameraStream = (images: any, updatePreview: any, gl: any) => {
-    const loop = async () => {
-      const nextImageTensor = images.next().value;
-
-      //
-      // do something with tensor here
-      //
-
-      // if autorender is false you need the following two lines.
-      // updatePreview();
-      // gl.endFrameEXP();
-
-      requestAnimationFrame(loop);
-    };
-    loop();
-  };
   useEffect(() => {
     if (route.params.id === undefined) return navigation.navigate("Home");
 
@@ -233,25 +210,23 @@ export default function DatasetAnalyser({
           return alert(
             "Désolé. Nous avons besoin de cette permission afin d'initialiser l'IA"
           );
-        const currentModel = await mobilenet.load();
-        setModel(currentModel);
-        setCameraPermission(true);
-        setTfReadyState(true);
+        // const currentModel = await mobilenet.load();
+        // setModel(currentModel);
+        setPredictionControls({ ...predictionControls, cameraPermissionGranted: true, tfReady: true })
       })
       .catch((error: any) => {
         console.log("tf not loaded => ", error);
-        setTfReadyState(false);
-      });
+        setPredictionControls({ ...predictionControls, tfReady: false })
+      })
   }, []);
 
-  const TensorCamera = cameraWithTensors(Camera);
   const PredictionControls = () => (
-    <Stack
+    <VStack
       direction={"column"}
       alignItems={"center"}
       justifyContent={"space-around"}
     >
-      {cameraPermissionGranted ? (
+      {predictionControls.cameraPermissionGranted ? (
         <Button
           onPress={() =>
             setPredictionControls({
@@ -260,8 +235,10 @@ export default function DatasetAnalyser({
             })
           }
         >
-          {" "}
-          {predictionControls.cameraOn ? "Désactiver" : "  Activer"} la caméra
+          <Icon
+            as={FontAwesome5}
+            name={predictionControls.cameraOn ? "camera" : "camera"}
+          ></Icon>
         </Button>
       ) : null}
       <Button marginTop={2} onPress={() => predict()}>
@@ -283,26 +260,27 @@ export default function DatasetAnalyser({
               rounded="none"
               w="1/6"
               h="full"
-              onPress={() => predict(null, imageUrl)}
+              onPress={() => { predict(null, formRef.current.imageUrl); formRef.current.imageUrl = "" }}
             >
               <Icon as={FontAwesome5} name="check"></Icon>
             </Button>
           }
           placeholder="Url de l'image"
-          onChangeText={(value: string) => setImageUrl(value)}
+          defaultValue={formRef.current.imageUrl}
+          onChangeText={(value: string) => formRef.current = { ...formRef.current, imageUrl: value }}
         />
       </Box>
 
       <Button onPress={() => setPredictions([])} marginTop={2}>
         Nettoyer
       </Button>
-    </Stack>
+    </VStack>
   );
 
   return (
     <Layout navigation={navigation} route={route}>
       <>
-        <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+        <Modal isOpen={modalData.visible} onClose={() => setModalData({ ...modalData, visible: false })}>
           <Modal.Content maxWidth="400px">
             <Modal.CloseButton />
             <Modal.Header>Prédiction</Modal.Header>
@@ -313,14 +291,14 @@ export default function DatasetAnalyser({
                     <Image
                       height={isSmallScreen ? 150 : 200}
                       width={"100%"}
-                      source={{ uri: modalContent.uri }}
-                      alt={modalContent.id}
+                      source={{ uri: modalData.content.uri }}
+                      alt={modalData.content.id}
                       blurRadius={
-                        modalContent.blurred === true ? dataset.blur_radius : 0
+                        modalData.content.blurred === true ? dataset.blur_radius : 0
                       }
                     />
                   </Box>
-                  <Box px="4">{modalContent.textData}</Box>
+                  <Box px="4">{modalData.content.textData}</Box>
                   <Box
                     px="4"
                     flex={1}
@@ -339,18 +317,21 @@ export default function DatasetAnalyser({
                           <Pressable
                             key={star}
                             onPress={() =>
-                              setModalContent({
-                                ...modalContent,
-                                rating:
-                                  modalContent.rating === star
-                                    ? star - 1
-                                    : star,
+                              setModalData({
+                                ...modalData,
+                                content: {
+                                  ...modalData.content,
+                                  rating:
+                                    modalData.content.rating === star
+                                      ? star - 1
+                                      : star
+                                }
                               })
                             }
                           >
                             <Icon
                               color={
-                                modalContent.rating >= star ? "#ffff00" : "#000"
+                                modalData.content.rating >= star ? "#ffff00" : "#000"
                               }
                               as={FontAwesome5}
                               name="star"
@@ -380,14 +361,19 @@ export default function DatasetAnalyser({
                           bg: "teal.600",
                           endIcon: <CheckIcon size={5} />,
                         }}
-                        // selectedValue={modalContent.classNames[0]}
+                        // selectedValue={modalData.content.classNames[0]}
                         mt="1"
                         onValueChange={(value) => {
                           if (value === undefined || value === null) return;
-                          setModalContent({
-                            ...modalContent,
-                            classNames: [value],
-                          });
+                          setModalData({
+                            ...modalData,
+                            content: {
+                              ...modalData.content,
+                              classNames: [value]
+                            }
+                          })
+
+
                         }}
                       >
                         {dataset.class_names.map((className) => (
@@ -414,9 +400,15 @@ export default function DatasetAnalyser({
                       w="75%"
                       maxW="300"
                       onChangeText={(text) =>
-                        setModalContent({ ...modalContent, comment: text })
+                        setModalData({
+                          ...modalData,
+                          content: {
+                            ...modalData.content,
+                            comment: text
+                          }
+                        })
                       }
-                      value={modalContent.comment}
+                      value={modalData.content.comment}
                     />
                   </Box>
                 </VStack>
@@ -435,27 +427,22 @@ export default function DatasetAnalyser({
                 <Button
                   variant="ghost"
                   colorScheme="blueGray"
-                  onPress={() => {
-                    setShowModal(false);
-                  }}
+                  onPress={() => setModalData({ ...modalData, visible: false })}
                 >
                   Annuler
                 </Button>
                 <Button
                   onPress={async () => {
-                    console.log(modalContent);
-
-                    return;
                     try {
                       const res = await axios.post(
                         formatUrl("items/feedbacks"),
                         {
-                          comment: modalContent.comment,
-                          rating: modalContent.rating - 1,
+                          comment: modalData.content.comment,
+                          rating: modalData.content.rating - 1,
                           dataset_id: dataset.id,
-                          class_names: modalContent.classNames,
-                          prediction_data: modalContent.predictionData || null,
-                          image_url: modalContent.uri,
+                          class_names: modalData.content.classNames,
+                          prediction_data: modalData.content.predictionData || null,
+                          image_url: modalData.content.uri,
                           status: "published",
                         }
                       );
@@ -463,9 +450,9 @@ export default function DatasetAnalyser({
                       if ([204, 200].includes(res.status)) {
                         toast.closeAll();
                         toast.show({ title: "Réponse soumisse avec succès" });
-                        return setShowModal(false);
+                        return setModalData({ ...modalData, visible: false })
                       }
-                    } catch (error) {}
+                    } catch (error) { }
                   }}
                 >
                   Soumettre
@@ -474,57 +461,92 @@ export default function DatasetAnalyser({
             </Modal.Footer>
           </Modal.Content>
         </Modal>
-        <Image
-          source={{ uri: getImageUrl(dataset.thumb) }}
-          height={300}
-          width={"100%"}
-          // style={{ resizeMode: "resize" }}
-          alt={dataset.name}
-        />
-        <Stack
-          top={4}
-          left={1}
-          backgroundColor={"bg.dark"}
-          height={12}
-          position="absolute"
-          fontSize={20}
-          zIndex={99}
-          flex={1}
-          alignItems="flex-start"
-          justifyContent="flex-start"
-          padding={1.5}
-          rounded={"xl"}
-        >
-          <Text color={"#fff"} fontSize={"2xl"}>
-            {dataset.name}
-          </Text>
-        </Stack>
-        <Text color={"#fff"} fontSize={"md"} padding={2}>
-          {dataset.description}
-        </Text>
-        <Heading margin={5}>Tester {dataset.name}</Heading>
-        <PredictionControls />
 
-        {cameraPermissionGranted && predictionControls.cameraOn ? (
-          <View>
-            <TensorCamera
-              // Standard Camera props
-              //  style={}
-              type={Camera.Constants.Type.front}
-              // Tensor related props
-              resizeHeight={200}
-              resizeWidth={152}
-              resizeDepth={3}
-              onReady={handleCameraStream}
-              autorender={true}
-            />
-          </View>
-        ) : null}
-        <Stack
+        <Modal isOpen={predictionControls.cameraPermissionGranted && predictionControls.cameraOn} onClose={() => setPredictionControls({ ...predictionControls, cameraOn: false })}>
+          <Modal.Content maxWidth={350}>
+            <Modal.CloseButton />
+            <Modal.Header>Prédiction</Modal.Header>
+            <Modal.Body width={350} height={350}>
+              <Camera
+                ref={cameraRef}
+                style={{
+                  width: 300,
+                  height: 350,
+                }}
+                type={predictionControls.cameraType === Camera.Constants.Type.front ? Camera.Constants.Type.back : Camera.Constants.Type.front}
+                autoFocus={true}
+                whiteBalance={Camera.Constants.WhiteBalance.auto}
+              ></Camera>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button.Group space={3}>
+                <Button
+                  variant="ghost"
+                  colorScheme="blueGray"
+                  onPress={() => setPredictionControls({ ...predictionControls, cameraOn: false })}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  onPress={() => setPredictionControls(
+                    { ...predictionControls, 
+                      cameraType: ""
+                    })}
+                >
+                  <Icon as={FontAwesome5} name="user"></Icon>
+                </Button>
+                <Button
+                  onPress={() => {handleImageCapture(); setPredictionControls({ ...predictionControls, cameraOn: false })}}
+                >
+                  Prédire
+                </Button>
+              </Button.Group>
+            </Modal.Footer>
+          </Modal.Content>
+        </Modal>
+
+        <VStack>
+          <Image
+            source={{ uri: getImageUrl(dataset.thumb) }}
+            height={300}
+            width={"100%"}
+            // style={{ resizeMode: "resize" }}
+            alt={dataset.name}
+          />
+          <Stack
+            top={4}
+            left={1}
+            backgroundColor={"bg.dark"}
+            height={12}
+            position="absolute"
+            fontSize={20}
+            zIndex={99}
+            flex={1}
+            alignItems="flex-start"
+            justifyContent="flex-start"
+            padding={1.5}
+            rounded={"xl"}
+          >
+            <Text color={"#fff"} fontSize={"2xl"}>
+              {dataset.name}
+            </Text>
+          </Stack>
+          <Text color={"#fff"} fontSize={"md"} padding={2}>
+            {dataset.description}
+          </Text>
+        </VStack>
+
+        <VStack>
+          <Heading margin={5}>Tester {dataset.name}</Heading>
+          <PredictionControls />
+
+        </VStack>
+
+        <VStack
           flex={1}
           alignItems={"center"}
           width={"100%"}
-          paddingBottom={2}
+          padding={2}
           justifyContent={"flex-start"}
           direction={"row"}
           flexWrap={"wrap"}
@@ -577,21 +599,17 @@ export default function DatasetAnalyser({
                   {prediction.textData}
                 </Box>
                 <Box px="4" flex={1}>
-                  <Button
-                    onPress={() => {
-                      setModalContent(prediction);
-                      setShowModal(true);
-                    }}
-                  >
+                  <Button onPress={() => setModalData({ content: prediction, visible: true })}>
                     Voir plus
                   </Button>
                 </Box>
               </VStack>
             </Box>
           ))}
-        </Stack>
-        {predictions.length > 5 ? <PredictionControls /> : null}
+        </VStack>
       </>
     </Layout>
   );
 }
+
+const styles = StyleSheet.create({});

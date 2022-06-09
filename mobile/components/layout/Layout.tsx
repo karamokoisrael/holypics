@@ -1,6 +1,5 @@
 import React, { Fragment } from "react";
 import { VStack, StatusBar, ScrollView, Hidden } from "native-base";
-
 import { LayoutProps } from "../../@types/layout";
 import Navbar from "./Navbar";
 import BottomBar from "./BottomBar";

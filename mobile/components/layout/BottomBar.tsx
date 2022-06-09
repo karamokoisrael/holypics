@@ -26,6 +26,7 @@ export const bottomRoutes = [
     path: "ShoppingCard",
   },
 ];
+
 const BottomBar: React.FC<ComponentWithNavigationProps> = ({
   navigation,
   route,
@@ -103,7 +104,7 @@ const BottomBar: React.FC<ComponentWithNavigationProps> = ({
       _dark={{ bg: "bg.dark" }}
       flexDirection="row"
       width="100%"
-      maxHeight={"60px"}
+      maxHeight={"100px"}
       padding={0}
       margin={0}
     >

@@ -34,10 +34,6 @@ export default function Home({
   return (
     <Layout navigation={navigation} route={route}>
       <>
-        {/* <ConditionalSuspense condition={isSmallScreen}>
-          <Text>lkghj</Text>
-        </ConditionalSuspense> */}
-
         <Stack
           flex={1}
           alignItems={"center"}

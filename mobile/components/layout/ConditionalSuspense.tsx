@@ -4,7 +4,6 @@ type Props = {
   fallBack?: JSX.Element;
 };
 
-
 type RenderProps = {
   condition: boolean;
   component: JSX.Element;
