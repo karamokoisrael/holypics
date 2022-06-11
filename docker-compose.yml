@@ -1,5 +1,6 @@
 version: '3.4'
 services:
+
   website:
     container_name: ${WEBSITE_CONTAINER_NAME}
     restart: always
@@ -28,51 +29,18 @@ services:
       - backoffice_uploads:/app/uploads
       - backoffice_migration:/app/migration
 
-  # server:
-  #   container_name: ${SERVER_CONTAINER_NAME}
-  #   build: 
-  #     dockerfile: Dockerfile
-  #     context: server
-  #   restart: always
-  #   env_file:
-  #     - .env
-  #     - ./config/environment/server.env
-  #   ports:
-  #     - ${SERVER_PORT}:81
-  #   volumes:
-  #     - ./server/uploads:/usr/src/app/uploads
-    
-  # nginx:
-  #   image: ${NGINX_CONTAINER_NAME}
-  #   build: 
-  #     dockerfile: Dockerfile-nginx
-  #     context: server
-  #   ports:
-  #     - ${SERVER_NGINX_PORT}:80
-  #   depends_on:
-  #     - server
-
-  # web:
-  #   container_name: ${WEB_CONTAINER_NAME}
-  #   restart: always
-  #   build:
-  #     dockerfile: Dockerfile
-  #     context: web
-  #   ports:
-  #     - ${WEBSITE_PORT}:3000
-
-  # filebrowser:
-  #   container_name: ${FILE_BROWSER_CONTAINER_NAME}
-  #   image: hurlenko/filebrowser
-  #   user: "${FILEBROWSER_UID}:${FILEBROWSER_GID}"
-  #   ports:
-  #     - ${FILEBROWSER_PORT}:8080
-  #   volumes:
-  #     - ./data:/data
-  #     # - /CONFIG_DIR:/config
-  #   environment:
-  #     - FB_BASEURL=/filebrowser
-  #   restart: always
+  filebrowser:
+    container_name: ${FILE_BROWSER_CONTAINER_NAME}
+    image: hurlenko/filebrowser
+    user: "${FILEBROWSER_UID}:${FILEBROWSER_GID}"
+    ports:
+      - ${FILEBROWSER_PORT}:8080
+    volumes:
+      - ./data:/data
+      # - /CONFIG_DIR:/config
+    environment:
+      - FB_BASEURL=/filebrowser
+    restart: always
 
   tfserver:
     image: tensorflow/serving
@@ -82,6 +50,7 @@ services:
     volumes:
       - './models:/models'
     command: --model_config_file=/models/models.config
+
 volumes:
   backoffice_uploads:
   backoffice_migration:
