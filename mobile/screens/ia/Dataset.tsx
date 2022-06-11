@@ -17,23 +17,15 @@ import {
   CheckIcon,
   Select,
   useToast,
-  Center,
 } from "native-base";
 import * as tf from "@tensorflow/tfjs";
-import { fetch } from "@tensorflow/tfjs-react-native";
-import * as mobilenet from "@tensorflow-models/mobilenet";
-import Constants from "expo-constants";
-import * as Permissions from "expo-permissions";
-import * as jpeg from "jpeg-js";
 import React, { useEffect, useRef, useState } from "react";
-import { Dimensions, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { ComponentWithNavigationProps } from "../../@types/component";
 import { Dataset } from "../../@types/global";
 import Layout from "../../components/layout/Layout";
 import {
   MAX_SMALL_SCREEN_WIDTH,
-  WINDOW_HEIGHT,
-  WINDOW_WIDTH,
 } from "../../constants/layout";
 import { formatUrl, getImageUrl } from "../../helpers/utils";
 import useStore from "../../stores/store";
