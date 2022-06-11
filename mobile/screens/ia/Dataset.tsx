@@ -77,6 +77,7 @@ export default function DatasetAnalyser({
     production_models: [],
     blur_radius: 7,
   });
+
   const [modalData, setModalData] = useState({
     visible: false,
     content: {
@@ -447,9 +448,11 @@ export default function DatasetAnalyser({
                         }
                       );
 
+                      toast.show({ title: "Opération en cours" });
+
                       if ([204, 200].includes(res.status)) {
                         toast.closeAll();
-                        toast.show({ title: "Réponse soumisse avec succès" });
+                        toast.show({ title: "Réponse soumise avec succès" });
                         return setModalData({ ...modalData, visible: false })
                       }
                     } catch (error) { }
