@@ -8,30 +8,39 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const ai_1 = require("./../../helpers/ai");
-const auth_1 = require("./../../helpers/auth");
 const exceptions_1 = require("./../../helpers/exceptions");
 const endpoints_1 = require("../../helpers/endpoints");
-const formidable = require('express-formidable');
+const translation_1 = require("../../helpers/translation");
+const body_parser_1 = __importDefault(require("body-parser"));
 const imageToBase64 = require('image-to-base64');
+const multer = require('multer');
 function default_1(router, { database }) {
+    router.use(body_parser_1.default.json());
     // in latest body-parser use like below.
-    // router.use(bodyParser.urlencoded({ extended: true }));
-    router.use(formidable());
-    router.post('/predict/:model', (req, res) => __awaiter(this, void 0, void 0, function* () {
+    router.use(body_parser_1.default.urlencoded({ extended: true }));
+    // router.use(expressFormidable());
+    router.post('/predict/:model', multer().single('file'), (req, res) => __awaiter(this, void 0, void 0, function* () {
+        var _a, _b;
+        const t = yield (0, translation_1.getTranslator)(req, database);
         try {
-            const reqBody = req.fields;
+            const reqBody = req.body;
             let base64Image = "";
-            const configs = yield (0, endpoints_1.getConfigs)(database);
-            const dataset = configs.datasets.find((item) => item.name == req.params.model);
-            if (dataset === null || dataset === undefined)
-                return (0, exceptions_1.throwError)(res, "Veuillez sélectionner un dataset valide", 400);
-            if (reqBody.base64Image !== undefined) {
-                base64Image = reqBody.base64Image;
+            const modelData = yield (0, endpoints_1.getConfigs)(database, req.params.model);
+            if (modelData.id == undefined)
+                return (0, exceptions_1.throwError)(res, t("we_encountered_an_unexpected_error_during_the_operation"), 400);
+            const file = (_b = (_a = req) === null || _a === void 0 ? void 0 : _a.file) === null || _b === void 0 ? void 0 : _b.buffer;
+            const getBaseImageBack = reqBody.get_image_back !== undefined && Boolean(reqBody.get_image_back) == true;
+            if (file !== undefined) {
+                const base64 = file.toString('base64');
+                base64Image = `data:image/jpg;base64,${base64}`;
             }
-            else if (reqBody.imageUrl !== undefined) {
-                const base64 = yield imageToBase64(reqBody.imageUrl);
+            else if (reqBody.url !== undefined) {
+                const base64 = yield imageToBase64(reqBody.url);
                 base64Image = `data:image/jpg;base64,${base64}`;
             }
             else {
@@ -47,18 +56,13 @@ function default_1(router, { database }) {
                 const base64 = yield imageToBase64(randomImageUrl);
                 base64Image = `data:image/jpg;base64,${base64}`;
             }
-            const prediction = yield (0, ai_1.predict)(dataset, base64Image);
-            if (prediction.id === null)
-                throw new Error(`Error while prediction`);
+            const prediction = yield (0, ai_1.predict)(modelData, base64Image, getBaseImageBack);
             res.json({ data: prediction });
         }
         catch (error) {
             console.log("handled error => ", error);
-            return (0, exceptions_1.throwError)(res);
+            return (0, exceptions_1.throwError)(res, t("we_encountered_an_unexpected_error_during_the_operation"));
         }
-    }));
-    router.post('/test', (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const directus = yield (0, auth_1.getDirectusStatic)(req, "adsjkbhve");
     }));
 }
 exports.default = default_1;

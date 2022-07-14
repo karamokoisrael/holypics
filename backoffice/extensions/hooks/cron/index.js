@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = require("../../helpers/db");
-function default_1({ filter, schedule, }, { services, exceptions, emitter, database }) {
+function default_1({ filter, schedule, }, { services, exceptions, database }) {
     schedule('0 0 * * *', () => __awaiter(this, void 0, void 0, function* () {
         try {
             (0, db_1.dump)();

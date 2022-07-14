@@ -5,7 +5,7 @@ EXPOSE 8055
 
 ENV NODE_ENV=production
 RUN npm install && npm cache clean --force
-RUN npm install -g directus-extension-builder
+# RUN npm install -g directus-extension-builder
 # COPY . /app
 RUN chmod -R 755 /app
 CMD ["npm", "start"]

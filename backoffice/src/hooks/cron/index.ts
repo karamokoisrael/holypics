@@ -5,7 +5,7 @@ import { dump, getDumpList, restore } from "../../helpers/db"
 import { ApiExtensionContext } from "@directus/shared/types";
 import { EventContext, RegisterFunctions } from "../../@types/directus";
 
-export default function({ filter, schedule, }: RegisterFunctions, { services, exceptions, emitter, database }: ApiExtensionContext){
+export default function({ filter, schedule, }: RegisterFunctions, { services, exceptions, database }: ApiExtensionContext){
     schedule('0 0 * * *', async () => {
         try {
             dump()

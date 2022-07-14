@@ -15,37 +15,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.predict = void 0;
 const axios_1 = __importDefault(require("axios"));
 const uuid_1 = require("uuid");
-const predictFromModel = (productionModel, pureBase64Image) => __awaiter(void 0, void 0, void 0, function* () {
-    const response = yield axios_1.default.post(`${process.env.TF_SERVING_API_URL}/v${productionModel.model.version}/models/${productionModel.model.name}:predict`, {
+const predictFromModel = (model, pureBase64Image) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(`${process.env.TF_SERVING_API_URL}/v${model.current_version}/models/${model.name}:predict`);
+    const response = yield axios_1.default.post(`${process.env.TF_SERVING_API_URL}/v${model.current_version}/models/${model.name}:predict`, {
         instances: [pureBase64Image],
     });
     return response;
 });
-const predict = (dataset, base64Image) => __awaiter(void 0, void 0, void 0, function* () {
+const predict = (model, base64Image, getBaseImageBack) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const prediction = {
             id: (0, uuid_1.v4)(),
-            textData: "",
-            blurred: false,
             result: {},
-            base64Image
         };
-        const productionModel = dataset.production_models[0];
-        const modelConfig = productionModel.model.config;
+        if (getBaseImageBack)
+            prediction.base64_image = base64Image;
         const splitedImage = base64Image.split(",");
-        const response = yield predictFromModel(productionModel, splitedImage[splitedImage.length - 1]);
+        const response = yield predictFromModel(model, splitedImage[splitedImage.length - 1]);
+        // console.log(`${process.env.TF_SERVING_API_URL}/v${model.current_version}/models/${model.name}:predict`);
+        // const response = {data: {predictions: [[1, 1, 1]] }}
         const predictionOutput = response.data.predictions[0];
         for (let i = 0; i < predictionOutput.length; i++) {
             const predictionValue = predictionOutput[i];
-            prediction.result[modelConfig.classes[i]] = predictionValue;
-            if (predictionValue > modelConfig.prediction_threshold) {
-                prediction.textData += `${dataset.class_names[i]}: ${Math.round(predictionValue * 100)}% \n`;
-            }
+            prediction.result[model.parameters[i].key] = Object.assign(Object.assign({}, model.parameters[i]), { value: predictionValue });
         }
-        if (predictionOutput[predictionOutput.length - 1] < dataset.prediction_threshold)
-            prediction.blurred = true;
-        if (prediction.textData === "")
-            prediction.textData = dataset.neutral_class_name;
         return prediction;
     }
     catch (error) {

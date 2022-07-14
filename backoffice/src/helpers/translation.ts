@@ -1,23 +1,42 @@
-import { getHost } from './utils';
 import { Knex } from 'knex';
-import { getAdminTokens } from "./auth";
+import { Request } from "express";
+import { logInformation } from './logger';
 
-// export const translate = async (key: string, lang: string, database?: Knex, req?: any, accessToken?: string, host?: string) => {
-    
-//     if(accessToken == undefined && database != undefined) {
-//         const admTokenResults = await getAdminTokens(database);
-//         accessToken = admTokenResults.access_token
-//     }
 
-//     if(req != undefined) host = getHost(req);
+const formatString = (text: string, params: any[] | null = null) => {
+    if (params === null) return text;    
+    return text.replace(/{(\d+)}/g, function (match, number) {
+        return typeof params[number] != "undefined" ? params[number] : match;
+    });
+}
+const getDefaultTranslation = (key: string, params: any[] | null = null) => formatString(key.replace(new RegExp(`_`, "g"), " "), params);
+export const getTranslator = async (req: Request, database: any) => {
+    let t = getDefaultTranslation;
+    try {
+        const [{ translation_strings }] = await database("directus_settings").select("translation_strings").limit(1);
+        let lang = "fr-FR";
+        const languagesHeader = req.query.culture !== undefined ? req.query.culture : req.headers["accept-language"] as string | undefined;
+        switch (languagesHeader !== undefined ? (languagesHeader as string).split(",")[0].split("-")[0] : null) {
+            case "en":
+                lang = "en-US";
+                break;
+            default:
+                lang = "fr-FR";
+                break;
+        }
 
-//     try {
-//         const res = await fetch(`${host}/?fields[]=translation_strings&access_token=${accessToken}&limit=-1`)
-//         const resJson = await res.json()
-//         const translationData = resJson.data.translation_strings.filter((item: any)=> item.key == key.replace('$t:', ''))
-//         return translationData[lang]
-//     } catch (error) {
-//         return key.replace(new RegExp(`_`,"g"), "")
-//     }
-    
-// }
+        const tanslationStrings: Record<string, any>[] = translation_strings !== undefined && translation_strings !== null ? JSON.parse(translation_strings) : []
+        t = (key: string, params: any[] | null = null) => {
+            const tanslation = tanslationStrings.find((item) => item.key === key);
+            if (tanslation === undefined || tanslation.translations[lang] === undefined) return getDefaultTranslation(key)
+            return formatString(tanslation.translations[lang], params);
+        }
+
+    } catch (error) {
+        logInformation(error, true);
+    } finally {
+        return t;
+    }
+
+}
+

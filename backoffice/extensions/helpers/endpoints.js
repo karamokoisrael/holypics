@@ -10,24 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getConfigs = void 0;
-const getConfigs = (database) => __awaiter(void 0, void 0, void 0, function* () {
-    const [configurations] = yield database("configurations").limit(1);
-    const datasets = yield database("datasets").where({ status: "published" });
-    configurations.datasets = datasets;
-    for (let i = 0; i < datasets.length; i++) {
-        const production_models = yield database("datasets_models").where({
-            datasets_id: datasets[i].id
-        });
-        for (let u = 0; u < production_models.length; u++) {
-            const [model] = yield database("models").where({ id: production_models[u].models_id }).limit(1);
-            if (model.config != null)
-                model.config = JSON.parse(model.config);
-            production_models[u].model = model;
-        }
-        if (datasets[i].class_names != null)
-            datasets[i].class_names = JSON.parse(datasets[i].class_names);
-        datasets[i].production_models = production_models;
+const getConfigs = (database, model) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const [modelData] = yield database("models").where({ name: model }).limit(1);
+        modelData.parameters = JSON.parse(`${modelData.parameters}`);
+        return modelData;
     }
-    return configurations;
+    catch (error) {
+        return {};
+    }
 });
 exports.getConfigs = getConfigs;

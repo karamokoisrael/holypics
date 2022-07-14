@@ -65,43 +65,14 @@ export type AppSettings = {
     currencies: Record<string, WebsiteCurrency>
 }
 
-export type Config = {
-    id: string;
-    status: string;
-    user_created: string;
-    date_created: number;
-    user_updated: null | Date;
-    date_updated: null | Date;
-    datasets: Dataset[];
-}
 
-export type Dataset = {
-    id: string;
-    status: string;
-    sort: null | string;
-    user_created: string;
-    date_created: number;
-    user_updated: string;
-    date_updated: number;
-    name: string;
-    prediction_threshold: number;
-    neutral_class_name: string;
-    class_names: string[];
-    model_eval_code: null | string;
-    thumb: string | string;
-    production_models: ProductionModel[];
-    available_locally: boolean;
-}
 
-export type ProductionModel = {
-    id: number;
-    datasets_id: string;
-    models_id: string;
-    model: Model;
+export type ModelParameters  = {
+    key: string
 }
 
 export type Model = {
-    id: string;
+    id: number;
     status: string;
     sort: null | string;
     user_created: string;
@@ -109,16 +80,13 @@ export type Model = {
     user_updated: string;
     date_updated: number;
     name: string;
-    class_name: string;
-    dataset_id: string;
-    file: string;
-    tfjs_file: string;
-    session_id: string;
-    config: Record<string, any>;
-    tflite_file: null | string;
-    tf_serving_file: null | string;
-    version: number;
+    parameters: ModelParameters[];
+    available_locally: boolean;
+    current_version: number;
 }
+
+
+
 
 
 

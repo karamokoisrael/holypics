@@ -6,25 +6,37 @@ import { ApiExtensionContext } from '@directus/shared/types';
 import { getConfigs } from '../../helpers/endpoints';
 import axios from 'axios';
 import { v4 as uuidv4 } from "uuid";
-const formidable = require('express-formidable');
+import { getTranslator } from '../../helpers/translation';
+import bodyParser from 'body-parser';
 const imageToBase64 = require('image-to-base64');
+const multer = require('multer');
 export default function (router: Router, { database }: ApiExtensionContext) {
 
+
+        router.use(bodyParser.json()); 
         // in latest body-parser use like below.
-        // router.use(bodyParser.urlencoded({ extended: true }));
-        router.use(formidable());
-        router.post('/predict/:model', async (req: Request, res: Response) => {
+        router.use(bodyParser.urlencoded({ extended: true }));
+        // router.use(expressFormidable());
+
+
+        router.post('/predict/:model', multer().single('file'), async (req: Request, res: Response) => {
+                const t = await getTranslator(req, database)
                 try {
-                        const reqBody = (req as Record<string, any>).fields
+                        const reqBody = (req as Record<string, any>).body
                         let base64Image = "";
-                        const configs = await getConfigs(database);
-                        const dataset = configs.datasets.find((item) => item.name == req.params.model)
-                        if (dataset === null || dataset === undefined) return throwError(res, "Veuillez sélectionner un dataset valide", 400);
-                        if (reqBody.base64Image !== undefined) {
-                                base64Image = reqBody.base64Image;
-                        } else if (reqBody.imageUrl !== undefined) {
-                                const base64 = await imageToBase64(reqBody.imageUrl)
-                                base64Image = `data:image/jpg;base64,${base64}`
+                        
+                        const modelData = await getConfigs(database, req.params.model as string);
+                        if (modelData.id == undefined) return throwError(res, t("we_encountered_an_unexpected_error_during_the_operation"), 400);
+                        const file = (req as Record<string, any>)?.file?.buffer;
+                        
+                        const getBaseImageBack = reqBody.get_image_back !== undefined && Boolean(reqBody.get_image_back) == true;
+
+                        if (file !== undefined) {
+                                const base64 = file.toString('base64');
+                                base64Image = `data:image/jpg;base64,${base64}`;
+                        } else if (reqBody.url !== undefined) {                              
+                                const base64 = await imageToBase64(reqBody.url)
+                                base64Image = `data:image/jpg;base64,${base64}`; 
                         } else {
                                 const collections = [
                                         // "8909560",
@@ -38,18 +50,15 @@ export default function (router: Router, { database }: ApiExtensionContext) {
                                 const base64 = await imageToBase64(randomImageUrl)
                                 base64Image = `data:image/jpg;base64,${base64}`
                         }
-                        const prediction = await predict(dataset, base64Image)
-                        if (prediction.id === null) throw new Error(`Error while prediction`);
-                        res.json({ data: prediction })
+
+                        const prediction = await predict(modelData, base64Image, getBaseImageBack)
+                        res.json({ data: prediction });
                 } catch (error) {
                         console.log("handled error => ", error);
-                        return throwError(res);
+                        return throwError(res, t("we_encountered_an_unexpected_error_during_the_operation"));
                 }
         });
-        router.post('/test', async (req: Request, res: Response) => {
-                const directus = await getDirectusStatic(req, "adsjkbhve")
-        });
-
 }
+
 
 

@@ -10,7 +10,7 @@ import { getCacheValue, setCacheValue } from './cache';
 import { Directus } from '@directus/sdk';
 import { AdminTokens, DirectusDecodeToken, DirectusDecodeTokenOuput } from '../@types/directus';
 
-export const getAdminTokens = async (database: Knex): Promise<AdminTokens>=>{
+export const getAdminTokens = async (database: any): Promise<AdminTokens>=>{
     let accessToken = "";
     let adminId: string | undefined = "";
     try {
