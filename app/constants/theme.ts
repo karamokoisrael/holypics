@@ -101,7 +101,7 @@ export const lightTheme = {
   dark: false,
   colors: {
     primary: theme.colors.primary,
-    background: theme.colors.primary,
+    background: theme.colors.background,
     card: theme.colors.primary,
     text: theme.colors.headerControls,
     border: theme.colors.transparent,

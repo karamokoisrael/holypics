@@ -4,9 +4,7 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 export default function ({ init, action }: RegisterFunctions, apiExtension: ApiExtensionContext) {
     action('server.start', async (meta: Record<string, any>) => {
-        console.log("server has started");
-        const dir = './uploads/tmp';
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir);        
+        // 
     })
 };
 

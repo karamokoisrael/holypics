@@ -24,34 +24,31 @@ type DataProviderProps = {
 const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const store = useStore();
 
-  
-  const configsFetcher = async (...args: Parameters<typeof fetch>) => {
+  const configs = useSWR(formatUrl("config"), async (...args: Parameters<typeof fetch>) => {
     try {
-      return {};
-      // const res = await fetch(...args);
-      // const resJson = await res.json();
+      
+      const res = await fetch(...args);
+      const resJson = await res.json();
 
-      // if (resJson.errors !== undefined || resJson.data === undefined)
-      //   throw new Error("No config found");
+      if (resJson.errors !== undefined || resJson.data === undefined || Object.keys(resJson.data).length == 0)
+        throw new Error("No config found");
 
-      // await storeJsonData(CONFIG_KEY_NAME, resJson.data);
-      // store.setConfigs(resJson.data);
-      // return resJson.data;
+      await storeJsonData(CONFIG_KEY_NAME, resJson.data);
+
+      store.setConfigs(resJson.data);
+      return resJson.data;
     } catch (error) {
+      
       const data = await getJsonData(CONFIG_KEY_NAME);
-      if (data === null) throw new Error("No local config");
+      if (data === null || Object.keys(data).length === 0) throw new Error("No local config");
       store.setConfigs(data);
-    }
-  };
 
-  useSWR(formatUrl("config"), configsFetcher, {
+      return data;
+    }
+  }, {
     revalidateOnFocus: false,
     shouldRetryOnError: true,
   });
-
- 
-
-
 
 
   return (
@@ -60,15 +57,9 @@ const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       onError={errorHandler}
       FallbackComponent={CustomErrorFallback}
     >
-      <SWRConfig
-        value={{
-          refreshInterval: 0,
-          revalidateOnFocus: false,
-          fetcher: configsFetcher,
-        }}
-      >
+      <SWRConfig>
         <ConditionalSuspense
-          condition={true}
+          condition={configs.data != undefined && Object.keys(configs.data).length != 0}
           fallBack={<Loader />}
         >
           {children}

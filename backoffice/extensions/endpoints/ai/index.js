@@ -39,6 +39,11 @@ function default_1(router, { database }) {
                 const base64 = file.toString('base64');
                 base64Image = `data:image/jpg;base64,${base64}`;
             }
+            else if (reqBody.base64_image !== undefined) {
+                const splitted = reqBody.base64_image.split(",");
+                const base64 = splitted[splitted.length - 1];
+                base64Image = `data:image/jpg;base64,${base64}`;
+            }
             else if (reqBody.url !== undefined) {
                 const base64 = yield imageToBase64(reqBody.url);
                 base64Image = `data:image/jpg;base64,${base64}`;
@@ -56,7 +61,7 @@ function default_1(router, { database }) {
                 const base64 = yield imageToBase64(randomImageUrl);
                 base64Image = `data:image/jpg;base64,${base64}`;
             }
-            const prediction = yield (0, ai_1.predict)(modelData, base64Image, getBaseImageBack);
+            const prediction = yield (0, ai_1.predict)(modelData, base64Image, getBaseImageBack, t);
             res.json({ data: prediction });
         }
         catch (error) {

@@ -34,10 +34,14 @@ export default function (router: Router, { database }: ApiExtensionContext) {
                         if (file !== undefined) {
                                 const base64 = file.toString('base64');
                                 base64Image = `data:image/jpg;base64,${base64}`;
-                        } else if (reqBody.url !== undefined) {                              
+                        }else if(reqBody.base64_image !== undefined){
+                                const splitted = reqBody.base64_image.split(",")
+                                const base64 = splitted[splitted.length-1]
+                                base64Image = `data:image/jpg;base64,${base64}`;
+                        }else if (reqBody.url !== undefined) {                              
                                 const base64 = await imageToBase64(reqBody.url)
                                 base64Image = `data:image/jpg;base64,${base64}`; 
-                        } else {
+                        }else {
                                 const collections = [
                                         // "8909560",
                                         "1242151",
@@ -51,7 +55,7 @@ export default function (router: Router, { database }: ApiExtensionContext) {
                                 base64Image = `data:image/jpg;base64,${base64}`
                         }
 
-                        const prediction = await predict(modelData, base64Image, getBaseImageBack)
+                        const prediction = await predict(modelData, base64Image, getBaseImageBack, t)
                         res.json({ data: prediction });
                 } catch (error) {
                         console.log("handled error => ", error);

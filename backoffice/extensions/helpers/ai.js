@@ -22,11 +22,12 @@ const predictFromModel = (model, pureBase64Image) => __awaiter(void 0, void 0, v
     });
     return response;
 });
-const predict = (model, base64Image, getBaseImageBack) => __awaiter(void 0, void 0, void 0, function* () {
+const predict = (model, base64Image, getBaseImageBack, t) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const prediction = {
             id: (0, uuid_1.v4)(),
             result: {},
+            text_data: "",
         };
         if (getBaseImageBack)
             prediction.base64_image = base64Image;
@@ -37,7 +38,11 @@ const predict = (model, base64Image, getBaseImageBack) => __awaiter(void 0, void
         const predictionOutput = response.data.predictions[0];
         for (let i = 0; i < predictionOutput.length; i++) {
             const predictionValue = predictionOutput[i];
-            prediction.result[model.parameters[i].key] = Object.assign(Object.assign({}, model.parameters[i]), { value: predictionValue });
+            const params = model.parameters[i];
+            if (params["min_display_percentage"] < predictionValue) {
+                prediction.text_data += `${t(model.parameters[i].key)}: ${(predictionValue * 100).toPrecision(2)}%; \n`;
+            }
+            prediction.result[model.parameters[i].key] = Object.assign(Object.assign({}, params), { value: predictionValue });
         }
         return prediction;
     }

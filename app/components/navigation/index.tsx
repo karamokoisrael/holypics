@@ -1,27 +1,26 @@
 import { NavigationContainer } from "@react-navigation/native";
-import { createDrawerNavigator } from "@react-navigation/drawer";
 import * as React from "react";
 import Error from "../../screens/error/Error";
 import { RootStackParamList } from "../../@types/types";
 import { LinkingOptions } from "@react-navigation/native";
 import * as Linking from "expo-linking";
-import TermsAndUse from "../../screens/other/TermsAndUse";
 import { darkTheme, lightTheme, theme } from "../../constants/theme";
 import useStore from "../../stores/store";
-import { bottomRoutes } from "../layout/BottomNavigator";
 import SignIn from "../../screens/authentication/SignIn";
 import SignUp from "../../screens/authentication/SignUp";
 import Security from "../../screens/account/Security";
-import Settings from "../../screens/account/Settings";
 import Home from "../../screens/home/Home";
-import PinLocked from "../../screens/authentication/PinLocked";
 import OnBoarding from "../../screens/onBoarding/OnBoarding";
 import NotFound from "../../screens/error/NotFound";
-import { Appbar } from "react-native-paper";
-import Legal from "../../screens/onBoarding/Legal";
-import I18n from "i18n-js";
-import BackupWallet from "../../screens/onBoarding/BackupWallet";
-import { FULL_WIDTH } from "../../constants/layout";
+import { createStackNavigator } from "@react-navigation/stack";
+import Header from "../layout/Header";
+import { bottomRoutes } from "../layout/BottomNavigator";
+import Models from "../../screens/ai/Models";
+import Model from "../../screens/ai/Model";
+import Articles from "../../screens/blog/Articles";
+import Portfolio from "../../screens/blog/Portfolio";
+import Account from "../../screens/account/Account";
+import { drawerRoutes } from "../layout/DrawerNavigator";
 
 export type CustomRoute = {
   path: string;
@@ -29,7 +28,6 @@ export type CustomRoute = {
   icon?: React.FC<any>;
   access?: string;
   title?: string;
-  inDrawer?: boolean;
   modal?: boolean;
   directLink?: boolean;
   hideTitle?: boolean;
@@ -38,6 +36,7 @@ export type CustomRoute = {
 
 type RouteGroup = Array<CustomRoute>;
 type Routes = Record<string, RouteGroup>;
+
 
 export const routes: Routes = {
 
@@ -48,20 +47,6 @@ export const routes: Routes = {
         OnBoarding,
       title: "on_boarding",
       hideHeader: true
-    },
-    {
-      path: "/legal",
-      component:
-        Legal,
-      title: "legal",
-      modal: true
-    },
-    {
-      path: "/backup-wallet",
-      component:
-        BackupWallet,
-      title: "backup_wallet",
-      modal: true
     }
   ],
 
@@ -69,12 +54,26 @@ export const routes: Routes = {
     {
       path: "/",
       component: Home,
-      title: I18n.t("home"),
-      inDrawer: true,
+      title: "home",
       modal: true
     },
   ],
-  
+
+  AI: [
+    {
+      path: "/models",
+      component: Models,
+      title: "models",
+      modal: true
+    },
+    {
+      path: "/model/:id",
+      component: Model,
+      title: "model",
+      modal: true
+    },
+  ],
+
   Authentication: [
     {
       path: "sign-up",
@@ -90,22 +89,14 @@ export const routes: Routes = {
       access: "only-disconnected",
       title: "SignIn",
       hideHeader: true
-    },
-    {
-      path: "pin-locked",
-      component: PinLocked,
-      access: "only-disconnected",
-      title: "Pin Locked",
-      hideHeader: true
     }
   ],
 
-
   Account: [
     {
-      path: "/settings",
-      component: Settings,
-      title: "settings",
+      path: "/me",
+      component: Account,
+      title: "account",
     },
     {
       path: "/security",
@@ -114,11 +105,16 @@ export const routes: Routes = {
     },
   ],
 
-  Other: [
+  Blog: [
     {
-      path: "terms-and-use",
-      component: TermsAndUse,
-      title: "Termes et conditions"
+      path: "/articles",
+      component: Articles,
+      title: "articles",
+    },
+    {
+      path: "/portfolio",
+      component: Portfolio,
+      title: "portfolio"
     },
   ],
 
@@ -129,11 +125,13 @@ export const routes: Routes = {
 
 };
 
-const Drawer = createDrawerNavigator<RootStackParamList>();
+
+const Stack = createStackNavigator();
 
 type NavigationProps = {
   colorMode: "dark" | "light"
 }
+
 export default function Navigation({ colorMode }: NavigationProps) {
   const linking: LinkingOptions<RootStackParamList> = {
     prefixes: [Linking.makeUrl("/")],
@@ -142,28 +140,19 @@ export default function Navigation({ colorMode }: NavigationProps) {
     },
   };
 
-  const renderDrawer = (routeGroup: CustomRoute, routeName: string) => {
+
+
+  const renderScreen = (routeGroup: CustomRoute, routeName: string) => {
     return (
-      <Drawer.Screen
+      <Stack.Screen
         key={routeGroup.component.name}
         name={routeGroup.component.name as keyof RootStackParamList}
         component={routeGroup.component}
         options={({ navigation }) => ({
           title: routeGroup.title,
-          drawerActiveTintColor: theme.colors.headerControls,
-          drawerActiveBackgroundColor: theme.colors.primary,
-          headerLeft: routeGroup.modal ? () => <Appbar.Action icon="arrow-left" color={theme.colors.headerControls} onPress={() => navigation.goBack()} /> : undefined,
-          headerStyle: { maxWidth: FULL_WIDTH, minWidth: FULL_WIDTH},
-          headerTitle: routeGroup.hideTitle ? "" : undefined,
-          // headerShown: routeGroup.hideHeader ? false : undefined,
-          headerShown: false,
-          headerTintColor: theme.colors.headerControls,
-          drawerItemStyle:
-            routeGroup.inDrawer === true ? {} : { display: "none" },
-          // @ts-ignore
-          drawerActiveBackgroundColor: theme.colors.headerControls,
-          // @ts-ignore
-          drawerActiveTintColor: theme.colors.primary
+          headerTitle: routeGroup.title,
+          headerShown: routeGroup.hideHeader ? false : true,
+          headerTintColor: theme.colors.headerControls
         })}
       />
     );
@@ -193,26 +182,35 @@ export default function Navigation({ colorMode }: NavigationProps) {
 
     >
       {/* @ts-ignore */}
-      <Drawer.Navigator listeners={({ route }) => ({
-        drawerItemPress: () => {
-          let barSet = false;
-          bottomRoutes.forEach((currentRoute) => {
-            if (route.name == currentRoute.key) {
-              barSet = true;
-              store.setBottomBarSelectedIndex(currentRoute.id);
-            }
-            return;
-          });
-          if (!barSet) store.setBottomBarSelectedIndex(10);
-        },
-      })}>
+      <Stack.Navigator initialRouteName="Home"
+        screenOptions={{
+          header: (props) => <Header {...props} />,
+        }}
+
+        screenListeners={({ navigation, route }) => ({
+          
+          state: (e) => {
+            
+            bottomRoutes.map((currentRoute, index)=> {
+              if(currentRoute.key === route.name) return store.setBottomBarSelectedIndex(index);
+            })
+
+            drawerRoutes.map((currentRoute, index)=> {
+              if(currentRoute.key === route.name) return store.setDrawerSelectedIndex(index);
+            })
+            
+          },
+        })}
+      >
         {Object.keys(routes).map((routeName: string) =>
           routes[routeName].map((routeGroup: CustomRoute) =>
             // @ts-ignore
-            <Drawer.Group screenOptions={routeGroup.modal ? { presentation: "modal" } : {}}>{renderDrawer(routeGroup, routeName)}</Drawer.Group>
+            <Stack.Group screenOptions={routeGroup.modal ? { presentation: "modal" } : {}}>{renderScreen(routeGroup, routeName)}</Stack.Group>
           )
         )}
-      </Drawer.Navigator>
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
+
+

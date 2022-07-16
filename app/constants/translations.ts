@@ -1,3 +1,12 @@
+export const languages = {
+    fr: {
+        key: "fr-FR"
+    },
+    en: {
+        key: "en-US"
+    }
+}
+
 export const translations = {
     fr: {
         welcome: 'Bienvenue',
@@ -6,7 +15,7 @@ export const translations = {
     en: {
         welcome: 'Welcome',
         on_boarding_slogan: 'Welcome to megamax dev',
-        on_boarding_slogan_description: 'Discover more about technology',
+        on_boarding_slogan_description: 'Discover more about artificial intelligence and technology',
         get_started: "Get Started",
         home: "Home",
         create_new_wallet: 'Create a new wallet',
@@ -37,6 +46,18 @@ export const translations = {
         receive: "Receive",
         swap: "Swap",
         settings: "Settings",
-        refresh: "Refresh"
+        refresh: "Refresh",
+        models: "Models",
+        model: "model",
+        articles: "Articles",
+        account: "Account",
+        evaluate_ai: "Evaluate ai",
+        image_url: "Image url",
+        submit: "Submit",
+        test: "Test",
+        comment:  "Comment",
+        submit_feedback: "Submit feedback",
+        see_documentation: "See documentation",
+        holipics: "Holipics"
     },
 }
