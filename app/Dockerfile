@@ -3,7 +3,7 @@ WORKDIR /usr/src/app
 COPY package.json yarn.lock ./
 RUN yarn install
 COPY . ./
-RUN yarn run build:web
+RUN yarn run build:web -y
 
 # Stage 2 - the production environment
 FROM nginx:1.12-alpine
