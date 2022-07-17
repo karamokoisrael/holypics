@@ -48,6 +48,27 @@ services:
       - backoffice_migration:/app/migration
       - backoffice_uploads:/app/uploads
 
+
+  backoffice2:
+    container_name: ${BACKOFFICE_2_CONTAINER_NAME}
+    restart: always
+    build: 
+      dockerfile: Dockerfile
+      context: le-bon-coursier
+    env_file:
+      - .env
+      - config/environment/backoffice-2.env
+    ports:
+      - ${BACKOFFICE_2_PORT}:8055
+    links:
+      - db:db
+    depends_on:
+      - db
+    volumes:
+      - ./le-bon-coursier/extensions:/app/extensions
+      - backoffice_2_migration:/app/migration
+      - backoffice_2_uploads:/app/uploads
+
   db:
     container_name: ${DB_CONTAINER_NAME}
     image: mysql:latest 
@@ -78,8 +99,6 @@ services:
     volumes:
       - backoffice_migration:/data/backoffice_migration
       - backoffice_uploads:/data/backoffice_uploads
-      - mass_pay_uploads:/data/mass_pay_uploads
-      - api_uploads:/data/api_uploads
       - ./data:/data/data
       # - /CONFIG_DIR:/config
     environment:
@@ -98,6 +117,8 @@ services:
 volumes:
   backoffice_uploads:
   backoffice_migration:
+  backoffice_2_uploads:
+  backoffice_2_migration:
   db_data:
 
 
