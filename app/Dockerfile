@@ -2,8 +2,10 @@ FROM node:16.13.1 as build-deps
 WORKDIR /usr/src/app
 COPY package.json yarn.lock ./
 RUN yarn install
+RUN yarn global add expo-cli
 COPY . ./
-RUN yarn run build:web -y
+RUN yarn run build:web
+
 
 # Stage 2 - the production environment
 FROM nginx:1.12-alpine
