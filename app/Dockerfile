@@ -1,4 +1,4 @@
-FROM node:16.13.1 as build-deps
+FROM node:14 as build-deps
 WORKDIR /usr/src/app
 COPY package.json yarn.lock ./
 RUN npm cache clean --force
