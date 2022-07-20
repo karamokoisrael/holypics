@@ -1,10 +1,10 @@
 FROM node:16.13.1 as build-deps
 WORKDIR /usr/src/app
 COPY package.json yarn.lock ./
-RUN yarn install
-RUN yarn global add expo-cli
+RUN npm install
+RUN npm install -g expo-cli
 COPY . ./
-RUN yarn run build:web
+RUN npm run build:web
 
 
 # Stage 2 - the production environment
