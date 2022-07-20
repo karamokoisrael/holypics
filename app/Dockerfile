@@ -1,7 +1,7 @@
 FROM node:16.13.1 as build-deps
 WORKDIR /usr/src/app
 COPY package.json yarn.lock ./
-RUN npm install
+RUN npm install --force
 RUN npm install -g expo-cli
 COPY . ./
 RUN npm run build:web
