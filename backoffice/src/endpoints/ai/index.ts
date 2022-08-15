@@ -12,7 +12,7 @@ const imageToBase64 = require('image-to-base64');
 const multer = require('multer');
 export default function (router: Router, { database }: ApiExtensionContext) {
 
-
+        
         router.use(bodyParser.json()); 
         // in latest body-parser use like below.
         router.use(bodyParser.urlencoded({ extended: true }));
