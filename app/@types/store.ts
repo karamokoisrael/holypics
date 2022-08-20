@@ -1,6 +1,7 @@
 import { Directus } from "@directus/sdk";
 
 export type Store = {
+    isAuthenticated: boolean,
     user: Record<string, any>,
     recoveryPhrase: String,
     onBoardingPassed: boolean,
@@ -14,8 +15,8 @@ export type Store = {
     socketConnId: string,
     socket: WebSocket | undefined,
     toggleDrawer: Function
-    setBottomBarSelectedIndex: (index: number)=>{},
-    setDrawerSelectedIndex: (index: number)=>{},
+    setBottomBarSelectedIndex: (index: number)=>any,
+    setDrawerSelectedIndex: (index: number)=>any,
     setConfigs: Function,
     setSocketConnId: Function,
     setSocket: Function,

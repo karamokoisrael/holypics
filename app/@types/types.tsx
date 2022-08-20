@@ -18,6 +18,8 @@ export type RootStackParamList = {
 
   // 
   Legal: NavigatorScreenParams<RootTabParamList> | undefined;
+  Articles: NavigatorScreenParams<RootTabParamList> | undefined;
+  Portfolio: NavigatorScreenParams<RootTabParamList> | undefined;
   BackupWallet: NavigatorScreenParams<RootTabParamList> | undefined;
   SignUp: NavigatorScreenParams<RootTabParamList> | undefined;
   SignIn: NavigatorScreenParams<RootTabParamList> | undefined;

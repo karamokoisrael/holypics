@@ -13,8 +13,9 @@ export default (router: Router, { database }: ApiExtensionContext) => {
             const [ file ]: Record<string, any>[] = await database("directus_files").where({id: req.params.id})
             res.sendFile(`${__dirname.replace("extensions/endpoints/file", "")}/uploads/${file.filename_disk}`)
         } catch (error) {
-            console.log(error);
-            return throwError(res); 
+            // console.log(error);
+            // return throwError(res); 
+            res.status(204).send();
         }
 	}); 
 

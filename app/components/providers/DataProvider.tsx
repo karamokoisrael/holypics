@@ -33,17 +33,18 @@ const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       if (resJson.errors !== undefined || resJson.data === undefined || Object.keys(resJson.data).length == 0)
         throw new Error("No config found");
 
-      await storeJsonData(CONFIG_KEY_NAME, resJson.data);
+      // await storeJsonData(CONFIG_KEY_NAME, resJson.data);
 
       store.setConfigs(resJson.data);
       return resJson.data;
-    } catch (error) {
-      
-      const data = await getJsonData(CONFIG_KEY_NAME);
-      if (data === null || Object.keys(data).length === 0) throw new Error("No local config");
-      store.setConfigs(data);
+    } catch (error) {      
+      if(Object.keys(store.configs).length == 0) throw new Error("No local config");
 
-      return data;
+      // const data = await getJsonData(CONFIG_KEY_NAME);
+      // if (data === null || Object.keys(data).length === 0) throw new Error("No local config");
+      // store.setConfigs(data);
+
+      return store.configs;
     }
   }, {
     revalidateOnFocus: false,

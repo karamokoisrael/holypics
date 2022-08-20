@@ -9,7 +9,7 @@ export default function SignIn() {
     <Layout>
       <View>
       <Text>SignIn</Text>
-      <Button onPress={()=> navigation.navigate("Wallet")}>Hey</Button>
+      <Button onPress={()=> navigation.navigate("SignUp")}>Hey</Button>
       </View>
     </Layout>
   );

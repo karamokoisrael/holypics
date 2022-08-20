@@ -1,5 +1,5 @@
 import { NavigationContainer } from "@react-navigation/native";
-import * as React from "react";
+import React, { useEffect } from "react";
 import Error from "../../screens/error/Error";
 import { RootStackParamList } from "../../@types/types";
 import { LinkingOptions } from "@react-navigation/native";
@@ -22,8 +22,9 @@ import Portfolio from "../../screens/blog/Portfolio";
 import Account from "../../screens/account/Account";
 import { drawerRoutes } from "../layout/DrawerNavigator";
 
+
 export type CustomRoute = {
-  path: string;
+  // path: string;
   component: React.FC<any>;
   icon?: React.FC<any>;
   access?: string;
@@ -42,7 +43,6 @@ export const routes: Routes = {
 
   OnBoarding: [
     {
-      path: "/on-boarding",
       component:
         OnBoarding,
       title: "on_boarding",
@@ -52,7 +52,6 @@ export const routes: Routes = {
 
   Home: [
     {
-      path: "/",
       component: Home,
       title: "home",
       modal: true
@@ -61,22 +60,19 @@ export const routes: Routes = {
 
   AI: [
     {
-      path: "/models",
       component: Models,
       title: "models",
       modal: true
     },
     {
-      path: "/model/:id",
       component: Model,
       title: "model",
-      modal: true
+      modal: false
     },
   ],
 
   Authentication: [
     {
-      path: "sign-up",
       component: SignUp,
       access: "only-disconnected",
       title: "sign_up",
@@ -84,7 +80,6 @@ export const routes: Routes = {
       hideTitle: true
     },
     {
-      path: "sign-in",
       component: SignIn,
       access: "only-disconnected",
       title: "SignIn",
@@ -94,12 +89,10 @@ export const routes: Routes = {
 
   Account: [
     {
-      path: "/me",
       component: Account,
       title: "account",
     },
     {
-      path: "/security",
       component: Security,
       title: "security"
     },
@@ -107,24 +100,47 @@ export const routes: Routes = {
 
   Blog: [
     {
-      path: "/articles",
       component: Articles,
       title: "articles",
     },
     {
-      path: "/portfolio",
       component: Portfolio,
       title: "portfolio"
     },
   ],
 
   Error: [
-    { path: "error", component: Error, title: "error" },
-    { path: "*", component: NotFound }
+    { 
+      component: Error, 
+      title: "error" 
+    },
+    { 
+      component: NotFound,
+      title: "not_found"
+    }
   ],
 
 };
 
+export const linking: LinkingOptions<RootStackParamList> = {
+  prefixes: [Linking.makeUrl("/")],
+  config: {
+    screens: {
+      OnBoarding: "/on-boarding",
+      Home: '/',
+      Models: '/models',
+      Model: "/model/:id",
+      SignUp: "/sign-up",
+      SignIn: "sign-in",
+      Account: '/me',
+      Security: '/security',
+      Articles: '/articles',
+      Portfolio: '/portfolio',
+      Error: '/error',
+      NotFound: '*'
+    },
+  },
+};
 
 const Stack = createStackNavigator();
 
@@ -133,16 +149,8 @@ type NavigationProps = {
 }
 
 export default function Navigation({ colorMode }: NavigationProps) {
-  const linking: LinkingOptions<RootStackParamList> = {
-    prefixes: [Linking.makeUrl("/")],
-    config: {
-      screens: {},
-    },
-  };
 
-
-
-  const renderScreen = (routeGroup: CustomRoute, routeName: string) => {
+  const renderScreen = (routeGroup: CustomRoute) => {
     return (
       <Stack.Screen
         key={routeGroup.component.name}
@@ -158,21 +166,6 @@ export default function Navigation({ colorMode }: NavigationProps) {
     );
   };
 
-  Object.keys(routes).forEach((routeName: string) => {
-    // @ts-ignore
-    linking.config.screens[routeName] = {};
-
-    routes[routeName].forEach((route: any) => {
-      try {
-        // @ts-ignore
-        linking.config.screens[route.component.name] =
-          route.path != "*" && route.path != "" && route.path != "/" && route.directLink != true
-            ? `${routeName.toLocaleLowerCase()}/${route.path}`
-            : route.path;
-      } catch (error) { }
-    });
-  });
-
   const store = useStore();
 
   return (
@@ -181,31 +174,30 @@ export default function Navigation({ colorMode }: NavigationProps) {
       theme={colorMode === "dark" ? darkTheme : lightTheme}
 
     >
-      {/* @ts-ignore */}
       <Stack.Navigator initialRouteName="Home"
         screenOptions={{
           header: (props) => <Header {...props} />,
         }}
 
         screenListeners={({ navigation, route }) => ({
-          
+
           state: (e) => {
-            
-            bottomRoutes.map((currentRoute, index)=> {
-              if(currentRoute.key === route.name) return store.setBottomBarSelectedIndex(index);
+
+            bottomRoutes.map((currentRoute, index) => {
+              if (currentRoute.key === route.name) return store.setBottomBarSelectedIndex(index);
             })
 
-            drawerRoutes.map((currentRoute, index)=> {
-              if(currentRoute.key === route.name) return store.setDrawerSelectedIndex(index);
+            drawerRoutes.map((currentRoute, index) => {
+              if (currentRoute.key === route.name) return store.setDrawerSelectedIndex(index);
             })
-            
+
           },
         })}
       >
         {Object.keys(routes).map((routeName: string) =>
           routes[routeName].map((routeGroup: CustomRoute) =>
             // @ts-ignore
-            <Stack.Group screenOptions={routeGroup.modal ? { presentation: "modal" } : {}}>{renderScreen(routeGroup, routeName)}</Stack.Group>
+            <Stack.Group screenOptions={routeGroup.modal ? { presentation: "modal" } : {}}>{renderScreen(routeGroup)}</Stack.Group>
           )
         )}
       </Stack.Navigator>
