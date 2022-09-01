@@ -1,3 +1,4 @@
+import { RnColorScheme } from 'twrnc';
 import { Directus } from '@directus/sdk';
 import create from "zustand";
 import { Store } from '../@types/store';
@@ -14,12 +15,12 @@ const { persist, purge } = configurePersist({
 const useStore = create<Store>(
     persist({
         key: 'auth', // required, child key of storage
-        allowlist: ['isAuthenticated', 'user', 'configs'], // optional, will save everything if allowlist is undefined
+        allowlist: ['isAuthenticated', 'user', 'configs', 'colorScheme'], // optional, will save everything if allowlist is undefined
         denylist: [], // optional, if allowlist set, denylist will be ignored
     }, (set, get) => ({
         isAuthenticated: false,
         user: { id: "" },
-        colorMode: "light",
+        colorScheme: "light",
         bottomBarSelectedIndex: 0,
         drawerSelectedIndex: 0,
         drawerOpened: false,
@@ -34,11 +35,19 @@ const useStore = create<Store>(
         setBottomBarSelectedIndex: (value: number) => set(() => ({ bottomBarSelectedIndex: value })),
         setDrawerSelectedIndex: (value: number) => set(() => ({ drawerSelectedIndex: value })),
         setConfigs: (value: Record<string, any>) => set(() => ({ configs: value })),
-        setColorMode: (value: "light" | "dark") => { return set(() => ({ colorMode: value })) },
+        toggleColorScheme: () => { return set(() => ({ colorScheme: get().colorScheme == "light" ? "dark" : "light" })) },
+        setColorScheme: (value: RnColorScheme) => { return set(() => ({ colorScheme: value })) },
         setSocketConnId: (value: string) => { return set(() => ({ socketConnId: value })) },
         setSocket: (value: WebSocket) => { return set(() => ({ socket: value })) },
         setUser: (value: Record<string, any>) => { return set(() => ({ user: value })); },
         setNotifications: (value: Array<Notification>) => { return set(() => ({ notifications: value })) },
+        purgePersistenStore: async ()=> {
+            try {
+                await purge();
+            } catch (error) {
+                
+            }
+        }
     }))
 )
 

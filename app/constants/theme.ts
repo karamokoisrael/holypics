@@ -1,60 +1,60 @@
 import { configureFonts, MD3LightTheme as DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
-// const fontConfig = {
-//   web: {
-//     regular: {
-//       fontFamily: 'sans-serif',
-//       fontWeight: 'normal',
-//     },
-//     medium: {
-//       fontFamily: 'sans-serif-medium',
-//       fontWeight: 'normal',
-//     },
-//     light: {
-//       fontFamily: 'sans-serif-light',
-//       fontWeight: 'normal',
-//     },
-//     thin: {
-//       fontFamily: 'sans-serif-thin',
-//       fontWeight: 'normal',
-//     },
-//   },
-//   ios: {
-//     regular: {
-//       fontFamily: 'sans-serif',
-//       fontWeight: 'normal',
-//     },
-//     medium: {
-//       fontFamily: 'sans-serif-medium',
-//       fontWeight: 'normal',
-//     },
-//     light: {
-//       fontFamily: 'sans-serif-light',
-//       fontWeight: 'normal',
-//     },
-//     thin: {
-//       fontFamily: 'sans-serif-thin',
-//       fontWeight: 'normal',
-//     },
-//   },
-//   android: {
-//     regular: {
-//       fontFamily: 'sans-serif',
-//       fontWeight: 'normal',
-//     },
-//     medium: {
-//       fontFamily: 'sans-serif-medium',
-//       fontWeight: 'normal',
-//     },
-//     light: {
-//       fontFamily: 'sans-serif-light',
-//       fontWeight: 'normal',
-//     },
-//     thin: {
-//       fontFamily: 'sans-serif-thin',
-//       fontWeight: 'normal',
-//     },
-//   }
-// };
+const fontConfig = {
+  web: {
+    regular: {
+      fontFamily: 'sans-serif',
+      fontWeight: 'normal',
+    },
+    medium: {
+      fontFamily: 'sans-serif-medium',
+      fontWeight: 'normal',
+    },
+    light: {
+      fontFamily: 'sans-serif-light',
+      fontWeight: 'normal',
+    },
+    thin: {
+      fontFamily: 'sans-serif-thin',
+      fontWeight: 'normal',
+    },
+  },
+  ios: {
+    regular: {
+      fontFamily: 'sans-serif',
+      fontWeight: 'normal',
+    },
+    medium: {
+      fontFamily: 'sans-serif-medium',
+      fontWeight: 'normal',
+    },
+    light: {
+      fontFamily: 'sans-serif-light',
+      fontWeight: 'normal',
+    },
+    thin: {
+      fontFamily: 'sans-serif-thin',
+      fontWeight: 'normal',
+    },
+  },
+  android: {
+    regular: {
+      fontFamily: 'Global',
+      fontWeight: 'normal',
+    },
+    medium: {
+      fontFamily: 'Global',
+      fontWeight: 'normal',
+    },
+    light: {
+      fontFamily: 'Global',
+      fontWeight: 'normal',
+    },
+    thin: {
+      fontFamily: 'Global',
+      fontWeight: 'normal',
+    },
+  }
+};
 
 export const theme = {
   ...DefaultTheme,
@@ -80,7 +80,6 @@ export const theme = {
     chip: "#ebdefa",
     transparent: "#fff0"
   },
-
   // @ts-ignore
   // fonts: configureFonts(fontConfig),
 };

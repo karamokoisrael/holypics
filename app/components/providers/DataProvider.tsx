@@ -4,11 +4,6 @@ import React from "react";
 import useSWR, { SWRConfig } from "swr";
 import ErrorBoundary from "react-native-error-boundary";
 import { ConditionalSuspense } from "../layout/ConditionalSuspense";
-import {
-  getJsonData,
-  storeJsonData,
-} from "../../helpers/local-storage";
-import { CONFIG_KEY_NAME } from "../../constants/global";
 import CustomErrorFallback, { errorHandler } from "../custom/Error";
 import Loader from "../custom/Loader";
 import i18n from 'i18n-js';
@@ -23,27 +18,18 @@ type DataProviderProps = {
 };
 const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const store = useStore();
-
   const configs = useSWR(formatUrl("config"), async (...args: Parameters<typeof fetch>) => {
     try {
-      
+
       const res = await fetch(...args);
       const resJson = await res.json();
 
       if (resJson.errors !== undefined || resJson.data === undefined || Object.keys(resJson.data).length == 0)
         throw new Error("No config found");
-
-      // await storeJsonData(CONFIG_KEY_NAME, resJson.data);
-
       store.setConfigs(resJson.data);
       return resJson.data;
-    } catch (error) {      
-      if(Object.keys(store.configs).length == 0) throw new Error("No local config");
-
-      // const data = await getJsonData(CONFIG_KEY_NAME);
-      // if (data === null || Object.keys(data).length === 0) throw new Error("No local config");
-      // store.setConfigs(data);
-
+    } catch (error) {
+      if (Object.keys(store.configs).length == 0) throw new Error("No local config");
       return store.configs;
     }
   }, {

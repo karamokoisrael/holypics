@@ -30,23 +30,22 @@ const Layout: React.FC<LayoutProps> = ({ children, backgroundColor, bottomNaviga
 
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center", maxHeight: WINDOW_HEIGHT, maxWidth: WINDOW_WIDTH, backgroundColor: backgroundColor || theme.colors.background }}>
             <DrawerNavigator />
-            <ScrollView>
-              {children}
-            </ScrollView>
+            {children}
           </View>
           :
           (
-            noScrollView ?
-              <>
-                <DrawerNavigator />
-                {children}
-              </>
-              :
+            !noScrollView ?
               <>
                 <DrawerNavigator />
                 <ScrollView>
                   {children}
                 </ScrollView>
+              </>
+
+              :
+              <>
+                <DrawerNavigator />
+                {children}
               </>
 
           )

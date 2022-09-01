@@ -1,10 +1,10 @@
 import { NavigationContainer } from "@react-navigation/native";
-import React, { useEffect } from "react";
+import React from "react";
 import Error from "../../screens/error/Error";
 import { RootStackParamList } from "../../@types/types";
 import { LinkingOptions } from "@react-navigation/native";
 import * as Linking from "expo-linking";
-import { darkTheme, lightTheme, theme } from "../../constants/theme";
+import { darkTheme, lightTheme } from "../../constants/theme";
 import useStore from "../../stores/store";
 import SignIn from "../../screens/authentication/SignIn";
 import SignUp from "../../screens/authentication/SignUp";
@@ -35,92 +35,6 @@ export type CustomRoute = {
   hideHeader?: boolean;
 };
 
-type RouteGroup = Array<CustomRoute>;
-type Routes = Record<string, RouteGroup>;
-
-
-export const routes: Routes = {
-
-  OnBoarding: [
-    {
-      component:
-        OnBoarding,
-      title: "on_boarding",
-      hideHeader: true
-    }
-  ],
-
-  Home: [
-    {
-      component: Home,
-      title: "home",
-      modal: true
-    },
-  ],
-
-  AI: [
-    {
-      component: Models,
-      title: "models",
-      modal: true
-    },
-    {
-      component: Model,
-      title: "model",
-      modal: false
-    },
-  ],
-
-  Authentication: [
-    {
-      component: SignUp,
-      access: "only-disconnected",
-      title: "sign_up",
-      modal: true,
-      hideTitle: true
-    },
-    {
-      component: SignIn,
-      access: "only-disconnected",
-      title: "SignIn",
-      hideHeader: true
-    }
-  ],
-
-  Account: [
-    {
-      component: Account,
-      title: "account",
-    },
-    {
-      component: Security,
-      title: "security"
-    },
-  ],
-
-  Blog: [
-    {
-      component: Articles,
-      title: "articles",
-    },
-    {
-      component: Portfolio,
-      title: "portfolio"
-    },
-  ],
-
-  Error: [
-    { 
-      component: Error, 
-      title: "error" 
-    },
-    { 
-      component: NotFound,
-      title: "not_found"
-    }
-  ],
-
-};
 
 export const linking: LinkingOptions<RootStackParamList> = {
   prefixes: [Linking.makeUrl("/")],
@@ -145,61 +59,47 @@ export const linking: LinkingOptions<RootStackParamList> = {
 const Stack = createStackNavigator();
 
 type NavigationProps = {
-  colorMode: "dark" | "light"
+  colorScheme: "dark" | "light"
 }
 
-export default function Navigation({ colorMode }: NavigationProps) {
-
-  const renderScreen = (routeGroup: CustomRoute) => {
-    return (
-      <Stack.Screen
-        key={routeGroup.component.name}
-        name={routeGroup.component.name as keyof RootStackParamList}
-        component={routeGroup.component}
-        options={({ navigation }) => ({
-          title: routeGroup.title,
-          headerTitle: routeGroup.title,
-          headerShown: routeGroup.hideHeader ? false : true,
-          headerTintColor: theme.colors.headerControls
-        })}
-      />
-    );
-  };
-
+export default function Navigation({ colorScheme }: NavigationProps) {
   const store = useStore();
-
+  const defaultScreenOptions = {
+    headerShown: false,
+  }
   return (
     <NavigationContainer
       linking={linking}
-      theme={colorMode === "dark" ? darkTheme : lightTheme}
-
+      theme={colorScheme === "dark" ? darkTheme : lightTheme}
     >
       <Stack.Navigator initialRouteName="Home"
         screenOptions={{
           header: (props) => <Header {...props} />,
         }}
 
-        screenListeners={({ navigation, route }) => ({
-
-          state: (e) => {
-
+        screenListeners={({ route }) => ({
+          state: () => {
             bottomRoutes.map((currentRoute, index) => {
               if (currentRoute.key === route.name) return store.setBottomBarSelectedIndex(index);
             })
-
             drawerRoutes.map((currentRoute, index) => {
               if (currentRoute.key === route.name) return store.setDrawerSelectedIndex(index);
             })
-
           },
         })}
       >
-        {Object.keys(routes).map((routeName: string) =>
-          routes[routeName].map((routeGroup: CustomRoute) =>
-            // @ts-ignore
-            <Stack.Group screenOptions={routeGroup.modal ? { presentation: "modal" } : {}}>{renderScreen(routeGroup)}</Stack.Group>
-          )
-        )}
+        <Stack.Screen name="OnBoarding" component={OnBoarding} options={{...defaultScreenOptions, title: "on_boarding" }} />
+        <Stack.Screen name="Home" component={Home} options={{...defaultScreenOptions, title: "home" }} />
+        <Stack.Screen name="Models" component={Models} options={{...defaultScreenOptions, title: "models" }} />
+        <Stack.Screen name="Model" component={Model} options={{...defaultScreenOptions, title: "model", headerShown: true, headerTitle: "model" }} />
+        <Stack.Screen name="SignUp" component={SignUp} options={{...defaultScreenOptions, title: "sign_up" }} />
+        <Stack.Screen name="SignIn" component={SignIn} options={{...defaultScreenOptions, title: "sign_in" }} />
+        <Stack.Screen name="Account" component={Account} options={{...defaultScreenOptions, title: "account" }} />
+        <Stack.Screen name="Security" component={Security} options={{...defaultScreenOptions, title: "security" }} />
+        <Stack.Screen name="Articles" component={Articles} options={{...defaultScreenOptions, title: "articles" }} />
+        <Stack.Screen name="Portfolio" component={Portfolio} options={{...defaultScreenOptions, title: "portfolio" }} />
+        <Stack.Screen name="Error" component={Error} options={{...defaultScreenOptions, title: "error" }} />
+        <Stack.Screen name="NotFound" component={NotFound} options={{...defaultScreenOptions, title: "not_foundnot_found" }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

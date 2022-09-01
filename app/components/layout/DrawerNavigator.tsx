@@ -6,6 +6,7 @@ import { FULL_WIDTH } from "../../constants/layout";
 import { View } from "react-native";
 import I18n from "i18n-js";
 import theme from "../../constants/theme";
+import { isSmallScreen } from "../../helpers/layout";
 
 export const drawerRoutes = [
     {
@@ -22,6 +23,13 @@ export const drawerRoutes = [
         focusedIcon: "newspaper",
         unfocusedIcon: 'newspaper-variant',
     },
+    {
+        id: 1,
+        title: "account",
+        key: "Account",
+        focusedIcon: "newspaper",
+        unfocusedIcon: 'newspaper-variant',
+    },
 ];
 
 const DrawerNavigator: React.FC = () => {
@@ -32,8 +40,8 @@ const DrawerNavigator: React.FC = () => {
 
     return (
         <Portal>
-            <Modal contentContainerStyle={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.background, width: FULL_WIDTH }} visible={drawerOpened} onDismiss={() => store.toggleDrawer()}>
-                <View style={{ width: "100%", flex: 1, alignItems: "flex-start", justifyContent: "flex-start"}}>
+            <Modal contentContainerStyle={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.background, width: isSmallScreen() ? FULL_WIDTH : 400 }} visible={drawerOpened} onDismiss={() => store.toggleDrawer()}>
+                <View style={{ width: "100%", flex: 1, alignItems: "flex-start", justifyContent: "flex-start" }}>
                     <View style={{ flex: 1, alignItems: "flex-end", width: "100%", height: "10%" }}>
                         <IconButton icon={"close"} onPress={() => store.toggleDrawer()}></IconButton>
                     </View>
@@ -43,7 +51,7 @@ const DrawerNavigator: React.FC = () => {
                                 <Drawer.Item
                                     key={index}
                                     label={I18n.t(item.title)}
-                                    style={index === drawerSelectedIndex ? { backgroundColor: theme.colors.primaryOpac }: {}}
+                                    style={index === drawerSelectedIndex ? { backgroundColor: theme.colors.primaryOpac } : {}}
                                     active={index === drawerSelectedIndex}
                                     onPress={() => {
                                         if (item.key === "Model") {

@@ -58,6 +58,7 @@ export const translations = {
         comment:  "Comment",
         submit_feedback: "Submit feedback",
         see_documentation: "See documentation",
-        holipics: "Holipics"
+        holipics: "Holipics",
+        hi: "Hi"
     },
 }

@@ -1,11 +1,12 @@
 import { Directus } from "@directus/sdk";
+import { RnColorScheme } from "twrnc";
 
 export type Store = {
     isAuthenticated: boolean,
     user: Record<string, any>,
     recoveryPhrase: String,
     onBoardingPassed: boolean,
-    colorMode: "light" | "dark",
+    colorScheme: RnColorScheme,
     bottomBarSelectedIndex: number,
     drawerSelectedIndex: number,
     drawerOpened: boolean,
@@ -21,6 +22,8 @@ export type Store = {
     setSocketConnId: Function,
     setSocket: Function,
     setUser: Function,
-    setNotifications: Function,
-    setColorMode: Function
+    setNotifications: (Function),
+    toggleColorScheme: ()=> void;
+    setColorScheme: (value: RnColorScheme)=> void;
+    purgePersistenStore: ()=> void;
 }

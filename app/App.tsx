@@ -4,10 +4,13 @@ import { Provider as PaperProvider } from 'react-native-paper';
 import theme from "./constants/theme";
 import Navigation from "./components/navigation";
 import DataProvider from "./components/providers/DataProvider";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
+import { useFonts } from 'expo-font';
 import useStore from "./stores/store";
-import { View } from "react-native";
-import { FULL_WIDTH, WINDOW_HEIGHT } from "./constants/layout";
+import { useAppColorScheme, useDeviceContext } from 'twrnc';
+import tw from "./helpers/tailwind";
+import * as SplashScreen from 'expo-splash-screen';
+// SplashScreen.preventAutoHideAsync();
 // import {
 //   useFonts,
 //   Inter_100Thin,
@@ -22,31 +25,22 @@ import { FULL_WIDTH, WINDOW_HEIGHT } from "./constants/layout";
 // } from "@expo-google-fonts/inter";
 
 export default function App() {
-  const colorMode = useStore((state) => state.colorMode);
+  const colorScheme = useStore((state) => state.colorScheme);
+  // useDeviceContext(tw); 
+  useDeviceContext(tw, { withDeviceColorScheme: false });
   if (process.env.NODE_ENV !== "development") console.log = () => { }
-  // let [fontsLoaded] = useFonts({
-  //   Inter_100Thin,
-  //   Inter_200ExtraLight,
-  //   Inter_300Light,
-  //   Inter_400Regular,
-  //   Inter_500Medium,
-  //   Inter_600SemiBold,
-  //   Inter_700Bold,
-  //   Inter_800ExtraBold,
-  //   Inter_900Black,
-  // });
+  const [fontsLoaded] = useFonts({
+    'Global-Fam': require('./assets/fonts/Lobster/Lobster-Regular.ttf'),
+  });
 
-  // if (!fontsLoaded) {
-  //   return <></>;
-  // }
+  if (!fontsLoaded) return null;
 
   return (
-    // @ts-ignore
-    <PaperProvider theme={{ ...theme, dark: colorMode === "dark" }}>
+    <PaperProvider theme={{ ...theme, dark: colorScheme === "dark" }}>
       <DataProvider>
         <Fragment>
           <StatusBar />
-            <Navigation colorMode={colorMode} />
+          <Navigation colorScheme={colorScheme} />
         </Fragment>
       </DataProvider>
     </PaperProvider>

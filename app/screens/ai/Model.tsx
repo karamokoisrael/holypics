@@ -12,7 +12,8 @@ import { languages } from "../../constants/translations";
 import * as FileSystem from "expo-file-system";
 import { Camera } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
-
+import { isSmallScreen } from "../../helpers/layout";
+import tw from '../../helpers/tailwind';
 export default function Model({ route }) {
   const { id } = route.params;
   const toast = {
@@ -20,6 +21,7 @@ export default function Model({ route }) {
     closeAll: () => { },
     close: (id: any) => { }
   }
+  
   const navigation = useNavigation();
   const configs = useStore(state => state.configs);
   const req = useSWR("models", async (...args: any) => {
@@ -165,7 +167,7 @@ export default function Model({ route }) {
     <Layout>
       <>
         <Portal>
-          <Modal contentContainerStyle={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'white', padding: 20, width: FULL_WIDTH }} visible={predictionModalData.visible} onDismiss={() => setPredictionModalData({ ...predictionModalData, visible: false })}>
+          <Modal contentContainerStyle={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'white', padding: 20, width: isSmallScreen() ? FULL_WIDTH : 400 }} visible={predictionModalData.visible} onDismiss={() => setPredictionModalData({ ...predictionModalData, visible: false })}>
             <Card key={predictionModalData.content.id}>
               <Card.Cover source={{ uri: predictionModalData.content.uri }} />
               <Card.Content>
@@ -251,7 +253,7 @@ export default function Model({ route }) {
         </Portal>
 
         <Portal>
-          <Modal contentContainerStyle={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'white', padding: 20, width: FULL_WIDTH }} visible={predictionControls.cameraPermissionGranted && predictionControls.cameraOn} onDismiss={() => setPredictionControls({ ...predictionControls, cameraOn: false })} >
+          <Modal contentContainerStyle={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'white', padding: 20, width: isSmallScreen() ? FULL_WIDTH : 400 }} visible={predictionControls.cameraPermissionGranted && predictionControls.cameraOn} onDismiss={() => setPredictionControls({ ...predictionControls, cameraOn: false })} >
             <Camera
               ref={cameraRef}
               style={{
@@ -265,7 +267,7 @@ export default function Model({ route }) {
               whiteBalance={Camera.Constants.WhiteBalance.auto}
             ></Camera>
 
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "space-around", flexDirection: "row", flexWrap: "wrap", width: FULL_WIDTH }}>
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "space-around", flexDirection: "row", flexWrap: "wrap", width: isSmallScreen() ? FULL_WIDTH : 400 }}>
 
               <IconButton icon="camera-iris" mode="contained" style={{ flexBasis: "50%" }} onPress={() => handleImageCapture()} />
 
@@ -296,20 +298,20 @@ export default function Model({ route }) {
           </Card.Content>
         </Card>
 
-        <View>
+        <View style={tw`flex flex-col justify-center items-center h-48`}>
           <Text style={{ textAlign: "center", padding: 20 }} variant="titleMedium">{I18n.t("test")} {req.data?.title}</Text>
-          <View style={{ flex: 1, alignItems: "center", justifyContent: "space-around", flexDirection: "row", flexWrap: "wrap", width: FULL_WIDTH }}>
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "space-around", flexDirection: "row", flexWrap: "wrap", width: isSmallScreen() ? FULL_WIDTH : 400 }}>
             {/* @ts-ignore */}
             <TextInput
               label={I18n.t("image_url")}
               // value={formRef.current.imageUrl}
               onChangeText={text => formRef.current.imageUrl = text}
-              style={{ flexBasis: "85%", width: "89%", marginBottom: 10 }}
+              style={{ flexBasis: "85%", width: "89%"}}
             />
             <IconButton icon="send" mode="contained" style={{ flexBasis: "10%" }} onPress={() => predict(null, formRef.current.imageUrl)} />
           </View>
 
-          <View style={{ flex: 1, alignItems: "center", justifyContent: "space-around", flexDirection: "row", flexWrap: "wrap", width: FULL_WIDTH }}>
+          <View style={{flex: 1, alignItems: "center", justifyContent: "space-around", flexDirection: "row", flexWrap: "wrap", width: isSmallScreen() ? FULL_WIDTH : 400}}>
 
             <IconButton icon="camera" mode="contained" style={{ flexBasis: "10%" }} onPress={() => setPredictionControls({ ...predictionControls, cameraOn: true })} />
 
@@ -327,6 +329,7 @@ export default function Model({ route }) {
             null
         }
 
+        <View>
         {
           predictions.map((item) => (
             <TouchableHighlight
@@ -345,6 +348,7 @@ export default function Model({ route }) {
             </TouchableHighlight>
           ))
         }
+        </View>
       </>
 
 
