@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FlatList, Linking, Platform, StyleSheet, TouchableHighlight, View } from "react-native";
+import { Linking, Platform, StyleSheet, TouchableHighlight, View } from "react-native";
 import { Button, Card, IconButton, Paragraph, TextInput, Title, Text, ActivityIndicator, Portal, Modal } from "react-native-paper";
 import Layout from "../../components/layout/Layout";
-import { FULL_WIDTH, SMALL_SCREEN, WINDOW_HEIGHT } from "../../constants/layout";
+import { FULL_WIDTH } from "../../constants/layout";
 import I18n from "i18n-js";
 import { useNavigation } from "@react-navigation/native";
 import useSWR from "swr";
@@ -15,18 +15,18 @@ import * as ImagePicker from "expo-image-picker";
 import { isSmallScreen } from "../../helpers/layout";
 import tw from '../../helpers/tailwind';
 export default function Model({ route }) {
-  const { id } = route.params;
+  const id = "holipics";
   const toast = {
     show: ({ title }) => { },
     closeAll: () => { },
     close: (id: any) => { }
   }
-  
+
   const navigation = useNavigation();
   const configs = useStore(state => state.configs);
   const req = useSWR("models", async (...args: any) => {
-    const data = configs.models.find((item) => item.name == id);
-    const supData = data.translations.find((item) => item.languages_id == languages[I18n.locale].key)
+    const data = configs.models.find((item: any) => item.name == id);
+    const supData = data.translations.find((item: any) => item.languages_id == languages[I18n.locale].key)
     return { ...data, ...supData }
   }, {
     revalidateOnFocus: false,
@@ -71,7 +71,7 @@ export default function Model({ route }) {
         formData.append("url", url);
       }
 
-      const res = await fetch(formatUrl(`ai/predict/${req.data?.name}?culture=${I18n.locale}`), { body: formData, method: "POST" })
+      const res = await fetch(formatUrl(`ai/predict/${req?.data?.name}?culture=${I18n.locale}`), { body: formData, method: "POST" })
       const resJson = await res.json();
 
       if (resJson.data === undefined) throw new Error("No data returned");
@@ -156,7 +156,6 @@ export default function Model({ route }) {
       if (cameraPermission.status === "granted") {
         setPredictionControls({ ...predictionControls, cameraPermissionGranted: true })
       }
-
     })()
 
   }, []);
@@ -211,7 +210,7 @@ export default function Model({ route }) {
                           {
                             comment: predictionModalData.content.comment,
                             rating: predictionModalData.content.rating - 1,
-                            model_id: req.data?.id,
+                            model_id: req?.data?.id,
                             prediction_data: predictionModalData.content.json || null,
                             image_data: predictionModalData.content.uri,
                           }
@@ -289,29 +288,29 @@ export default function Model({ route }) {
         </Portal>
 
         <Card>
-          {/* <Card.Title title={req.data?.title} /> */}
-          <Card.Cover source={{ uri: formatUrl(`file/${req.data?.thumb}`) }} />
+          {/* <Card.Title title={req?.data?.title} /> */}
+          <Card.Cover source={{ uri: formatUrl(`file/${req?.data?.thumb}`) }} />
           <Card.Content>
-            <Title>{req.data?.title}</Title>
-            <Paragraph>{req.data?.description}</Paragraph>
-            <Button mode="contained" style={{ marginTop: 10 }} onPress={() => Linking.openURL(req.data?.doc_url)}>{I18n.t("see_documentation")}</Button>
+            <Title>{req?.data?.title}</Title>
+            <Paragraph>{req?.data?.description}</Paragraph>
+            <Button mode="contained" style={{ marginTop: 10 }} onPress={() => Linking.openURL(req?.data?.doc_url)}>{I18n.t("see_documentation")}</Button>
           </Card.Content>
         </Card>
 
         <View style={tw`flex flex-col justify-center items-center h-48`}>
-          <Text style={{ textAlign: "center", padding: 20 }} variant="titleMedium">{I18n.t("test")} {req.data?.title}</Text>
+          <Text style={{ textAlign: "center", padding: 20 }} variant="titleMedium">{I18n.t("test")} {req?.data?.title}</Text>
           <View style={{ flex: 1, alignItems: "center", justifyContent: "space-around", flexDirection: "row", flexWrap: "wrap", width: isSmallScreen() ? FULL_WIDTH : 400 }}>
             {/* @ts-ignore */}
             <TextInput
               label={I18n.t("image_url")}
               // value={formRef.current.imageUrl}
               onChangeText={text => formRef.current.imageUrl = text}
-              style={{ flexBasis: "85%", width: "89%"}}
+              style={{ flexBasis: "85%", width: "89%" }}
             />
             <IconButton icon="send" mode="contained" style={{ flexBasis: "10%" }} onPress={() => predict(null, formRef.current.imageUrl)} />
           </View>
 
-          <View style={{flex: 1, alignItems: "center", justifyContent: "space-around", flexDirection: "row", flexWrap: "wrap", width: isSmallScreen() ? FULL_WIDTH : 400}}>
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "space-around", flexDirection: "row", flexWrap: "wrap", width: isSmallScreen() ? FULL_WIDTH : 400 }}>
 
             <IconButton icon="camera" mode="contained" style={{ flexBasis: "10%" }} onPress={() => setPredictionControls({ ...predictionControls, cameraOn: true })} />
 
@@ -322,6 +321,7 @@ export default function Model({ route }) {
             <IconButton icon="delete" mode="contained" style={{ flexBasis: "10%" }} onPress={() => setPredictions([])} />
           </View>
         </View>
+
         {
           isLoading ?
             <ActivityIndicator />
@@ -330,29 +330,26 @@ export default function Model({ route }) {
         }
 
         <View>
-        {
-          predictions.map((item) => (
-            <TouchableHighlight
-              key={item.id}
-              onPress={() => setPredictionModalData({ visible: true, content: { ...predictionModalData, ...item } })}>
-              <Card key={item.id}>
-                <Card.Cover source={{ uri: item.uri }} />
-                <Card.Content>
-                  {/* <Title>{item.textData}</Title> */}
-                  <Paragraph>{item.textData}</Paragraph>
-                  {/* <Card.Actions>
+          {
+            predictions.map((item) => (
+              <TouchableHighlight
+                key={item.id}
+                onPress={() => setPredictionModalData({ visible: true, content: { ...predictionModalData, ...item } })}>
+                <Card key={item.id}>
+                  <Card.Cover source={{ uri: item.uri }} />
+                  <Card.Content>
+                    {/* <Title>{item.textData}</Title> */}
+                    <Paragraph>{item.textData}</Paragraph>
+                    {/* <Card.Actions>
                     <IconButton icon="delete"/>
                   </Card.Actions> */}
-                </Card.Content>
-              </Card>
-            </TouchableHighlight>
-          ))
-        }
+                  </Card.Content>
+                </Card>
+              </TouchableHighlight>
+            ))
+          }
         </View>
       </>
-
-
-
     </Layout>
   );
 }

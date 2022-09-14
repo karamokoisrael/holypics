@@ -31,7 +31,7 @@ export type RootStackParamList = {
   NotFound: NavigatorScreenParams<RootTabParamList> | undefined;
 
   Models: NavigatorScreenParams<RootTabParamList> | undefined;
-  Model: NavigatorScreenParams<RootTabParamList> | undefined;
+  Holipics: NavigatorScreenParams<RootTabParamList> | undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<

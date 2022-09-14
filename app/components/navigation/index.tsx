@@ -16,7 +16,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Header from "../layout/Header";
 import { bottomRoutes } from "../layout/BottomNavigator";
 import Models from "../../screens/ai/Models";
-import Model from "../../screens/ai/Model";
+import Holipics from "../../screens/ai/Holipics";
 import Articles from "../../screens/blog/Articles";
 import Portfolio from "../../screens/blog/Portfolio";
 import Account from "../../screens/account/Account";
@@ -43,7 +43,7 @@ export const linking: LinkingOptions<RootStackParamList> = {
       OnBoarding: "/on-boarding",
       Home: '/',
       Models: '/models',
-      Model: "/model/:id",
+      Holipics: "/holipics",
       SignUp: "/sign-up",
       SignIn: "sign-in",
       Account: '/me',
@@ -91,7 +91,7 @@ export default function Navigation({ colorScheme }: NavigationProps) {
         <Stack.Screen name="OnBoarding" component={OnBoarding} options={{...defaultScreenOptions, title: "on_boarding" }} />
         <Stack.Screen name="Home" component={Home} options={{...defaultScreenOptions, title: "home" }} />
         <Stack.Screen name="Models" component={Models} options={{...defaultScreenOptions, title: "models" }} />
-        <Stack.Screen name="Model" component={Model} options={{...defaultScreenOptions, title: "model", headerShown: true, headerTitle: "model" }} />
+        <Stack.Screen name="Holipics" component={Holipics} options={{...defaultScreenOptions, title: "holipics", headerShown: true, headerTitle: "holipics" }} />
         <Stack.Screen name="SignUp" component={SignUp} options={{...defaultScreenOptions, title: "sign_up" }} />
         <Stack.Screen name="SignIn" component={SignIn} options={{...defaultScreenOptions, title: "sign_in" }} />
         <Stack.Screen name="Account" component={Account} options={{...defaultScreenOptions, title: "account" }} />

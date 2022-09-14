@@ -59,6 +59,8 @@ export const translations = {
         submit_feedback: "Submit feedback",
         see_documentation: "See documentation",
         holipics: "Holipics",
-        hi: "Hi"
+        hi: "Hi",
+        // @ts-ignore
+        holipics: "Holipics"
     },
 }

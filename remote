@@ -2,5 +2,5 @@ if [ -f .env ]; then
     # Load Environment Variables
     export $(cat .env | grep -v '#' | awk '/=/ {print $1}')
     # For instance, will be example_kaggle_key
-    sudo ssh -i "$SSH_USERNAME" $SSH_HOST
+    ssh "$SSH_USERNAME@$SSH_HOST" 
 fi
