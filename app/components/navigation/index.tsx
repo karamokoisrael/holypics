@@ -6,21 +6,14 @@ import { LinkingOptions } from "@react-navigation/native";
 import * as Linking from "expo-linking";
 import { darkTheme, lightTheme } from "../../constants/theme";
 import useStore from "../../stores/store";
-import SignIn from "../../screens/authentication/SignIn";
-import SignUp from "../../screens/authentication/SignUp";
-import Security from "../../screens/account/Security";
 import Home from "../../screens/home/Home";
 import OnBoarding from "../../screens/onBoarding/OnBoarding";
 import NotFound from "../../screens/error/NotFound";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import Header from "../layout/Header";
 import { bottomRoutes } from "../layout/BottomNavigator";
 import Models from "../../screens/ai/Models";
-import Holipics from "../../screens/ai/Holipics";
-import Articles from "../../screens/blog/Articles";
-import Portfolio from "../../screens/blog/Portfolio";
 import Account from "../../screens/account/Account";
-import { drawerRoutes } from "../layout/DrawerNavigator";
 
 
 export type CustomRoute = {
@@ -43,20 +36,14 @@ export const linking: LinkingOptions<RootStackParamList> = {
       OnBoarding: "/on-boarding",
       Home: '/',
       Models: '/models',
-      Holipics: "/holipics",
-      SignUp: "/sign-up",
-      SignIn: "sign-in",
       Account: '/me',
-      Security: '/security',
-      Articles: '/articles',
-      Portfolio: '/portfolio',
       Error: '/error',
       NotFound: '*'
     },
   },
 };
 
-const Stack = createStackNavigator();
+const Drawer = createDrawerNavigator();
 
 type NavigationProps = {
   colorScheme: "dark" | "light"
@@ -67,12 +54,13 @@ export default function Navigation({ colorScheme }: NavigationProps) {
   const defaultScreenOptions = {
     headerShown: false,
   }
+
   return (
     <NavigationContainer
       linking={linking}
       theme={colorScheme === "dark" ? darkTheme : lightTheme}
     >
-      <Stack.Navigator initialRouteName="Home"
+      <Drawer.Navigator initialRouteName="OnBoarding"
         screenOptions={{
           header: (props) => <Header {...props} />,
         }}
@@ -82,25 +70,20 @@ export default function Navigation({ colorScheme }: NavigationProps) {
             bottomRoutes.map((currentRoute, index) => {
               if (currentRoute.key === route.name) return store.setBottomBarSelectedIndex(index);
             })
-            drawerRoutes.map((currentRoute, index) => {
-              if (currentRoute.key === route.name) return store.setDrawerSelectedIndex(index);
-            })
+            // console.log(route.name);
+            // drawerRoutes.map((currentRoute, index) => {
+            //   if (currentRoute.key === route.name) return store.setDrawerSelectedIndex(index);
+            // })
           },
         })}
       >
-        <Stack.Screen name="OnBoarding" component={OnBoarding} options={{...defaultScreenOptions, title: "on_boarding" }} />
-        <Stack.Screen name="Home" component={Home} options={{...defaultScreenOptions, title: "home" }} />
-        <Stack.Screen name="Models" component={Models} options={{...defaultScreenOptions, title: "models" }} />
-        <Stack.Screen name="Holipics" component={Holipics} options={{...defaultScreenOptions, title: "holipics", headerShown: true, headerTitle: "holipics" }} />
-        <Stack.Screen name="SignUp" component={SignUp} options={{...defaultScreenOptions, title: "sign_up" }} />
-        <Stack.Screen name="SignIn" component={SignIn} options={{...defaultScreenOptions, title: "sign_in" }} />
-        <Stack.Screen name="Account" component={Account} options={{...defaultScreenOptions, title: "account" }} />
-        <Stack.Screen name="Security" component={Security} options={{...defaultScreenOptions, title: "security" }} />
-        <Stack.Screen name="Articles" component={Articles} options={{...defaultScreenOptions, title: "articles" }} />
-        <Stack.Screen name="Portfolio" component={Portfolio} options={{...defaultScreenOptions, title: "portfolio" }} />
-        <Stack.Screen name="Error" component={Error} options={{...defaultScreenOptions, title: "error" }} />
-        <Stack.Screen name="NotFound" component={NotFound} options={{...defaultScreenOptions, title: "not_foundnot_found" }} />
-      </Stack.Navigator>
+        <Drawer.Screen name="OnBoarding" component={OnBoarding} options={{...defaultScreenOptions, title: "on_boarding" }} />
+        <Drawer.Screen name="Home" component={Home} options={{...defaultScreenOptions, title: "home", headerShown: false }} />
+        <Drawer.Screen name="Models" component={Models} options={{...defaultScreenOptions, title: "models" }} />
+        <Drawer.Screen name="Account" component={Account} options={{...defaultScreenOptions, title: "account" }} />
+        <Drawer.Screen name="Error" component={Error} options={{...defaultScreenOptions, title: "error" }} />
+        <Drawer.Screen name="NotFound" component={NotFound} options={{...defaultScreenOptions, title: "not_foundnot_found" }} />
+      </Drawer.Navigator>
     </NavigationContainer>
   );
 }

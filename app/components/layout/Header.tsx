@@ -17,7 +17,7 @@ export default function Header(props: Record<string, any>) {
         <Appbar.Header style={{ width: FULL_WIDTH, flex: 1, alignItems: "center", justifyContent: "space-between", flexDirection: "row", backgroundColor: theme.colors.primaryOpac }}>
           <Avatar.Image size={50} source={require('../../assets/img/logo.png')} />
           <View style={tw`flex flex-row`}>
-            <Appbar.Action icon="person" onPress={() => store.toggleDrawer()} />
+            {/* <Appbar.Action icon="person" onPress={() => store.toggleDrawer()} /> */}
             <Appbar.Action icon="menu" onPress={() => store.toggleDrawer()} />
           </View>
         </Appbar.Header>

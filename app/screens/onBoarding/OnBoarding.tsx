@@ -8,8 +8,12 @@ import logo from "../../assets/img/logo.png"
 import { sharedStyles } from "../../styles/shared";
 import I18n from "i18n-js";
 import { useNavigation } from "@react-navigation/native";
+import useStore from "../../stores/store";
 export default function OnBoarding() {
   const navigation = useNavigation();
+  const onBoardingPassed = useStore(state=> state.onBoardingPassed);
+  const store = useStore();
+  if(onBoardingPassed) navigation.navigate("Home");
   return (
     <Layout hideHeader>
       <View style={styles.fullContainer}>
@@ -21,7 +25,10 @@ export default function OnBoarding() {
 
         <View style={{...styles.container, height: 200}}>
           {/* <Text variant="displayLarge" style={sharedStyles.centeredText}>...</Text> */}
-          <Button mode="contained"  style={{marginTop: 10}} onPress={()=> navigation.navigate("Home")}>{I18n.t("get_started")}</Button>
+          <Button mode="contained"  style={{marginTop: 10}} onPress={()=> {
+            store.toggleOnboardingStatus();
+            navigation.navigate("Home");
+          }}>{I18n.t("get_started")}</Button>
           {/* <Button mode="text" onPress={()=> navigation.navigate("SignIn")}>{I18n.t("i_already_have_a_wallet")}</Button> */}
         </View>
 

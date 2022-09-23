@@ -5,7 +5,6 @@ import Footer from "./Footer";
 import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../constants/layout";
 import theme from "../../constants/theme";
 import BottomNavigator from "./BottomNavigator";
-import DrawerNavigator from "./DrawerNavigator";
 
 
 export type LayoutProps = {
@@ -14,10 +13,11 @@ export type LayoutProps = {
   backgroundColor?: string,
   bottomNavigation?: boolean,
   hideHeader?: boolean,
-  noScrollView?: boolean
+  noScrollView?: boolean,
+  webStyle?: Record<string, any>
 };
 
-const Layout: React.FC<LayoutProps> = ({ children, backgroundColor, bottomNavigation, noScrollView }) => {
+const Layout: React.FC<LayoutProps> = ({ children, backgroundColor, bottomNavigation, noScrollView, webStyle }) => {
 
   return (
     <Fragment>
@@ -27,16 +27,14 @@ const Layout: React.FC<LayoutProps> = ({ children, backgroundColor, bottomNaviga
       />
       {
         Platform.OS === "web" ?
-
-          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", maxHeight: WINDOW_HEIGHT, maxWidth: WINDOW_WIDTH, backgroundColor: backgroundColor || theme.colors.background }}>
-            <DrawerNavigator />
+          // @ts-ignore
+          <View style={{ ...(webStyle || {}), flex: 1, alignItems: "center", justifyContent: "flex-center", maxHeight: WINDOW_HEIGHT, maxWidth: WINDOW_WIDTH, backgroundColor: backgroundColor || theme.colors.background }}>
             {children}
           </View>
           :
           (
             !noScrollView ?
               <>
-                <DrawerNavigator />
                 <ScrollView>
                   {children}
                 </ScrollView>
@@ -44,7 +42,6 @@ const Layout: React.FC<LayoutProps> = ({ children, backgroundColor, bottomNaviga
 
               :
               <>
-                <DrawerNavigator />
                 {children}
               </>
 

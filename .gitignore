@@ -151,3 +151,4 @@ config/letsencrypt/*
 config/proxymanager/*
 config/portainer-data/*
 *.pem
+data/*

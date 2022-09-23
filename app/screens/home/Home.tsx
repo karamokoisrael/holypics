@@ -7,7 +7,6 @@ import { WINDOW_HEIGHT, FULL_WIDTH } from "../../constants/layout"
 import { useNavigation } from "@react-navigation/native";
 import tw from '../../helpers/tailwind';
 import useStore from "../../stores/store";
-import Swiper from 'react-native-swiper'
 import theme from "../../constants/theme";
 import useSWR from "swr";
 import environment from "../../constants/environment";
@@ -30,11 +29,11 @@ export default function Home() {
   // backgroundColor={({...tw`bg-red-800`}).color as string}
   return (
     <Layout>
-      <View style={tw`flex flex-col bg-gray-50`}>
+      <View style={tw`flex flex-col bg-gray-50 w-full`}>
         <View style={tw`flex flex-row justify-between items-center mt-10`}>
           <View style={tw`flex flex-row justify-around items-center`}>
             <Avatar.Image size={50} source={require("../../assets/img/logo.png")} style={tw`ml-10`} />
-            <Text style={tw`ml-2`}>Hi Koffi !</Text>
+            <Text style={tw`ml-2`}>Hi Koffis !</Text>
             {/* <Avatar.Text size={60} style={tw`ml-10`}>Hi</Avatar.Text> */}
           </View>
           <Avatar.Icon size={50} icon="bell-outline" style={tw`mr-10 bg-white`} />
@@ -54,7 +53,7 @@ export default function Home() {
 
           {
             dataCtrl.data ?
-              <Swiper height={110} autoplay activeDotStyle={{ backgroundColor: theme.colors.primary }}>
+              <View>
                 {
                   arrayToPairs(dataCtrl.data).map((models: Record<string, any>[], id: React.Key) => (
                     <View key={id} style={tw`flex flex-wrap flex-row justify-between ml-5 mr-5`}>
@@ -71,7 +70,7 @@ export default function Home() {
                     </View>
                   ))
                 }
-              </Swiper> :
+              </View> :
               <ActivityIndicator animating={true} />
           }
 
@@ -86,7 +85,7 @@ export default function Home() {
 
           {
             dataCtrl.data ?
-              <Swiper height={290} autoplay activeDotStyle={{ backgroundColor: theme.colors.primary }}>
+              <View>
                 {
                   arrayToPairs(dataCtrl.data).map((models: Record<string, any>[], id: React.Key) => (
                     <View key={id} style={tw`flex flex-wrap flex-row justify-between`}>
@@ -115,7 +114,7 @@ export default function Home() {
                     </View>
                   ))
                 }
-              </Swiper>
+              </View>
               :
               <ActivityIndicator animating={true} />
           }
