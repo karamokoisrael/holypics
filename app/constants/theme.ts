@@ -1,4 +1,5 @@
-import { configureFonts, MD3LightTheme as DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
+import { configureFonts, MD3LightTheme as DefaultTheme } from 'react-native-paper';
+
 const fontConfig = {
   web: {
     regular: {
@@ -38,19 +39,19 @@ const fontConfig = {
   },
   android: {
     regular: {
-      fontFamily: 'Global',
+      fontFamily: 'Global-Fam',
       fontWeight: 'normal',
     },
     medium: {
-      fontFamily: 'Global',
+      fontFamily: 'Global-Fam',
       fontWeight: 'normal',
     },
     light: {
-      fontFamily: 'Global',
+      fontFamily: 'Global-Fam',
       fontWeight: 'normal',
     },
     thin: {
-      fontFamily: 'Global',
+      fontFamily: 'Global-Fam',
       fontWeight: 'normal',
     },
   }
@@ -81,7 +82,7 @@ export const theme = {
     transparent: "#fff0"
   },
   // @ts-ignore
-  // fonts: configureFonts(fontConfig),
+  fonts: configureFonts(fontConfig),
 };
 
 export const darkTheme = {
@@ -110,6 +111,5 @@ export const lightTheme = {
   }
 
 };
-
 
 export default theme;

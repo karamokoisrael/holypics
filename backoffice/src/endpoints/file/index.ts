@@ -1,8 +1,6 @@
-import { getAdminTokens, getDirectusStatic } from './../../helpers/auth'; 
 import { ApiExtensionContext } from '@directus/shared/types';
 import { Router, Request, Response } from "express";
 import { throwError } from '../../helpers/exceptions';
-import { getHost } from '../../helpers/utils';
 
 
 export default (router: Router, { database }: ApiExtensionContext) => {

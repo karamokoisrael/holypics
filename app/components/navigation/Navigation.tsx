@@ -4,7 +4,7 @@ import Error from "../../screens/error/Error";
 import { RootStackParamList } from "../../@types/types";
 import { LinkingOptions } from "@react-navigation/native";
 import * as Linking from "expo-linking";
-import { darkTheme, lightTheme } from "../../constants/theme";
+import theme, { darkTheme, lightTheme } from "../../constants/theme";
 import useStore from "../../stores/store";
 import Home from "../../screens/home/Home";
 import OnBoarding from "../../screens/onBoarding/OnBoarding";
@@ -14,6 +14,8 @@ import Header from "../layout/Header";
 import { bottomRoutes } from "../layout/BottomNavigator";
 import Models from "../../screens/ai/Models";
 import Account from "../../screens/account/Account";
+import Holipics from "../../screens/ai/Holipics";
+import I18n from "i18n-js";
 
 
 export type CustomRoute = {
@@ -51,8 +53,26 @@ type NavigationProps = {
 
 export default function Navigation({ colorScheme }: NavigationProps) {
   const store = useStore();
+  const t = (text: string)=> I18n.t(text) ||  ""
+
+
   const defaultScreenOptions = {
-    headerShown: false,
+    headerShown: true,
+    // drawerActiveTintColor: theme.colors.headerControls,
+    // drawerActiveBackgroundColor: theme.colors.primary,
+    // headerLeft: routeGroup.modal ? () => <Appbar.Action icon="arrow-left" color={theme.colors.headerControls} onPress={() => navigation.goBack()} /> : undefined,
+    // headerStyle: { maxWidth: FULL_WIDTH, minWidth: FULL_WIDTH},
+    // headerTitle: routeGroup.hideTitle ? "" : undefined,
+    // headerTintColor: theme.colors.headerControls,
+  
+    // @ts-ignore
+    drawerActiveBackgroundColor: theme.colors.primaryOpac,
+    // @ts-ignore
+    // drawerActiveTintColor: theme.colors.primary
+    back: true
+  }
+  const drawerHiddenOptions = {
+    drawerItemStyle: { display: "none" } as any
   }
 
   return (
@@ -70,19 +90,16 @@ export default function Navigation({ colorScheme }: NavigationProps) {
             bottomRoutes.map((currentRoute, index) => {
               if (currentRoute.key === route.name) return store.setBottomBarSelectedIndex(index);
             })
-            // console.log(route.name);
-            // drawerRoutes.map((currentRoute, index) => {
-            //   if (currentRoute.key === route.name) return store.setDrawerSelectedIndex(index);
-            // })
           },
         })}
       >
-        <Drawer.Screen name="OnBoarding" component={OnBoarding} options={{...defaultScreenOptions, title: "on_boarding" }} />
-        <Drawer.Screen name="Home" component={Home} options={{...defaultScreenOptions, title: "home", headerShown: false }} />
-        <Drawer.Screen name="Models" component={Models} options={{...defaultScreenOptions, title: "models" }} />
-        <Drawer.Screen name="Account" component={Account} options={{...defaultScreenOptions, title: "account" }} />
-        <Drawer.Screen name="Error" component={Error} options={{...defaultScreenOptions, title: "error" }} />
-        <Drawer.Screen name="NotFound" component={NotFound} options={{...defaultScreenOptions, title: "not_foundnot_found" }} />
+        <Drawer.Screen name="Home" component={Home} options={{ ...defaultScreenOptions, title: "home", drawerLabel: t("home"), ...{back: false} }} />
+        <Drawer.Screen name="OnBoarding" component={OnBoarding} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: t("on_boarding") , headerShown: false}} />
+        <Drawer.Screen name="Holipics" component={Holipics} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: "holipics", }} />
+        <Drawer.Screen name="Models" component={Models} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: "models", }} />
+        <Drawer.Screen name="Account" component={Account} options={{ ...defaultScreenOptions, title: "account", drawerLabel: t("account") }} />
+        <Drawer.Screen name="Error" component={Error} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: "error", }} />
+        <Drawer.Screen name="NotFound" component={NotFound} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: "not_found", }} />
       </Drawer.Navigator>
     </NavigationContainer>
   );

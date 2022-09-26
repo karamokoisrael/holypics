@@ -29,6 +29,7 @@ const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       store.setConfigs(resJson.data);
       return resJson.data;
     } catch (error) {
+      console.log(error);
       if (Object.keys(store.configs).length == 0) throw new Error("No local config");
       return store.configs;
     }

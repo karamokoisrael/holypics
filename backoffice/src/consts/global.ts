@@ -5,6 +5,7 @@ export const ADMIN_ID_CACHE_KEY='adminId'
 export const USER_TOKEN_EXPIRATION='1440h'
 export const DIRECTUS_DEFAULT_LANGUAGE='fr-FR'
 export const DEFAULT_ERROR_MESSAGE="Nous avons rencontré une erreur lors de l'opération."
+export const TRANSLATIONS_CACHE_KEY = "translation_strings";
 export const ERROR_MESSAGES: Record<string, any> = {
     "OK": {
         message: 'opération effectuée avec succès',

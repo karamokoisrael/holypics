@@ -6,11 +6,13 @@ import theme from "../../constants/theme";
 import React from "react";
 import useStore from "../../stores/store";
 import tw from "../../helpers/tailwind";
+import { useNavigation } from "@react-navigation/native";
 
-export default function Header(props: Record<string, any>) {  
+export default function Header(props: Record<string, any>) {
+
   if (Platform.OS != "ios" && props.headerShown == false) return null;
-  const store = useStore();
-
+  // const store = useStore();
+  const navigation = useNavigation();
   if (Platform.OS === "web") {
     return (
       <View style={{ width: WINDOW_WIDTH, flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -18,7 +20,7 @@ export default function Header(props: Record<string, any>) {
           <Avatar.Image size={50} source={require('../../assets/img/logo.png')} />
           <View style={tw`flex flex-row`}>
             {/* <Appbar.Action icon="person" onPress={() => store.toggleDrawer()} /> */}
-            <Appbar.Action icon="menu" onPress={() => store.toggleDrawer()} />
+            <Appbar.Action icon="menu" onPress={() => alert("clicked")} />
           </View>
         </Appbar.Header>
       </View>
@@ -28,10 +30,10 @@ export default function Header(props: Record<string, any>) {
   return (
     <>
       <Appbar.Header style={{ maxWidth: FULL_WIDTH, minWidth: FULL_WIDTH }}>
-        {props.back ? <Appbar.BackAction onPress={props.navigation.goBack} /> : null}
+        {props.options?.back ? <Appbar.BackAction onPress={() => navigation.goBack()} /> : null}
+        {!props.options?.back ? <Appbar.Action icon="menu" onPress={() => (navigation as Record<string, any>).toggleDrawer()} /> : null}
         <Appbar.Content title={props.options.headerTitle != undefined ? I18n.t(props.options.headerTitle) : ""} />
-        {/* <Appbar.Action icon={MORE_ICON} onPress={() => { }} /> */}
-        <Appbar.Action icon="menu" onPress={() => store.toggleDrawer()} />
+        {!props.options?.back ? <Appbar.Action icon="account" onPress={() => navigation.navigate("Account")} /> : null}
       </Appbar.Header>
     </>
   )

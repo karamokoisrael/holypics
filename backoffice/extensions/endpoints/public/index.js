@@ -14,10 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const utils_1 = require("../../helpers/utils");
-const path = require('path');
-exports.default = (router, { services, exceptions, getSchema, database, env }) => {
+exports.default = (router, { database }) => {
     router.use("/static", express_1.default.static('./extensions/static'));
-    router.get('/logo', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    router.get('/logo', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const [settings] = yield database('directus_settings').where('id', '=', 1);
         res.redirect((0, utils_1.getHost)(req) + `/assets/${settings.project_logo}`);
     }));

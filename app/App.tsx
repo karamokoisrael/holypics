@@ -2,7 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import "react-native-gesture-handler";
 import { Provider as PaperProvider } from 'react-native-paper';
 import theme from "./constants/theme";
-import Navigation from "./components/navigation";
+import Navigation from "./components/navigation/Navigation";
 import DataProvider from "./components/providers/DataProvider";
 import { Fragment } from "react";
 import { useFonts } from 'expo-font';
@@ -10,7 +10,7 @@ import useStore from "./stores/store";
 import { useDeviceContext } from 'twrnc';
 import tw from "./helpers/tailwind";
 // SplashScreen.preventAutoHideAsync();
-
+  
 export default function App() {
   const colorScheme = useStore((state) => state.colorScheme); 
   useDeviceContext(tw, { withDeviceColorScheme: false });

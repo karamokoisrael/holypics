@@ -11,6 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getTranslator = void 0;
 const logger_1 = require("./logger");
+const cache_1 = require("./cache");
+const global_1 = require("../consts/global");
 const formatString = (text, params = null) => {
     if (params === null)
         return text;
@@ -19,23 +21,46 @@ const formatString = (text, params = null) => {
     });
 };
 const getDefaultTranslation = (key, params = null) => formatString(key.replace(new RegExp(`_`, "g"), " "), params);
+const getTranslationStrings = (database) => __awaiter(void 0, void 0, void 0, function* () {
+    const [{ translation_strings }] = yield database("directus_settings").select("translation_strings").limit(1);
+    const cache = (0, cache_1.createCache)();
+    if (!cache.has(global_1.TRANSLATIONS_CACHE_KEY)) {
+        (0, cache_1.setCacheValue)(global_1.TRANSLATIONS_CACHE_KEY, translation_strings);
+    }
+    return translation_strings !== undefined && translation_strings !== null ? JSON.parse(translation_strings) : [];
+});
+const getLanguage = (req) => {
+    const baseLanguage = "en-US";
+    let lang = baseLanguage;
+    const languagesHeader = req.query.culture !== undefined ? req.query.culture : req.headers["accept-language"];
+    switch (languagesHeader !== undefined ? languagesHeader.split(",")[0].split("-")[0] : null) {
+        case "en":
+            lang = "en-US";
+            break;
+        case "fr":
+            lang = "fr-FR";
+            break;
+        default:
+            break;
+    }
+    return lang;
+};
 const getTranslator = (req, database) => __awaiter(void 0, void 0, void 0, function* () {
     let t = getDefaultTranslation;
+    const lang = getLanguage(req);
+    let translationStrings = [];
     try {
-        const [{ translation_strings }] = yield database("directus_settings").select("translation_strings").limit(1);
-        let lang = "fr-FR";
-        const languagesHeader = req.query.culture !== undefined ? req.query.culture : req.headers["accept-language"];
-        switch (languagesHeader !== undefined ? languagesHeader.split(",")[0].split("-")[0] : null) {
-            case "en":
-                lang = "en-US";
-                break;
-            default:
-                lang = "fr-FR";
-                break;
+        const cachedTranslationStrings = (0, cache_1.getCacheValue)(global_1.TRANSLATIONS_CACHE_KEY);
+        if (cachedTranslationStrings != null && cachedTranslationStrings != undefined) {
+            translationStrings = cachedTranslationStrings !== undefined && cachedTranslationStrings !== null ? JSON.parse(cachedTranslationStrings) : [];
+            console.log("cache loaded");
         }
-        const tanslationStrings = translation_strings !== undefined && translation_strings !== null ? JSON.parse(translation_strings) : [];
+        else {
+            translationStrings = yield getTranslationStrings(database);
+            console.log("no cache loaded");
+        }
         t = (key, params = null) => {
-            const tanslation = tanslationStrings.find((item) => item.key === key);
+            const tanslation = translationStrings.find((item) => item.key === key);
             if (tanslation === undefined || tanslation.translations[lang] === undefined)
                 return getDefaultTranslation(key);
             return formatString(tanslation.translations[lang], params);
@@ -45,7 +70,7 @@ const getTranslator = (req, database) => __awaiter(void 0, void 0, void 0, funct
         (0, logger_1.logInformation)(error, true);
     }
     finally {
-        return t;
+        return { t, lang };
     }
 });
 exports.getTranslator = getTranslator;

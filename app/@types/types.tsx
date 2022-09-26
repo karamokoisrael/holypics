@@ -32,6 +32,7 @@ export type RootStackParamList = {
 
   Models: NavigatorScreenParams<RootTabParamList> | undefined;
   Holipics: NavigatorScreenParams<RootTabParamList> | undefined;
+  StableDiffusion: NavigatorScreenParams<RootTabParamList> | undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<

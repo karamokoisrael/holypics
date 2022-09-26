@@ -61,6 +61,7 @@ export const translations = {
         holipics: "Holipics",
         hi: "Hi",
         // @ts-ignore
-        holipics: "Holipics"
+        holipics: "Holipics",
+        on_boarding: "OnBoarding"
     },
 }

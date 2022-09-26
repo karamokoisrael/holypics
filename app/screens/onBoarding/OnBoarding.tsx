@@ -13,7 +13,7 @@ export default function OnBoarding() {
   const navigation = useNavigation();
   const onBoardingPassed = useStore(state=> state.onBoardingPassed);
   const store = useStore();
-  if(onBoardingPassed) navigation.navigate("Home");
+  // if(onBoardingPassed) navigation.navigate("Home");
   return (
     <Layout hideHeader>
       <View style={styles.fullContainer}>
