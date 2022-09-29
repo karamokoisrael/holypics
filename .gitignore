@@ -152,3 +152,4 @@ config/proxymanager/*
 config/portainer-data/*
 *.pem
 data/*
+flagged/

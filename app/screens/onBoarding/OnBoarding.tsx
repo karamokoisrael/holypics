@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, StyleSheet, Image } from "react-native";
 import { Button, Text } from "react-native-paper";
 import Layout from "../../components/layout/Layout";
@@ -13,7 +13,9 @@ export default function OnBoarding() {
   const navigation = useNavigation();
   const onBoardingPassed = useStore(state=> state.onBoardingPassed);
   const store = useStore();
-  // if(onBoardingPassed) navigation.navigate("Home");
+  useEffect(()=>{
+    if(onBoardingPassed) navigation.navigate("Home");
+  }, [onBoardingPassed])
   return (
     <Layout hideHeader>
       <View style={styles.fullContainer}>

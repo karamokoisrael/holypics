@@ -16,6 +16,7 @@ import Models from "../../screens/ai/Models";
 import Account from "../../screens/account/Account";
 import Holipics from "../../screens/ai/Holipics";
 import I18n from "i18n-js";
+import StableDiffusion from "../../screens/ai/StableDiffusion";
 
 
 export type CustomRoute = {
@@ -53,7 +54,7 @@ type NavigationProps = {
 
 export default function Navigation({ colorScheme }: NavigationProps) {
   const store = useStore();
-  const t = (text: string)=> I18n.t(text) ||  ""
+  const t = (text: string) => I18n.t(text) || ""
 
 
   const defaultScreenOptions = {
@@ -64,7 +65,7 @@ export default function Navigation({ colorScheme }: NavigationProps) {
     // headerStyle: { maxWidth: FULL_WIDTH, minWidth: FULL_WIDTH},
     // headerTitle: routeGroup.hideTitle ? "" : undefined,
     // headerTintColor: theme.colors.headerControls,
-  
+
     // @ts-ignore
     drawerActiveBackgroundColor: theme.colors.primaryOpac,
     // @ts-ignore
@@ -93,9 +94,10 @@ export default function Navigation({ colorScheme }: NavigationProps) {
           },
         })}
       >
-        <Drawer.Screen name="Home" component={Home} options={{ ...defaultScreenOptions, title: "home", drawerLabel: t("home"), ...{back: false} }} />
-        <Drawer.Screen name="OnBoarding" component={OnBoarding} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: t("on_boarding") , headerShown: false}} />
+        <Drawer.Screen name="Home" component={Home} options={{ ...defaultScreenOptions, title: "home", drawerLabel: t("home"), ...{ back: false } }} />
+        <Drawer.Screen name="OnBoarding" component={OnBoarding} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: t("on_boarding"), headerShown: false }} />
         <Drawer.Screen name="Holipics" component={Holipics} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: "holipics", }} />
+        <Drawer.Screen name="StableDiffusion" component={StableDiffusion} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: "stable-diffusion", }} />
         <Drawer.Screen name="Models" component={Models} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: "models", }} />
         <Drawer.Screen name="Account" component={Account} options={{ ...defaultScreenOptions, title: "account", drawerLabel: t("account") }} />
         <Drawer.Screen name="Error" component={Error} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: "error", }} />
