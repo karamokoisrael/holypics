@@ -25,7 +25,7 @@
     "adm-zip": "^0.5.9",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.0",
-    "directus": "^9.14.1",
+    "directus": "^9.18.1",
     "directus-extension-display-link": "^1.5.2",
     "directus-extension-masked-interface": "^1.0.0",
     "directus-extension-svgmap-picker-interface": "^0.1.0",
