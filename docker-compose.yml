@@ -1,6 +1,7 @@
 
 version: '3.4'
 services:
+
   website:
     container_name: ${WEBSITE_CONTAINER_NAME}
     restart: always
@@ -52,21 +53,6 @@ services:
       MYSQL_DATABASE: "${MYSQL_DATABASE}"
       MYSQL_USER: "${MYSQL_USER}"
       MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
-
-  filebrowser:
-    container_name: ${FILEBROWSER_CONTAINER_NAME}
-    image: hurlenko/filebrowser
-    user: "${FILEBROWSER_UID}:${FILEBROWSER_GID}"
-    ports:
-      - ${FILEBROWSER_PORT}:8080
-    volumes:
-      - backoffice_migration:/data/backoffice_migration
-      - backoffice_uploads:/data/backoffice_uploads
-      - ./data:/data/data
-      # - /CONFIG_DIR:/config
-    environment:
-      - FB_BASEURL=/filebrowser
-    restart: always
 
   tfserver:
     image: tensorflow/serving
