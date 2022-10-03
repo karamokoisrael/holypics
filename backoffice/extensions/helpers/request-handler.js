@@ -217,11 +217,14 @@ const translate = (translations, text, lang = global_1.DIRECTUS_DEFAULT_LANGUAGE
     return text.replace("$t:", "").replace(/_/g, ' ').toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase());
 };
 exports.translate = translate;
-const getRequestParams = (req) => {
+const getRequestParams = (req, forceAdmin = false) => {
     // @ts-ignore
     const filters = req.query.filters;
     // @ts-ignore
     const accountability = req.accountability;
+    // @ts-ignore
+    if (forceAdmin)
+        accountability.admin = true;
     // @ts-ignore
     const schema = req.schema;
     return { filters, accountability, schema };

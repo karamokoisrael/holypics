@@ -274,11 +274,13 @@ export type ExtractRequestParams = {
 
 
 
-export const getRequestParams = (req: Request): ExtractRequestParams=>{
+export const getRequestParams = (req: Request, forceAdmin=false): ExtractRequestParams=>{
   // @ts-ignore
   const filters = req.query.filters as Record<string, any>;
   // @ts-ignore
   const accountability = req.accountability;
+  // @ts-ignore
+  if(forceAdmin) accountability.admin = true
   // @ts-ignore
   const schema = req.schema;
   return { filters, accountability, schema}

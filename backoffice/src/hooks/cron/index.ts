@@ -1,40 +1,25 @@
-import { notify } from './../../helpers/notification';
-import { WebSocketMessage } from './../../@types/webSocket';
-import { NextFunction, Request, Response, Router } from "express";
-import { dump, getDumpList, restore } from "../../helpers/db"
+import { dump } from "../../helpers/db"
 import { ApiExtensionContext } from "@directus/shared/types";
-import { EventContext, RegisterFunctions } from "../../@types/directus";
+import { RegisterFunctions } from "../../@types/directus";
+import moment from 'moment';
 
-export default function({ filter, schedule, }: RegisterFunctions, { services, exceptions, database }: ApiExtensionContext){
+export default function ({ schedule, }: RegisterFunctions, { database }: ApiExtensionContext) {
     schedule('0 0 * * *', async () => {
         try {
             dump()
-        } catch (error) {
-            
-        }
-        
-    })  
-    
-    // schedule('* * * * *', async () => {
-    //     console.log('notifying user');
-        
-    //     notify(database, null, 'admin', `hey for admin ${new Date()}`, '8d93e385-9c22-46a9-be13-aa6e68c617d5', 'products')
-    //     notify(database, null, 'user', `hey for user ${new Date()}`, 'da347118-dc7b-4bac-93e0-9e121bbc9578', 'products')
-    // })  
+        } catch (error) { }
 
-    // emitter.onFilter('websocket.subscribe.beforeSend', async (message: WebSocketMessage) => {
-    //     if (message.action === 'update') {
-    //       // read the full item when an update occurs
-    //       const service = new services.ItemsService(message.collection, {
-    //         knex, schema: await getSchema(), accountability: { admin: true }
-    //       });
-    //       message.payload = await service.readMany(message.keys);
-    //     }
-    //     return message;
-    //   });
+    })
 
-    
+    schedule('0 1 * * *', async () => {
+        try {
+            const today = moment(new Date(), "DD-MM-YYYY hh:mm:ss").add(60, 'minutes').toDate()
+            await database("directus_users").update({
+                "subscription_deadline": null
+            }).whereNotNull("subscription_deadline").where("subscription_deadline", "<=", today);
+        } catch (error) { }
 
+    })
 };
 
 

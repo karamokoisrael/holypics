@@ -8,31 +8,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = require("../../helpers/db");
-function default_1({ filter, schedule, }, { services, exceptions, database }) {
+const moment_1 = __importDefault(require("moment"));
+function default_1({ schedule, }, { database }) {
     schedule('0 0 * * *', () => __awaiter(this, void 0, void 0, function* () {
         try {
             (0, db_1.dump)();
         }
-        catch (error) {
-        }
+        catch (error) { }
     }));
-    // schedule('* * * * *', async () => {
-    //     console.log('notifying user');
-    //     notify(database, null, 'admin', `hey for admin ${new Date()}`, '8d93e385-9c22-46a9-be13-aa6e68c617d5', 'products')
-    //     notify(database, null, 'user', `hey for user ${new Date()}`, 'da347118-dc7b-4bac-93e0-9e121bbc9578', 'products')
-    // })  
-    // emitter.onFilter('websocket.subscribe.beforeSend', async (message: WebSocketMessage) => {
-    //     if (message.action === 'update') {
-    //       // read the full item when an update occurs
-    //       const service = new services.ItemsService(message.collection, {
-    //         knex, schema: await getSchema(), accountability: { admin: true }
-    //       });
-    //       message.payload = await service.readMany(message.keys);
-    //     }
-    //     return message;
-    //   });
+    schedule('0 1 * * *', () => __awaiter(this, void 0, void 0, function* () {
+        try {
+            const today = (0, moment_1.default)(new Date(), "DD-MM-YYYY hh:mm:ss").add(60, 'minutes').toDate();
+            yield database("directus_users").update({
+                "subscription_deadline": null
+            }).whereNotNull("subscription_deadline").where("subscription_deadline", "<=", today);
+        }
+        catch (error) { }
+    }));
 }
 exports.default = default_1;
 ;
