@@ -38,7 +38,7 @@ export const linking: LinkingOptions<RootStackParamList> = {
     screens: {
       OnBoarding: "/on-boarding",
       Home: '/',
-      Models: '/models',
+      Models: '/models:id',
       Account: '/me',
       Error: '/error',
       NotFound: '*'
@@ -81,7 +81,7 @@ export default function Navigation({ colorScheme }: NavigationProps) {
       linking={linking}
       theme={colorScheme === "dark" ? darkTheme : lightTheme}
     >
-      <Drawer.Navigator initialRouteName="OnBoarding"
+      <Drawer.Navigator initialRouteName="Home"
         screenOptions={{
           header: (props) => <Header {...props} />,
         }}

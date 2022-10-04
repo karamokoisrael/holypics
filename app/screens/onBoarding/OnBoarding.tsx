@@ -26,12 +26,10 @@ export default function OnBoarding() {
         </View>
 
         <View style={{...styles.container, height: 200}}>
-          {/* <Text variant="displayLarge" style={sharedStyles.centeredText}>...</Text> */}
           <Button mode="contained"  style={{marginTop: 10}} onPress={()=> {
             store.toggleOnboardingStatus();
             navigation.navigate("Home");
           }}>{I18n.t("get_started")}</Button>
-          {/* <Button mode="text" onPress={()=> navigation.navigate("SignIn")}>{I18n.t("i_already_have_a_wallet")}</Button> */}
         </View>
 
       </View>
