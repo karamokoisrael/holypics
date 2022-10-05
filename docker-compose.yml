@@ -16,22 +16,21 @@ services:
   backoffice:
     container_name: ${BACKOFFICE_CONTAINER_NAME}
     restart: always
-    build: 
-      dockerfile: Dockerfile
-      context: backoffice
+    image: directus/directus:latest
     env_file:
       - .env
       - config/environment/backoffice.env
     ports:
       - ${BACKOFFICE_PORT}:8055
-    links:
-      - db:db
+    networks:
+      - directus
     depends_on:
       - db
+      - cache
     volumes:
-      - ./backoffice/extensions:/app/extensions
-      - backoffice_migration:/app/migration
-      - backoffice_uploads:/app/uploads
+      - ./backoffice/extensions:/directus/extensions
+      - backoffice_migration:/directus/migration
+      - backoffice_uploads:/directus/uploads
 
   db:
     container_name: ${DB_CONTAINER_NAME}
