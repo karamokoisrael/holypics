@@ -6,7 +6,7 @@ export default function Account() {
   return (
     <Layout>
       <View>
-        <Text>Account</Text>
+        <Image src={}/>
       </View>
     </Layout>
   );
