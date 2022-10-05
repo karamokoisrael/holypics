@@ -1,12 +1,12 @@
 import { defineInterface } from '@directus/extensions-sdk';
-import IntefaceComponent from './interface.vue';
-
+import InterfaceComponent from './interface.vue';
+// 
 export default defineInterface({
 	id: 'mgx-interface-ssr',
 	name: 'Interface SSR',
 	icon: 'box',
 	description: 'Here a an alternative way of displaying interface data using server side rendering',
-	component: IntefaceComponent,
+	component: InterfaceComponent,
 	hideLabel: true,
 	hideLoader: true,
 	types: ['alias'],

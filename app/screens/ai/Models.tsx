@@ -1,15 +1,22 @@
-import React, {  } from "react";
+import React, { } from "react";
 import { Text } from "react-native-paper";
 import useSWR from "swr";
 import Layout from "../../components/layout/Layout";
 import useStore from "../../stores/store";
-export default function Models() {
+export default function Models({ route }) {
   const configs = useStore(state => state.configs);
-  const dataCtrl = useSWR("models", async (...args: any) => {
-    // const data = configs.models.find((item: any) => item.id == route.params?.id);
-    // if (data == undefined) throw new Error("No data");
-    // return data;
-    return {}
+  const dataCtrl = useSWR("model", async () => {
+    try {
+      console.log(route);
+      
+      const data = configs?.models.find((item: { id: any; }) => item.id == route.params.id)
+      console.log("model => ");
+      console.log(data);
+      return data;
+    } catch (error) {
+      // console.log(error);
+      throw new Error("");
+    }
   }, {
     revalidateOnFocus: false,
     shouldRetryOnError: true,
@@ -17,7 +24,7 @@ export default function Models() {
 
   return (
     <Layout>
-      <Text>StableDiffusion</Text>
+      <Text>{dataCtrl.data?.title}</Text>
     </Layout>
   );
 }

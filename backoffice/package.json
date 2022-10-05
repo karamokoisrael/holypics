@@ -23,6 +23,7 @@
     "@tensorflow/tfjs-node": "^3.18.0",
     "@types/socket.io": "^3.0.2",
     "adm-zip": "^0.5.9",
+    "axios": "^0.27.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.0",
     "directus": "^9.18.1",

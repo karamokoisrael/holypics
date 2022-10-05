@@ -19,8 +19,6 @@ export default function Home() {
   const dataCtrl = useSWR("models", async () => {
     try {
       const data = configs.models
-      // console.log(data);
-
       if (searchText != "") {
         return data.filter((item: any) => item.title.toLowerCase().search(searchText.toLowerCase()) != -1 || item.tags?.includes(searchText.toLowerCase()))
       }
@@ -59,7 +57,8 @@ export default function Home() {
               <View style={tw`flex flex-wrap flex-row justify-around w-full`}>
                 {
                   dataCtrl.data?.map((model: Record<string, any>) => (
-                    <TouchableOpacity key={model.id} onPress={() => navigation.navigate("Models")}>
+                    // @ts-ignore
+                    <TouchableOpacity key={model.id} onPress={() => navigation.navigate("Models", {id: model.id})}>
                       <View key={model.id} style={tw`bg-white w-[180px] rounded-lg flex justify-center items-center bg-white`}>
                         <Image style={tw`w-[160px] h-[160px] rounded-lg mt-2`} source={{ uri: `${environment.apiUrl}/file/${model.thumb}` }} />
                         <View style={tw`flex justify-start w-full`}>
