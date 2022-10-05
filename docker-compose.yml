@@ -37,7 +37,7 @@ services:
       - ./backoffice/package.json:/directus
       - backoffice_migration:/directus/migration
       - backoffice_uploads:/directus/uploads
-      -
+      
     networks:
       - directus
 
