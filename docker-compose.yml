@@ -24,6 +24,9 @@ services:
     container_name: ${BACKOFFICE_CONTAINER_NAME}
     restart: always
     image: directus/directus:latest
+    # build: 
+    #   dockerfile: Dockerfile
+    #   context: backoffice
     env_file:
       - .env
       - config/environment/backoffice.env
