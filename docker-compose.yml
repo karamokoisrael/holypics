@@ -34,8 +34,10 @@ services:
       - cache
     volumes:
       - ./backoffice/extensions:/directus/extensions
+      - ./backoffice/package.json:/directus
       - backoffice_migration:/directus/migration
       - backoffice_uploads:/directus/uploads
+      -
     networks:
       - directus
 
@@ -62,7 +64,7 @@ services:
       MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
     networks:
       - directus
-      
+
   tfserving:
     image: tensorflow/serving
     container_name: ${TF_SERVING_CONTAINER_NAME}
