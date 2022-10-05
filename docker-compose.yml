@@ -53,7 +53,7 @@ services:
       MYSQL_USER: "${MYSQL_USER}"
       MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
 
-  tfserver:
+  tfserving:
     image: tensorflow/serving
     container_name: ${TF_SERVING_CONTAINER_NAME}
     ports:
