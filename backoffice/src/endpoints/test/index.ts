@@ -39,14 +39,15 @@ export default function (router: Router, { database }: ApiExtensionContext) {
                 last_collection_total_pages: number,
                 collection_req_query: string,
                 last_collection_req_page: number,
-                last_collection_req_items_per_page: number
+                last_collection_req_items_per_page: number,
+                model_path: string
             }
             const { schema, accountability } = getRequestParams(req, true);
             const { admin_id } = await getAdminTokens(database);
             const configsService = new ItemsService("configurations", { schema, accountability: { ...accountability, user: admin_id as string } });
             const feedbacksService = new ItemsService("feedbacks", { schema, accountability: { ...accountability, user: admin_id as string } });
             const configs = await configsService.readSingleton({});
-            const { api_key, preprocessed_collections, items_per_page, last_collection, last_collection_page, neutral_class, neutral_class_danger_probability, collection_req_query, last_collection_req_page,  last_collection_req_items_per_page } = configs.unsplash_settings as UnplashSetting;
+            const { api_key, preprocessed_collections, items_per_page, last_collection, last_collection_page, neutral_class, neutral_class_danger_probability, collection_req_query, last_collection_req_page,  last_collection_req_items_per_page, model_path } = configs.unsplash_settings as UnplashSetting;
             const headers = { Authorization: `Client-ID ${api_key}` }
             const collectionsReq = await axios.get(`https://api.unsplash.com/search/collections?page=${last_collection_req_page}&per_page=${last_collection_req_items_per_page}&query=${collection_req_query}`, { headers })
             const collections: string[] = collectionsReq.data.results.map((item: any)=> item.id);
@@ -74,7 +75,7 @@ export default function (router: Router, { database }: ApiExtensionContext) {
                 try {
                     const image_url = imageData?.urls?.small;
                     const base64 = await imageToBase64(image_url);
-                    const predictionReq = await axios.post(`https://mgx-tf-serving.karamokoisrael.tech/v1/models/nsfw_content_moderator:predict`,
+                    const predictionReq = await axios.post(`${process.env.TF_SERVING_API_URL as string}${model_path}`,
                         { instances: [base64] }
                     )
                     const prediction = predictionReq.data.predictions[0];

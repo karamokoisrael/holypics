@@ -43,7 +43,7 @@ function default_1(router, { database }) {
             const configsService = new directus_1.ItemsService("configurations", { schema, accountability: Object.assign(Object.assign({}, accountability), { user: admin_id }) });
             const feedbacksService = new directus_1.ItemsService("feedbacks", { schema, accountability: Object.assign(Object.assign({}, accountability), { user: admin_id }) });
             const configs = yield configsService.readSingleton({});
-            const { api_key, preprocessed_collections, items_per_page, last_collection, last_collection_page, neutral_class, neutral_class_danger_probability, collection_req_query, last_collection_req_page, last_collection_req_items_per_page } = configs.unsplash_settings;
+            const { api_key, preprocessed_collections, items_per_page, last_collection, last_collection_page, neutral_class, neutral_class_danger_probability, collection_req_query, last_collection_req_page, last_collection_req_items_per_page, model_path } = configs.unsplash_settings;
             const headers = { Authorization: `Client-ID ${api_key}` };
             const collectionsReq = yield axios_1.default.get(`https://api.unsplash.com/search/collections?page=${last_collection_req_page}&per_page=${last_collection_req_items_per_page}&query=${collection_req_query}`, { headers });
             const collections = collectionsReq.data.results.map((item) => item.id);
@@ -66,7 +66,7 @@ function default_1(router, { database }) {
                 try {
                     const image_url = (_a = imageData === null || imageData === void 0 ? void 0 : imageData.urls) === null || _a === void 0 ? void 0 : _a.small;
                     const base64 = yield imageToBase64(image_url);
-                    const predictionReq = yield axios_1.default.post(`https://mgx-tf-serving.karamokoisrael.tech/v1/models/nsfw_content_moderator:predict`, { instances: [base64] });
+                    const predictionReq = yield axios_1.default.post(`${process.env.TF_SERVING_API_URL}${model_path}`, { instances: [base64] });
                     const prediction = predictionReq.data.predictions[0];
                     const predictionData = {};
                     for (let i = 0; i < prediction.scores.length; i++) {

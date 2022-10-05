@@ -13,7 +13,7 @@ export default function (router: Router, { database }: ApiExtensionContext) {
         function selectProxyHost(req: any) {
                 const noAuthAccess = true;
                 const { accountability } = getRequestParams(req);
-                return accountability?.user || noAuthAccess ? "https://mgx-tf-serving.karamokoisrael.tech" : accessForbiddenPath;
+                return accountability?.user || noAuthAccess ? process.env.TF_SERVING_API_URL as string : accessForbiddenPath;
         }
 
         // @ts-ignore

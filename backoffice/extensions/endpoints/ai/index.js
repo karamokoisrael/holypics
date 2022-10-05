@@ -21,7 +21,7 @@ function default_1(router, { database }) {
     function selectProxyHost(req) {
         const noAuthAccess = true;
         const { accountability } = (0, request_handler_1.getRequestParams)(req);
-        return (accountability === null || accountability === void 0 ? void 0 : accountability.user) || noAuthAccess ? "https://mgx-tf-serving.karamokoisrael.tech" : accessForbiddenPath;
+        return (accountability === null || accountability === void 0 ? void 0 : accountability.user) || noAuthAccess ? process.env.TF_SERVING_API_URL : accessForbiddenPath;
     }
     // @ts-ignore
     router.use(express_1.default.json({ limit: "10mb", extended: true }));
