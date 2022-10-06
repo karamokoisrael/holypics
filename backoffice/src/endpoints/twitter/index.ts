@@ -34,7 +34,8 @@ export default function (router: Router, { database }: ApiExtensionContext) {
         replicate_api_key: string
     }
 
-    const callbackURL = `${process.env.PUBLIC_URL}/twitter/auth-callback`;
+    const callbackURL = process.env.PUBLIC_URL != "/" ? `${process.env.PUBLIC_URL}/twitter/auth-callback` :
+        `https://mgx-twitter.requestcatcher.com/twitter/auth-callback`;
 
     router.get('/auth', async (req: Request, res: Response) => {
         const { t } = await getTranslator(req, database);
@@ -55,7 +56,7 @@ export default function (router: Router, { database }: ApiExtensionContext) {
             );
 
             await configsService.upsertSingleton({ twitter_settings: { ...configs.twitter_settings, code_verifier: codeVerifier, state } });
-            res.redirect(url);
+            return res.redirect(url);
         } catch (error) {
             console.log(error);
             return throwError(res, t("we_encountered_an_unexpected_error_during_the_operation"));
@@ -136,26 +137,35 @@ export default function (router: Router, { database }: ApiExtensionContext) {
             // });
 
             const wordHint = prompt_hints[Math.floor(Math.random() * prompt_hints.length)]
-            const promptReq = await axios.post('https://api-inference.huggingface.co/models/succinctly/text2image-prompt-generator', {
-                inputs: wordHint
-            }, { headers: { "Authorization": `Bearer ${hugging_face_api_key}` } })
+            // const promptReq = await axios.post('https://api-inference.huggingface.co/models/succinctly/text2image-prompt-generator', {
+            //     inputs: wordHint
+            // }, { headers: { "Authorization": `Bearer ${hugging_face_api_key}` } })
 
-            console.log("wordHint => ", wordHint);
+            const generatedPrompt = wordHint //promptReq.data[0].generated_text
+
             
-            console.log("generated_text => ", promptReq.data[0].generated_text);
+            
+            console.log("wordHint => ", wordHint);
+
+            console.log("generated_text => ", generatedPrompt);
+
             
             await refreshedClient.v2.tweet({
-                text: promptReq.data[0].generated_text
+                text: generatedPrompt
             });
 
             const replicate = new Replicate({ apiToken: replicate_api_key, pollingInterval: 5000 });
             const imagePredictionData = await replicate.predict("9e767fbac45bea05d5e1823f737f927856c613e18cbc8d9068bafdc6d600a0f7", {
-                prompt: promptReq.data[0].generated_text
+                prompt: generatedPrompt
             })
 
-            console.log("ouput url => ", imagePredictionData.output[0]);
-    
-            const mediaBase64 = await imageToBase64(imagePredictionData.output[0]);
+            console.log(imagePredictionData);
+            
+            const imageUrl = imagePredictionData.output[0]
+
+            console.log("ouput url => ", imageUrl);
+
+            const mediaBase64 = await imageToBase64(imageUrl);
             const mediaPath = "./uploads/twitter-media.jpg"
             Buffer.from(`data:image/jpg;base64,${mediaBase64}`)
             require("fs").writeFile(mediaPath, mediaBase64, 'base64', async function (err: any) {
