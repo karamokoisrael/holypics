@@ -39,6 +39,7 @@ function default_1(router, { database }) {
                 clientId: client_id,
                 clientSecret: client_secret,
             });
+            console.log("callback url => ", callbackURL);
             const { url, codeVerifier, state } = twitterClient.generateOAuth2AuthLink(callbackURL, { scope: ['tweet.read', 'tweet.write', 'users.read', 'offline.access'] });
             yield configsService.upsertSingleton({ twitter_settings: Object.assign(Object.assign({}, configs.twitter_settings), { code_verifier: codeVerifier, state }) });
             return res.redirect(url);
@@ -108,9 +109,9 @@ function default_1(router, { database }) {
             const generatedPrompt = wordHint; //promptReq.data[0].generated_text
             console.log("wordHint => ", wordHint);
             console.log("generated_text => ", generatedPrompt);
-            yield refreshedClient.v2.tweet({
-                text: generatedPrompt
-            });
+            // await refreshedClient.v2.tweet({
+            //     text: generatedPrompt
+            // });
             const replicate = new replicate_1.default({ apiToken: replicate_api_key, pollingInterval: 5000 });
             const imagePredictionData = yield replicate.predict("9e767fbac45bea05d5e1823f737f927856c613e18cbc8d9068bafdc6d600a0f7", {
                 prompt: generatedPrompt

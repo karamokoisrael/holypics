@@ -1,13 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function default_1({ init, action }, apiExtension) {
-    // init("app.before", ({app}: any)=>{
-    //     // console.log(app);
-    //     app.use(bodyParser.json({ limit: '10mb' }));
-    //     app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
-    // })
-    // action('server.start', async (meta: Record<string, any>) => {
-    //     // 
+function default_1({ init, action }, { database }) {
+    // action('server.start', async (meta: Record<string, any>, { schema, accountability }) => {
     // })
 }
 exports.default = default_1;

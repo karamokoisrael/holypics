@@ -50,6 +50,9 @@ export default function (router: Router, { database }: ApiExtensionContext) {
                 clientSecret: client_secret,
             });
 
+            console.log("callback url => ", callbackURL);
+            
+
             const { url, codeVerifier, state } = twitterClient.generateOAuth2AuthLink(
                 callbackURL,
                 { scope: ['tweet.read', 'tweet.write', 'users.read', 'offline.access'] }
@@ -150,9 +153,9 @@ export default function (router: Router, { database }: ApiExtensionContext) {
             console.log("generated_text => ", generatedPrompt);
 
             
-            await refreshedClient.v2.tweet({
-                text: generatedPrompt
-            });
+            // await refreshedClient.v2.tweet({
+            //     text: generatedPrompt
+            // });
 
             const replicate = new Replicate({ apiToken: replicate_api_key, pollingInterval: 5000 });
             const imagePredictionData = await replicate.predict("9e767fbac45bea05d5e1823f737f927856c613e18cbc8d9068bafdc6d600a0f7", {
