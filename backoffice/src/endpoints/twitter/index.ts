@@ -8,6 +8,9 @@ import axios from 'axios';
 import { getAdminTokens } from '../../helpers/auth';
 import { TwitterApi } from 'twitter-api-v2';
 import { TwitterApiV2Settings } from 'twitter-api-v2';
+import Replicate from '../../helpers/replicate';
+// import { Replicate } from '../../helpers/replicate';
+
 TwitterApiV2Settings.deprecationWarnings = false;
 const imageToBase64 = require('image-to-base64');
 const { Configuration, OpenAIApi } = require("openai");
@@ -28,6 +31,7 @@ export default function (router: Router, { database }: ApiExtensionContext) {
         openai_organization: string,
         hugging_face_api_key: string,
         prompt_hints: string[],
+        replicate_api_key: string
     }
 
     const callbackURL = `${process.env.PUBLIC_URL}/twitter/auth-callback`;
@@ -73,9 +77,9 @@ export default function (router: Router, { database }: ApiExtensionContext) {
                 clientSecret: client_secret,
             });
 
-            // if (state !== storedState) {
-            //     return throwError(res, t("auth_error"));
-            // }
+            if (state !== storedState) {
+                return throwError(res, t("auth_error"));
+            }
 
             const {
                 client: loggedClient,
@@ -105,7 +109,21 @@ export default function (router: Router, { database }: ApiExtensionContext) {
             const { admin_id } = await getAdminTokens(database);
             const configsService = new ItemsService("configurations", { schema, accountability: { ...accountability, user: admin_id as string } });
             const configs = await configsService.readSingleton({});
-            const { client_id, client_secret, refresh_token, openai_key, openai_organization, hugging_face_api_key, prompt_hints } = configs.twitter_settings as TwitterSetting;
+            const { client_id, client_secret, refresh_token, openai_key, openai_organization, hugging_face_api_key, prompt_hints, replicate_api_key } = configs.twitter_settings as TwitterSetting;
+
+            const predictionParams = {
+                modelId: "9e767fbac45bea05d5e1823f737f927856c613e18cbc8d9068bafdc6d600a0f7",
+                path: "cjwbw/waifu-diffusion",
+                input: { prompt: "kid walking", }
+            };
+            const replicate = new Replicate({ apiToken: replicate_api_key, pollingInterval: 5000 });
+            const data = await replicate.predict(predictionParams.modelId, predictionParams.input)
+            console.log(data);
+
+            // If you set the REPLICATE_API_TOKEN environment variable, you do not need to provide a token to the constructor.
+            // const replicate = new Replicate();
+
+
             // const twitterClient = new TwitterApi({
             //     clientId: client_id,
             //     clientSecret: client_secret,
@@ -128,16 +146,16 @@ export default function (router: Router, { database }: ApiExtensionContext) {
             //     prompt: 'tweet something cool for #techtwitter',
             //     max_tokens: 64,
             // });
-            const promptReq = await axios.post('https://api-inference.huggingface.co/models/succinctly/text2image-prompt-generator', {
-                inputs: prompt_hints[Math.floor(Math.random() * prompt_hints.length)]
-            }, { headers: { "Authorization": `Bearer ${hugging_face_api_key}` } })
-            console.log();
+            // const promptReq = await axios.post('https://api-inference.huggingface.co/models/succinctly/text2image-prompt-generator', {
+            //     inputs: prompt_hints[Math.floor(Math.random() * prompt_hints.length)]
+            // }, { headers: { "Authorization": `Bearer ${hugging_face_api_key}` } })
+            // console.log();
 
 
-            const imageReq = await axios.post('https://hf.space/embed/hakurei/waifu-diffusion-demo/+/', {
-                inputs: promptReq.data[0].generated_text
-            }, { headers: { "Authorization": `Bearer ${hugging_face_api_key}` } })
-            console.log(imageReq.data);
+            // const imageReq = await axios.post('https://hf.space/embed/hakurei/waifu-diffusion-demo/+/', {
+            //     inputs: promptReq.data[0].generated_text
+            // }, { headers: { "Authorization": `Bearer ${hugging_face_api_key}` } })
+            // console.log(imageReq.data);
 
             // await refreshedClient.v2.tweet({
             //     text: tweet
