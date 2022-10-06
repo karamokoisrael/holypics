@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/karamokoisrael/holypics#readme",
   "dependencies": {
-    "axios": "^1.0.0"
+    "axios": "^1.0.0",
+    "dalle-node": "^1.0.7"
   }
 }

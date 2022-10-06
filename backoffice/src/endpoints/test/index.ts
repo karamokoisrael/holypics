@@ -9,22 +9,6 @@ import { getAdminTokens } from '../../helpers/auth';
 const imageToBase64 = require('image-to-base64');
 
 export default function (router: Router, { database }: ApiExtensionContext) {
-
-    router.get('/sub', async (req: Request, res: Response) => {
-        const { t, lang } = await getTranslator(req, database);
-        try {
-            const { schema, accountability } = getRequestParams(req, true);
-            accountability.admin = true;
-            const userService = new UsersService({ schema, accountability });
-            const users = await userService.readByQuery({});
-            return res.json(users);
-        } catch (error) {
-            console.log(error);
-            return throwError(res, t("we_encountered_an_unexpected_error_during_the_operation"));
-        }
-
-    });
-
     router.get('/holypics-unsplash', async (req: Request, res: Response) => {
         const { t } = await getTranslator(req, database);
         try {
@@ -47,10 +31,10 @@ export default function (router: Router, { database }: ApiExtensionContext) {
             const configsService = new ItemsService("configurations", { schema, accountability: { ...accountability, user: admin_id as string } });
             const feedbacksService = new ItemsService("feedbacks", { schema, accountability: { ...accountability, user: admin_id as string } });
             const configs = await configsService.readSingleton({});
-            const { api_key, preprocessed_collections, items_per_page, last_collection, last_collection_page, neutral_class, neutral_class_danger_probability, collection_req_query, last_collection_req_page,  last_collection_req_items_per_page, model_path } = configs.unsplash_settings as UnplashSetting;
+            const { api_key, preprocessed_collections, items_per_page, last_collection, last_collection_page, neutral_class, neutral_class_danger_probability, collection_req_query, last_collection_req_page, last_collection_req_items_per_page, model_path } = configs.unsplash_settings as UnplashSetting;
             const headers = { Authorization: `Client-ID ${api_key}` }
             const collectionsReq = await axios.get(`https://api.unsplash.com/search/collections?page=${last_collection_req_page}&per_page=${last_collection_req_items_per_page}&query=${collection_req_query}`, { headers })
-            const collections: string[] = collectionsReq.data.results.map((item: any)=> item.id);
+            const collections: string[] = collectionsReq.data.results.map((item: any) => item.id);
             const collectionsPhotosReq = await axios.get(`https://api.unsplash.com/collections/${last_collection}/photos?page=${last_collection_page}&per_page=${items_per_page}`, { headers })
             const updatePayload = configs.unsplash_settings;
             if (parseInt(collectionsPhotosReq.headers["x-total"]) < last_collection_page * items_per_page) {
@@ -63,7 +47,7 @@ export default function (router: Router, { database }: ApiExtensionContext) {
                             last_collection: nextCollection,
                             last_collection_page: 1,
                             preprocessed_collections: [...preprocessed_collections, last_collection],
-                            last_collection_total_pages:  Math.round(parseInt(collectionsPhotosReq.headers["x-total"]) / items_per_page)
+                            last_collection_total_pages: Math.round(parseInt(collectionsPhotosReq.headers["x-total"]) / items_per_page)
                         }
                     });
                     return successMessage(res, "moving to new collection");
@@ -101,6 +85,7 @@ export default function (router: Router, { database }: ApiExtensionContext) {
         }
 
     });
+    
 }
 
 

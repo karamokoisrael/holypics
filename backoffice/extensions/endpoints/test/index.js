@@ -20,20 +20,6 @@ const axios_1 = __importDefault(require("axios"));
 const auth_1 = require("../../helpers/auth");
 const imageToBase64 = require('image-to-base64');
 function default_1(router, { database }) {
-    router.get('/sub', (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { t, lang } = yield (0, translation_1.getTranslator)(req, database);
-        try {
-            const { schema, accountability } = (0, request_handler_1.getRequestParams)(req, true);
-            accountability.admin = true;
-            const userService = new directus_1.UsersService({ schema, accountability });
-            const users = yield userService.readByQuery({});
-            return res.json(users);
-        }
-        catch (error) {
-            console.log(error);
-            return (0, exceptions_1.throwError)(res, t("we_encountered_an_unexpected_error_during_the_operation"));
-        }
-    }));
     router.get('/holypics-unsplash', (req, res) => __awaiter(this, void 0, void 0, function* () {
         var _a;
         const { t } = yield (0, translation_1.getTranslator)(req, database);

@@ -4,7 +4,6 @@ import proxy from 'express-http-proxy';
 import { getRequestParams } from '../../helpers/request-handler';
 import bodyParser from 'body-parser';
 import express from "express";
-// const multer = require('multer');
 
 export default function (router: Router, { database }: ApiExtensionContext) {
 
