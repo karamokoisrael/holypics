@@ -48,18 +48,14 @@ export default class Replicate {
         const startResponse = await this.startPrediction(modelId, input);
         let predictionStatus: PredictionStatus;
         do {
-            console.log("checking");
+            // console.log("checking");
             const checkResponse = await this.getPrediction(startResponse.data.id);
             predictionStatus = checkResponse.data.status;
-            console.log("status => ", predictionStatus);
+            // console.log("status => ", predictionStatus);
             await sleep(this.pollingInterval);
-            return checkResponse.data;
+            if (!["starting", "processing"].includes(predictionStatus)) return checkResponse.data;
         } while (["starting", "processing"].includes(predictionStatus));
     }
-
-    // const getPrediction = async (id: string) => {
-    //     return await axios.get(`https://api.replicate.com/v1/predictions/${id}`, { headers });
-    // }
 
 }
 

@@ -111,31 +111,19 @@ export default function (router: Router, { database }: ApiExtensionContext) {
             const configs = await configsService.readSingleton({});
             const { client_id, client_secret, refresh_token, openai_key, openai_organization, hugging_face_api_key, prompt_hints, replicate_api_key } = configs.twitter_settings as TwitterSetting;
 
-            const predictionParams = {
-                modelId: "9e767fbac45bea05d5e1823f737f927856c613e18cbc8d9068bafdc6d600a0f7",
-                path: "cjwbw/waifu-diffusion",
-                input: { prompt: "kid walking", }
-            };
-            const replicate = new Replicate({ apiToken: replicate_api_key, pollingInterval: 5000 });
-            const data = await replicate.predict(predictionParams.modelId, predictionParams.input)
-            console.log(data);
-
-            // If you set the REPLICATE_API_TOKEN environment variable, you do not need to provide a token to the constructor.
-            // const replicate = new Replicate();
 
 
-            // const twitterClient = new TwitterApi({
-            //     clientId: client_id,
-            //     clientSecret: client_secret,
-            // });
-            // const {
-            //     client: refreshedClient,
-            //     accessToken,
-            //     refreshToken: newRefreshToken,
-            // } = await twitterClient.refreshOAuth2Token(refresh_token);
-            // await configsService.upsertSingleton({ twitter_settings: { ...configs.twitter_settings, access_token: accessToken, refresh_token: newRefreshToken } });
+            const twitterClient = new TwitterApi({
+                clientId: client_id,
+                clientSecret: client_secret,
+            });
 
-
+            const {
+                client: refreshedClient,
+                accessToken,
+                refreshToken: newRefreshToken,
+            } = await twitterClient.refreshOAuth2Token(refresh_token);
+            await configsService.upsertSingleton({ twitter_settings: { ...configs.twitter_settings, access_token: accessToken, refresh_token: newRefreshToken } });
 
             // const configuration = new Configuration({
             //     organization: openai_organization,
@@ -146,33 +134,34 @@ export default function (router: Router, { database }: ApiExtensionContext) {
             //     prompt: 'tweet something cool for #techtwitter',
             //     max_tokens: 64,
             // });
-            // const promptReq = await axios.post('https://api-inference.huggingface.co/models/succinctly/text2image-prompt-generator', {
-            //     inputs: prompt_hints[Math.floor(Math.random() * prompt_hints.length)]
-            // }, { headers: { "Authorization": `Bearer ${hugging_face_api_key}` } })
-            // console.log();
 
+            const wordHint = prompt_hints[Math.floor(Math.random() * prompt_hints.length)]
+            const promptReq = await axios.post('https://api-inference.huggingface.co/models/succinctly/text2image-prompt-generator', {
+                inputs: wordHint
+            }, { headers: { "Authorization": `Bearer ${hugging_face_api_key}` } })
 
-            // const imageReq = await axios.post('https://hf.space/embed/hakurei/waifu-diffusion-demo/+/', {
-            //     inputs: promptReq.data[0].generated_text
-            // }, { headers: { "Authorization": `Bearer ${hugging_face_api_key}` } })
-            // console.log(imageReq.data);
+            console.log("wordHint => ", wordHint);
+            
+            console.log("generated_text => ", promptReq.data[0].generated_text);
+            
+            await refreshedClient.v2.tweet({
+                text: promptReq.data[0].generated_text
+            });
 
-            // await refreshedClient.v2.tweet({
-            //     text: tweet
-            // });
+            const replicate = new Replicate({ apiToken: replicate_api_key, pollingInterval: 5000 });
+            const imagePredictionData = await replicate.predict("9e767fbac45bea05d5e1823f737f927856c613e18cbc8d9068bafdc6d600a0f7", {
+                prompt: promptReq.data[0].generated_text
+            })
 
-            // const mediaUri = 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTV8fGh1bWFufGVufDB8fDB8fA%3D%3D&w=1000&q=80'
-            // const mediaBase64 = await imageToBase64(mediaUri);
-            // const mediaPath = "./uploads/twitter-media.jpg"
-            //   Buffer.from(`data:image/jpg;base64,${mediaBase64}`)
-            // require("fs").writeFile(mediaPath, mediaBase64, 'base64', async function (err: any) {
-            //     const media = await refreshedClient.v1.uploadMedia(mediaPath)
-            //     console.log(media);
-            // });
-
-
-
-
+            console.log("ouput url => ", imagePredictionData.output[0]);
+    
+            const mediaBase64 = await imageToBase64(imagePredictionData.output[0]);
+            const mediaPath = "./uploads/twitter-media.jpg"
+            Buffer.from(`data:image/jpg;base64,${mediaBase64}`)
+            require("fs").writeFile(mediaPath, mediaBase64, 'base64', async function (err: any) {
+                const media = await refreshedClient.v1.uploadMedia(mediaPath)
+                console.log(media);
+            });
 
             return successMessage(res, t("success"));
         } catch (error) {

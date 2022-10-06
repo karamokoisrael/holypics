@@ -37,12 +37,13 @@ class Replicate {
             const startResponse = yield this.startPrediction(modelId, input);
             let predictionStatus;
             do {
-                console.log("checking");
+                // console.log("checking");
                 const checkResponse = yield this.getPrediction(startResponse.data.id);
                 predictionStatus = checkResponse.data.status;
-                console.log("status => ", predictionStatus);
+                // console.log("status => ", predictionStatus);
                 yield sleep(this.pollingInterval);
-                return checkResponse.data;
+                if (!["starting", "processing"].includes(predictionStatus))
+                    return checkResponse.data;
             } while (["starting", "processing"].includes(predictionStatus));
         });
     }
