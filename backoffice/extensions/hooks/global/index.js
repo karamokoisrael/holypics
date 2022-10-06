@@ -1,7 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs = require('fs');
-const bodyParser = require('body-parser');
 function default_1({ init, action }, apiExtension) {
     // init("app.before", ({app}: any)=>{
     //     // console.log(app);

@@ -2,7 +2,6 @@ import { Router } from "express";
 import { ApiExtensionContext } from '@directus/shared/types';
 import proxy from 'express-http-proxy';
 import { getRequestParams } from '../../helpers/request-handler';
-import bodyParser from 'body-parser';
 import express from "express";
 
 export default function (router: Router, { database }: ApiExtensionContext) {

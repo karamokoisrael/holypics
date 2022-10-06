@@ -1,6 +1,4 @@
 import { sendSms } from './sms-sender';
-import { Directus, TypeMap } from '@directus/sdk';
-import { Notification } from '@directus/shared/types';
 import { MailService } from 'directus';
 import { Knex } from "knex";
 import { NotificationPayload } from "../@types/directus";

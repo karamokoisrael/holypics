@@ -1,11 +1,9 @@
 import { Knex } from "knex";
 import mysql from "mysql";
 import mysqldump from "mysqldump" ;
-// import { Importer } from "mysql-import";
 const Importer = require('mysql-import');
 const path = require('path');
 const fs = require('fs');
-const findRemoveSync = require('find-remove');
 //joining path of directory 
 
 

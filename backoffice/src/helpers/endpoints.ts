@@ -1,5 +1,4 @@
 import { Model } from './../@types/global';
-import { Knex } from "knex";
 
 export const getConfigs = async (database: any, model: string): Promise<Model> => {
         try {

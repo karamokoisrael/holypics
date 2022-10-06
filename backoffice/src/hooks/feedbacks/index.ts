@@ -1,7 +1,5 @@
-import { Accountability, ApiExtensionContext, SchemaOverview } from "@directus/shared/types";
-import { ItemsService } from "directus";
+import { ApiExtensionContext } from "@directus/shared/types";
 import { RegisterFunctions } from "../../@types/directus";
-import { getAdminTokens } from "../../helpers/auth";
 
 export default async function ({ filter }: RegisterFunctions, { database }: ApiExtensionContext) {
     filter('feedbacks.items.read', async (payload: any, meta, { accountability, schema }) => {

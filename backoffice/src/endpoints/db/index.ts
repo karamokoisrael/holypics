@@ -3,6 +3,7 @@
 // import { NextFunction, Request, Response, Router } from "express";
 // import { deleteBackup, dump, getDumpList, restore } from "../../helpers/db";
 import { ApiExtensionContext } from '@directus/shared/types';
+import { Router } from 'express';
 // const AdmZip = require("adm-zip");
 // const fs = require('fs');
 // const multer = require('multer')

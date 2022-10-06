@@ -1,7 +1,5 @@
 import { ApiExtensionContext } from "@directus/shared/types";
-import { EventContext, RegisterFunctions } from "../../@types/directus";
-const fs = require('fs');
-const bodyParser = require('body-parser');
+import { RegisterFunctions } from "../../@types/directus";
 export default function ({ init, action }: RegisterFunctions, apiExtension: ApiExtensionContext) {
     // init("app.before", ({app}: any)=>{
     //     // console.log(app);

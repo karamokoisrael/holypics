@@ -15,11 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getConnection = exports.restore = exports.dump = exports.deleteBackup = exports.getDumpList = void 0;
 const mysql_1 = __importDefault(require("mysql"));
 const mysqldump_1 = __importDefault(require("mysqldump"));
-// import { Importer } from "mysql-import";
 const Importer = require('mysql-import');
 const path = require('path');
 const fs = require('fs');
-const findRemoveSync = require('find-remove');
 //joining path of directory 
 const getDumpList = () => {
     const directoryPath = path.join(__dirname, '../../migration');

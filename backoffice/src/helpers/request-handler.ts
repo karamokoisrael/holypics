@@ -2,7 +2,6 @@ import { SchemaOverview } from '@directus/shared/types';
 import { Accountability } from '@directus/shared/types';
 import { DirectusData, DirectusTranslations } from './../@types/directus';
 import { JsonObject } from './../@types/global';
-// import { WebSocketMessage } from './../@types/webSocket'
 import https from 'https';
 import { v4 } from "uuid";
 import axios from 'axios';
@@ -10,8 +9,6 @@ import { default as FormData } from "form-data";
 import { formatUrl } from './utils';
 import { Request } from "express";
 import { Readable } from 'stream';
-import { getAdminTokens } from './auth';
-import { Knex } from 'knex';
 import { DIRECTUS_DEFAULT_LANGUAGE } from '../consts/global';
 
 export const customStringify = (query: JsonObject)=>{

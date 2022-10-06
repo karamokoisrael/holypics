@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRequestParams = exports.translate = exports.getTranslations = exports.base64MimeType = exports.uploadBase64File = exports.httpResponseToJson = exports.httpRequest = exports.getUploadedFileUrl = exports.getConfigs = exports.customFetchWithCredentialsAndFiles = exports.customFetchWithCredentials = exports.customFetch = exports.customStringify = void 0;
-// import { WebSocketMessage } from './../@types/webSocket'
 const https_1 = __importDefault(require("https"));
 const uuid_1 = require("uuid");
 const axios_1 = __importDefault(require("axios"));

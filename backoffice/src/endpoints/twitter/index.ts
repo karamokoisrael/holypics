@@ -3,7 +3,7 @@ import { successMessage, throwError } from './../../helpers/exceptions';
 import { Request, Response, Router } from "express";
 import { ApiExtensionContext } from '@directus/shared/types';
 import { getTranslator } from '../../helpers/translation';
-import { UsersService, ItemsService } from 'directus';
+import { ItemsService } from 'directus';
 import axios from 'axios';
 import { getAdminTokens } from '../../helpers/auth';
 import { TwitterApi } from 'twitter-api-v2';
