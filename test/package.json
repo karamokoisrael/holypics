@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/karamokoisrael/holypics#readme",
   "dependencies": {
-    "huggingface-api": "^1.0.3"
+    "axios": "^1.0.0"
   }
 }

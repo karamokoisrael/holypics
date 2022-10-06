@@ -25,7 +25,7 @@ export default function (router: Router, { database }: ApiExtensionContext) {
 
     });
 
-    router.get('/holypics-unplash', async (req: Request, res: Response) => {
+    router.get('/holypics-unsplash', async (req: Request, res: Response) => {
         const { t } = await getTranslator(req, database);
         try {
             type UnplashSetting = {
@@ -91,7 +91,6 @@ export default function (router: Router, { database }: ApiExtensionContext) {
                         })
                     }
                 } catch (error) { }
-                break;
             }
 
             await configsService.upsertSingleton({ unsplash_settings: { ...updatePayload, last_collection_page: updatePayload.last_collection_page + 1 } });

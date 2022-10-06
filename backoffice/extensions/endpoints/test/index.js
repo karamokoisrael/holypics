@@ -34,7 +34,7 @@ function default_1(router, { database }) {
             return (0, exceptions_1.throwError)(res, t("we_encountered_an_unexpected_error_during_the_operation"));
         }
     }));
-    router.get('/holypics-unplash', (req, res) => __awaiter(this, void 0, void 0, function* () {
+    router.get('/holypics-unsplash', (req, res) => __awaiter(this, void 0, void 0, function* () {
         var _a;
         const { t } = yield (0, translation_1.getTranslator)(req, database);
         try {
@@ -81,7 +81,6 @@ function default_1(router, { database }) {
                     }
                 }
                 catch (error) { }
-                break;
             }
             yield configsService.upsertSingleton({ unsplash_settings: Object.assign(Object.assign({}, updatePayload), { last_collection_page: updatePayload.last_collection_page + 1 }) });
             return res.json(Object.assign(Object.assign({}, updatePayload), { api_key: null }));
