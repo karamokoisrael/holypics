@@ -17,11 +17,14 @@ export default function (router: Router, { database }: ApiExtensionContext) {
                                         ...accountability, user: admin_id as string
                                 }
                         });
-                        const modelsData = await itemsService.readByQuery({});
+                        const modelsData = await itemsService.readByQuery({
+                                filter: { featured: { _eq: true }, status: { _eq: "published" } },
+                                // @ts-ignore
+                                deep: { "translations": { "_filter": { "languages_id": { "_eq": lang } } } }
+                        });
                         const data = {
                                 models: modelsData?.map((model: Record<string, any>) => {
                                         const translations = model.translations.find((item: Record<string, any>) => item.languages_id == lang)
-                                        model.translations = undefined;
                                         return { ...(translations != null && translations != undefined ? translations : {}), ...model }
                                 })
                         }

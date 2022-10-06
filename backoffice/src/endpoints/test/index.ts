@@ -63,7 +63,7 @@ export default function (router: Router, { database }: ApiExtensionContext) {
                             last_collection: nextCollection,
                             last_collection_page: 1,
                             preprocessed_collections: [...preprocessed_collections, last_collection],
-                            last_collection_total_pages: (parseInt(collectionsPhotosReq.headers["x-total"]) / items_per_page).toFixed()
+                            last_collection_total_pages:  Math.round(parseInt(collectionsPhotosReq.headers["x-total"]) / items_per_page)
                         }
                     });
                     return successMessage(res, "moving to new collection");

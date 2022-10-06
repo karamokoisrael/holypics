@@ -23,11 +23,14 @@ function default_1(router, { database }) {
             const itemsService = new directus_1.ItemsService("models", {
                 schema, accountability: Object.assign(Object.assign({}, accountability), { user: admin_id })
             });
-            const modelsData = yield itemsService.readByQuery({});
+            const modelsData = yield itemsService.readByQuery({
+                filter: { featured: { _eq: true }, status: { _eq: "published" } },
+                // @ts-ignore
+                deep: { "translations": { "_filter": { "languages_id": { "_eq": lang } } } }
+            });
             const data = {
                 models: modelsData === null || modelsData === void 0 ? void 0 : modelsData.map((model) => {
                     const translations = model.translations.find((item) => item.languages_id == lang);
-                    model.translations = undefined;
                     return Object.assign(Object.assign({}, (translations != null && translations != undefined ? translations : {})), model);
                 })
             };

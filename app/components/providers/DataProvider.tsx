@@ -9,6 +9,7 @@ import Loader from "../custom/Loader";
 import i18n from 'i18n-js';
 import { translations } from "../../constants/translations";
 import I18n from "i18n-js";
+import { storeData } from "../../helpers/local-storage";
 // import * as Localization from 'expo-localization';
 i18n.translations = translations;
 // Set the locale once at the beginning of your app.
@@ -19,13 +20,16 @@ type DataProviderProps = {
 };
 const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const store = useStore();
+  const isAuthenticated = useStore(state => state.isAuthenticated)
   const configs = useSWR(formatUrl(`config?culture=${I18n.currentLocale()}`), async (...args: Parameters<typeof fetch>) => {
     try {
       const res = await fetch(...args);
       const resJson = await res.json();
       if (resJson.errors !== undefined || resJson.data === undefined || Object.keys(resJson.data).length == 0)
         throw new Error("No config found");
-      store.setConfigs(resJson.data);      
+      if (!isAuthenticated) storeData("auth_token", "")
+      if (!isAuthenticated) storeData("AuthToken", "")
+      store.setConfigs(resJson.data);
       return resJson.data;
     } catch (error) {
       console.log(error);

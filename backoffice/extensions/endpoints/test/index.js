@@ -54,7 +54,7 @@ function default_1(router, { database }) {
                 const nextCollection = collections.find((item, i) => !preprocessed_collections.includes(item) && i >= collectionIndex);
                 if (nextCollection != undefined && nextCollection != null) {
                     yield configsService.upsertSingleton({
-                        unsplash_settings: Object.assign(Object.assign({}, updatePayload), { last_collection: nextCollection, last_collection_page: 1, preprocessed_collections: [...preprocessed_collections, last_collection], last_collection_total_pages: (parseInt(collectionsPhotosReq.headers["x-total"]) / items_per_page).toFixed() })
+                        unsplash_settings: Object.assign(Object.assign({}, updatePayload), { last_collection: nextCollection, last_collection_page: 1, preprocessed_collections: [...preprocessed_collections, last_collection], last_collection_total_pages: Math.round(parseInt(collectionsPhotosReq.headers["x-total"]) / items_per_page) })
                     });
                     return (0, exceptions_1.successMessage)(res, "moving to new collection");
                 }

@@ -5,7 +5,7 @@ import Footer from "./Footer";
 import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../constants/layout";
 import theme from "../../constants/theme";
 import BottomNavigator from "./BottomNavigator";
-
+import tw from "../../helpers/tailwind";
 
 export type LayoutProps = {
   children: JSX.Element,
@@ -28,8 +28,9 @@ const Layout: React.FC<LayoutProps> = ({ children, backgroundColor, bottomNaviga
       {
         Platform.OS === "web" ?
           // @ts-ignore
-          <View style={{ ...(webStyle || {}), flex: 1, alignItems: "center", justifyContent: "flex-center", maxHeight: WINDOW_HEIGHT, maxWidth: WINDOW_WIDTH, backgroundColor: backgroundColor || theme.colors.background }}>
+          <View style={{ ...(webStyle || {}),  ...tw`flex flex-col items-end justify-around content-end`, minHeight: WINDOW_HEIGHT,  height: "auto", maxWidth: WINDOW_WIDTH, backgroundColor: backgroundColor || theme.colors.background }}>
             {children}
+            <Footer />
           </View>
           :
           (
@@ -52,13 +53,6 @@ const Layout: React.FC<LayoutProps> = ({ children, backgroundColor, bottomNaviga
         bottomNavigation && Platform.OS !== "web" ?
           <BottomNavigator /> :
           null
-      }
-
-
-      {
-        Platform.OS === "web" ?
-          <Footer />
-          : null
       }
 
     </Fragment>

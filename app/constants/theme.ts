@@ -1,60 +1,30 @@
 import { configureFonts, MD3LightTheme as DefaultTheme } from 'react-native-paper';
+import tw from "../helpers/tailwind";
+
+const _fontConfig = {
+  regular: {
+    fontFamily: 'Global-Font',
+    fontWeight: 'normal',
+  },
+  medium: {
+    fontFamily: 'Global-Font',
+    fontWeight: 'normal',
+  },
+  light: {
+    fontFamily: 'Global-Font',
+    fontWeight: 'normal',
+  },
+  thin: {
+    fontFamily: 'Global-Font',
+    fontWeight: 'normal',
+  },
+};
 
 const fontConfig = {
-  web: {
-    regular: {
-      fontFamily: 'sans-serif',
-      fontWeight: 'normal',
-    },
-    medium: {
-      fontFamily: 'sans-serif-medium',
-      fontWeight: 'normal',
-    },
-    light: {
-      fontFamily: 'sans-serif-light',
-      fontWeight: 'normal',
-    },
-    thin: {
-      fontFamily: 'sans-serif-thin',
-      fontWeight: 'normal',
-    },
-  },
-  ios: {
-    regular: {
-      fontFamily: 'sans-serif',
-      fontWeight: 'normal',
-    },
-    medium: {
-      fontFamily: 'sans-serif-medium',
-      fontWeight: 'normal',
-    },
-    light: {
-      fontFamily: 'sans-serif-light',
-      fontWeight: 'normal',
-    },
-    thin: {
-      fontFamily: 'sans-serif-thin',
-      fontWeight: 'normal',
-    },
-  },
-  android: {
-    regular: {
-      fontFamily: 'Global-Fam',
-      fontWeight: 'normal',
-    },
-    medium: {
-      fontFamily: 'Global-Fam',
-      fontWeight: 'normal',
-    },
-    light: {
-      fontFamily: 'Global-Fam',
-      fontWeight: 'normal',
-    },
-    thin: {
-      fontFamily: 'Global-Fam',
-      fontWeight: 'normal',
-    },
-  }
+  // web: _fontConfig,
+  // ios: _fontConfig,
+  // android: _fontConfig,
+  default: _fontConfig,
 };
 
 export const theme = {
@@ -63,7 +33,9 @@ export const theme = {
   version: 3,
   colors: {
     ...DefaultTheme.colors,
-    background: "#fff",
+    background: tw.color('bg-gray-100'),
+    onBackground: tw.color('bg-gray-100'),
+    onbb: tw.color('bg-gray-100'),
     primary: '#e94256',
     primaryOpac: "#ffdde1",
     secondary: '#96cc6a',

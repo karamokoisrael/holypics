@@ -16,7 +16,7 @@ export default function App() {
   useDeviceContext(tw, { withDeviceColorScheme: false });
   if (process.env.NODE_ENV !== "development") console.log = () => { }
   const [fontsLoaded] = useFonts({
-    'Global-Fam': require('./assets/fonts/Lobster/Lobster-Regular.ttf'),
+    'Global-Font': require('./assets/fonts/Gemunu_Libre/GemunuLibre-VariableFont_wght.ttf'),
   });
 
   if (!fontsLoaded) return null;

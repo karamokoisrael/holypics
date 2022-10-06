@@ -29,8 +29,6 @@ const useStore = create<Store>(
         notifications: [],
         socketConnId: "",
         socket: undefined,
-        directus: new Directus(environment.apiUrl),
-        recoveryPhrase: "",
         toggleOnboardingStatus: () => set(() => ({ onBoardingPassed: !get().onBoardingPassed })),
         setBottomBarSelectedIndex: (value: number) => set(() => ({ bottomBarSelectedIndex: value })),
         setDrawerSelectedIndex: (value: number) => set(() => ({ drawerSelectedIndex: value })),

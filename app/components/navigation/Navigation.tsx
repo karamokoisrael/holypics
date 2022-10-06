@@ -12,11 +12,10 @@ import NotFound from "../../screens/error/NotFound";
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Header from "../layout/Header";
 import { bottomRoutes } from "../layout/BottomNavigator";
-import Models from "../../screens/ai/Models";
 import Account from "../../screens/account/Account";
-import Holipics from "../../screens/ai/Holipics";
 import I18n from "i18n-js";
 import StableDiffusion from "../../screens/ai/StableDiffusion";
+import Model from "../../screens/ai/Model";
 
 
 export type CustomRoute = {
@@ -38,7 +37,8 @@ export const linking: LinkingOptions<RootStackParamList> = {
     screens: {
       OnBoarding: "/on-boarding",
       Home: '/',
-      Models: '/models:id',
+      Model: '/model',
+      StableDiffusion: '/stable-diffusion',
       Account: '/me',
       Error: '/error',
       NotFound: '*'
@@ -94,12 +94,11 @@ export default function Navigation({ colorScheme }: NavigationProps) {
           },
         })}
       >
-        <Drawer.Screen name="Home" component={Home} options={{ ...defaultScreenOptions, title: "home", drawerLabel: t("home"), ...{ back: false } }} />
         <Drawer.Screen name="OnBoarding" component={OnBoarding} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: t("on_boarding"), headerShown: false }} />
-        <Drawer.Screen name="Holipics" component={Holipics} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: "holipics", }} />
-        <Drawer.Screen name="StableDiffusion" component={StableDiffusion} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: "stable-diffusion", }} />
-        <Drawer.Screen name="Models" component={Models} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: "models", }} />
-        <Drawer.Screen name="Account" component={Account} options={{ ...defaultScreenOptions, title: "account", drawerLabel: t("account") }} />
+        <Drawer.Screen name="Home" component={Home} options={{ ...defaultScreenOptions, title: "home", drawerLabel: t("home"), ...{ back: false } }} />
+        <Drawer.Screen name="Account" component={Account} options={{ ...defaultScreenOptions, title: "account", drawerLabel: t("account"), headerTitle: t("account") }} />
+        <Drawer.Screen name="StableDiffusion" component={StableDiffusion} options={{ ...defaultScreenOptions, title: "stable_diffusion", drawerLabel: "Stable Diffusion" }} />
+        <Drawer.Screen name="Model" component={Model} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: "model" }} />
         <Drawer.Screen name="Error" component={Error} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: "error", }} />
         <Drawer.Screen name="NotFound" component={NotFound} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: "not_found", }} />
       </Drawer.Navigator>

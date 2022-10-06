@@ -30,7 +30,7 @@ export type RootStackParamList = {
   TermsAndUse: NavigatorScreenParams<RootTabParamList> | undefined;
   NotFound: NavigatorScreenParams<RootTabParamList> | undefined;
 
-  Models: NavigatorScreenParams<RootTabParamList> | undefined;
+  Model: NavigatorScreenParams<RootTabParamList> | undefined;
   Holipics: NavigatorScreenParams<RootTabParamList> | undefined;
   StableDiffusion: NavigatorScreenParams<RootTabParamList> | undefined;
 };
@@ -41,6 +41,6 @@ export type RootStackScreenProps<Screen extends keyof RootStackParamList> = Nati
 >;
 
 export type RootTabParamList = {
-  Models: { id: string };
+  Model: { id: string };
 };
 
