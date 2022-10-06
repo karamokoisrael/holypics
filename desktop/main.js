@@ -7,11 +7,6 @@ const isDev = require("electron-is-dev");
 async function createWindow() {
   // Create splash browser window.
 
-  const startUrl = url.format({
-    pathname: path.join(__dirname, config.appIndexFile),
-    protocol: "file:",
-    slashes: true,
-  });
 
   const splash = new BrowserWindow({
     width: config.windowWidth,
@@ -30,6 +25,7 @@ async function createWindow() {
     height: config.windowHeight,
     show: false,
     webPreferences: {
+      enableBlinkFeatures: 'ExecCommandInJavaScript',
       preload: path.join(__dirname, "preload.js"),
     },
   });

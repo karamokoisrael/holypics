@@ -36,10 +36,9 @@ services:
       - db
       - cache
     volumes:
-      - ./backoffice/extensions:/directus/extensions
-      - ./backoffice/package.json:/directus
-      - backoffice_migration:/directus/migration
-      - backoffice_uploads:/directus/uploads
+      - ./backoffice/extensions:/app/extensions
+      - backoffice_migration:/app/migration
+      - backoffice_uploads:/app/uploads
       
     networks:
       - directus
