@@ -90,6 +90,7 @@ export default function ({ action }: RegisterFunctions, { database, emitter }: E
                     if (test_channels.includes(message.channel.id)) await message.reply(predictionMessage)
                     if (predictionData[neutral_class] <= neutral_class_danger_probability) {
                         const imageId = await filesService.importOne(url, { title: `${v4()}}` });
+                        
                         await database("feedbacks").insert({
                             image: imageId,
                             image_url: url,
