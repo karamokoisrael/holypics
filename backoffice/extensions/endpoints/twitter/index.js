@@ -121,7 +121,6 @@ function default_1(router, { database }) {
             console.log("ouput url => ", imageUrl);
             const mediaBase64 = yield imageToBase64(imageUrl);
             const mediaPath = "./uploads/twitter-media.jpg";
-            Buffer.from(`data:image/jpg;base64,${mediaBase64}`);
             require("fs").writeFile(mediaPath, mediaBase64, 'base64', function (err) {
                 return __awaiter(this, void 0, void 0, function* () {
                     const media = yield refreshedClient.v1.uploadMedia(mediaPath);

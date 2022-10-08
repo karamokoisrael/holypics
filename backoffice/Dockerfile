@@ -1,4 +1,4 @@
-FROM node:16.13.1
+FROM node:16-alpine
 WORKDIR /app
 COPY package.json package-lock.json /app/
 EXPOSE 8055

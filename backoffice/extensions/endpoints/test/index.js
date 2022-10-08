@@ -18,8 +18,9 @@ const translation_1 = require("../../helpers/translation");
 const directus_1 = require("directus");
 const axios_1 = __importDefault(require("axios"));
 const auth_1 = require("../../helpers/auth");
+const utils_1 = require("../../helpers/utils");
 const imageToBase64 = require('image-to-base64');
-function default_1(router, { database }) {
+function default_1(router, { database, emitter }) {
     router.get('/holypics-unsplash', (req, res) => __awaiter(this, void 0, void 0, function* () {
         var _a;
         const { t } = yield (0, translation_1.getTranslator)(req, database);
@@ -29,10 +30,13 @@ function default_1(router, { database }) {
             const configsService = new directus_1.ItemsService("configurations", { schema, accountability: Object.assign(Object.assign({}, accountability), { user: admin_id }) });
             const feedbacksService = new directus_1.ItemsService("feedbacks", { schema, accountability: Object.assign(Object.assign({}, accountability), { user: admin_id }) });
             const configs = yield configsService.readSingleton({});
-            const { api_key, preprocessed_collections, items_per_page, last_collection, last_collection_page, neutral_class, neutral_class_danger_probability, collection_req_query, last_collection_req_page, last_collection_req_items_per_page, model_path } = configs.unsplash_settings;
+            const { api_key, preprocessed_collections, items_per_page, last_collection_page, neutral_class, neutral_class_danger_probability, collection_req_query, last_collection_req_page, last_collection_req_items_per_page, model_path, prediction_sleep_ttl } = configs.unsplash_settings;
+            let { last_collection } = configs.unsplash_settings;
             const headers = { Authorization: `Client-ID ${api_key}` };
             const collectionsReq = yield axios_1.default.get(`https://api.unsplash.com/search/collections?page=${last_collection_req_page}&per_page=${last_collection_req_items_per_page}&query=${collection_req_query}`, { headers });
             const collections = collectionsReq.data.results.map((item) => item.id);
+            if (last_collection == "")
+                last_collection = collections[0];
             const collectionsPhotosReq = yield axios_1.default.get(`https://api.unsplash.com/collections/${last_collection}/photos?page=${last_collection_page}&per_page=${items_per_page}`, { headers });
             const updatePayload = configs.unsplash_settings;
             if (parseInt(collectionsPhotosReq.headers["x-total"]) < last_collection_page * items_per_page) {
@@ -51,20 +55,25 @@ function default_1(router, { database }) {
             for (const imageData of collectionsPhotosReq.data) {
                 try {
                     const image_url = (_a = imageData === null || imageData === void 0 ? void 0 : imageData.urls) === null || _a === void 0 ? void 0 : _a.small;
-                    const base64 = yield imageToBase64(image_url);
-                    const predictionReq = yield axios_1.default.post(`${process.env.TF_SERVING_API_URL}${model_path}`, { instances: [base64] });
-                    const prediction = predictionReq.data.predictions[0];
-                    const predictionData = {};
-                    for (let i = 0; i < prediction.scores.length; i++) {
-                        predictionData[prediction.classes[i]] = prediction.scores[i];
-                    }
-                    if (predictionData[neutral_class] <= neutral_class_danger_probability) {
-                        yield feedbacksService.createOne({
-                            image_url,
-                            prediction_data: predictionData,
-                            unsplash_collection: last_collection
-                        });
-                    }
+                    emitter.emitAction("holypics_predict_url", { imageUrl: image_url }, {});
+                    if (prediction_sleep_ttl != 0)
+                        yield (0, utils_1.sleep)(prediction_sleep_ttl);
+                    // const base64 = await imageToBase64(image_url);
+                    // const predictionReq = await axios.post(`${process.env.TF_SERVING_API_URL as string}${model_path}`,
+                    //     { instances: [base64] }
+                    // )
+                    // const prediction = predictionReq.data.predictions[0];
+                    // const predictionData = {} as Record<string, any>;
+                    // for (let i = 0; i < prediction.scores.length; i++) {
+                    //     predictionData[prediction.classes[i]] = prediction.scores[i];
+                    // }
+                    // if (predictionData[neutral_class] <= neutral_class_danger_probability) {
+                    //     await feedbacksService.createOne({
+                    //         image_url,
+                    //         prediction_data: predictionData,
+                    //         unsplash_collection: last_collection
+                    //     })
+                    // }
                 }
                 catch (error) { }
             }

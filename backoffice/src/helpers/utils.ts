@@ -26,3 +26,6 @@ export const objectToCamelCase = (object: Record<string, any>)=> {
 export const formatUrl = (req:Request, url: string)=>{
     return `${getHost(req)}/${url}`;
 }
+
+export const sleep: (ms: number) => Promise<void> = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));

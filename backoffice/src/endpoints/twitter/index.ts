@@ -170,7 +170,7 @@ export default function (router: Router, { database }: ApiExtensionContext) {
 
             const mediaBase64 = await imageToBase64(imageUrl);
             const mediaPath = "./uploads/twitter-media.jpg"
-            Buffer.from(`data:image/jpg;base64,${mediaBase64}`)
+            
             require("fs").writeFile(mediaPath, mediaBase64, 'base64', async function (err: any) {
                 const media = await refreshedClient.v1.uploadMedia(mediaPath)
                 console.log(media);

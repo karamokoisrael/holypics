@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.formatUrl = exports.objectToCamelCase = exports.getHost = void 0;
+exports.sleep = exports.formatUrl = exports.objectToCamelCase = exports.getHost = void 0;
 const lodash_1 = __importDefault(require("lodash"));
 const getHost = (req, type = "hostUrl") => {
     let output = req.get('host');
@@ -28,3 +28,5 @@ const formatUrl = (req, url) => {
     return `${(0, exports.getHost)(req)}/${url}`;
 };
 exports.formatUrl = formatUrl;
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+exports.sleep = sleep;
