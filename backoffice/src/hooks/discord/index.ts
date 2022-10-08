@@ -2,17 +2,19 @@ import { Accountability } from '@directus/shared/types';
 import { SchemaOverview } from '@directus/shared/types';
 import { ExtendedApiExtensionContext } from './../../@types/directus';
 import { RegisterFunctions } from "../../@types/directus";
-import { AnyChannel, Client, Collection, Intents, Message } from "discord.js"
+import { AnyChannel, Client, Collection, Intents, Message, MessageActionRow, MessageButton } from "discord.js"
 import { REST } from "@discordjs/rest";
-import { Routes } from "discord-api-types/v9";
+import { ButtonStyle, Routes } from "discord-api-types/v9";
 import ping from "./commands/ping";
 const imageToBase64 = require('image-to-base64');
 import axios from 'axios';
 import { FilesService } from 'directus';
 import { getAdminTokens } from '../../helpers/auth';
 import { v4 } from "uuid";
-const { Readable } = require('stream');
-const fs = require("")
+const fs = require("fs")
+import Jimp from 'jimp';
+import moment from 'moment';
+
 export default function ({ action }: RegisterFunctions, { database, emitter }: ExtendedApiExtensionContext) {
 
     type DiscordSetting = {
@@ -23,7 +25,10 @@ export default function ({ action }: RegisterFunctions, { database, emitter }: E
         nfsw_model_path: string,
         neutral_class: string,
         neutral_class_danger_probability: number,
-        test_channels: string[]
+        test_channels: string[],
+        prediction_folder: string,
+        bot_custom_id: string,
+        store_all_predictions: boolean
     }
 
     action('server.start', async (meta, { accountability, schema }) => {
@@ -31,10 +36,10 @@ export default function ({ action }: RegisterFunctions, { database, emitter }: E
 
 
             const { admin_id } = await getAdminTokens(database);
-            const filesService = new FilesService({ schema: schema as SchemaOverview, accountability: { ...(accountability as Accountability), user: admin_id as string, admin: true } })
+            // const filesService = new FilesService({ schema: schema as SchemaOverview, accountability: { ...(accountability as Accountability), user: admin_id as string, admin: true } })
 
             let [{ discord_settings }] = await database("configurations").select("discord_settings")
-            const { app_id, bot_token, nfsw_model_path, neutral_class, neutral_class_danger_probability, test_channels } = JSON.parse(discord_settings) as DiscordSetting;
+            const { bot_custom_id, store_all_predictions, app_id, bot_token, nfsw_model_path, neutral_class, neutral_class_danger_probability, test_channels, prediction_folder } = JSON.parse(discord_settings) as DiscordSetting;
             const client = new Client({
                 partials: ["CHANNEL"], intents:
                     [
@@ -83,32 +88,67 @@ export default function ({ action }: RegisterFunctions, { database, emitter }: E
                     const prediction = predictionReq.data.predictions[0];
                     const predictionData = {} as Record<string, any>;
                     let predictionMessage = "";
+                    const uuid = v4();
+                    const actionRow = new MessageActionRow()
                     for (let i = 0; i < prediction.scores.length; i++) {
                         predictionData[prediction.classes[i]] = prediction.scores[i];
                         predictionMessage += `${prediction.classes[i]}: ${(Math.round(prediction.scores[i] * 100))}% \n`
+                        actionRow.addComponents(
+                            new MessageButton()
+                                .setStyle("PRIMARY")
+                                .setLabel(`${prediction.classes[i]}`)
+                                .setCustomId(`${bot_custom_id}_class_${prediction.classes[i]}_id_${uuid}`));
                     }
 
-                    if (test_channels.includes(message.channel.id)) await message.reply(predictionMessage)
-                    if (predictionData[neutral_class] <= neutral_class_danger_probability) {
-                        const fileName = `ds_pred_${v4()}`;
+                    const utilityRow = new MessageActionRow().addComponents(
+                        new MessageButton()
+                            .setStyle("LINK")
+                            .setLabel("See image")
+                            // .setCustomId(`${bot_custom_id}_download_image_btn`)
+                            .setURL((predictionData[neutral_class] <= neutral_class_danger_probability || store_all_predictions) ? `${process.env.PUBLIC_URL}/file/${uuid}` : url)
+                            .setDisabled(false))
+
+
+                    if (test_channels.includes(message.channel.id)) await message.reply({
+                        content: predictionMessage, components: [actionRow, utilityRow]
+                    })
+
+                    if (predictionData[neutral_class] <= neutral_class_danger_probability || store_all_predictions) {
+                        const fileName = `${bot_custom_id}_pred_${uuid}`;
                         const fileDownloadName = `${fileName}.jpg`;
-                        fs.writeFile(`./uploads/${fileDownloadName}`, base64, 'base64', async (err: any) => {
+
+                        fs.writeFile(`./uploads/${fileDownloadName}`, base64, { encoding: 'base64' }, async (err: any) => {
                             if (err) return;
+
+                            const buffer = Buffer.from(base64, 'base64');
+                            const image = await Jimp.read(buffer);
+
                             await database("directus_files").insert({
+                                id: uuid,
                                 storage: "local",
                                 filename_disk: fileDownloadName,
                                 filename_download: fileDownloadName,
-                                title: fileDownloadName
+                                title: fileDownloadName,
+                                folder: prediction_folder,
+                                type: "image/jpeg",
+                                uploaded_by: admin_id,
+                                filesize: buffer.length,
+                                width: image.bitmap.width,
+                                height: image.bitmap.height,
+                                uploaded_on: moment(new Date(), "DD-MM-YYYY hh:mm:ss").toDate()
                             })
+
                             await database("feedbacks").insert({
-                                image: fileName,
+                                image: uuid,
                                 image_url: url,
                                 prediction_data: JSON.stringify(predictionData),
+                                date_created: moment(new Date(), "DD-MM-YYYY hh:mm:ss").toDate(),
+                                user_created: admin_id
                             })
                         });
                     }
                 } catch (error) {
-                    console.log(error);
+                    // console.log(error);
                 }
             }
 
@@ -122,7 +162,6 @@ export default function ({ action }: RegisterFunctions, { database, emitter }: E
                         .then(() => console.log('Successfully updated commands for guild ' + guildId))
                         .catch(console.log);
                 }
-
 
                 emitter.onAction("holypics_predict_url", async (meta) => {
                     const channel = await client.channels.fetch(test_channels[0]);
@@ -145,18 +184,46 @@ export default function ({ action }: RegisterFunctions, { database, emitter }: E
 
             client.on("interactionCreate", async interaction => {
 
-                if (!interaction.isCommand()) return;
-                // @ts-ignore
-                const command = client.commands.get(interaction.commandName);
-                if (!command) return;
-
                 try {
-                    await command.execute(interaction);
-                }
-                catch (error) {
+                    if (interaction.isButton() && interaction.customId.startsWith(`${bot_custom_id}_class_`)) {
+                        const idSubstring = interaction.customId.split(`${bot_custom_id}_class_`)[1];
+                        const [className, imageId] = idSubstring.split("_id_")
+                        await database("feedbacks").update({ moderation_classes: JSON.stringify([className]) }).where("image", "=", imageId);
+
+                        const components = interaction.message.components;
+                        if ((components?.length as number) <= 3) {
+                            const row = new MessageActionRow().addComponents(
+                                new MessageButton()
+                                    .setStyle("SUCCESS")
+                                    .setLabel("✔️")
+                                    .setCustomId(`${bot_custom_id}${v4()}`)
+                                    .setDisabled(true))
+                            // @ts-ignore
+                            components?.push(row)
+                        }
+
+                        return interaction.update({
+                            content: interaction.message.content,
+                            // @ts-ignore
+                            components,
+                        })
+                    }
+
+                    if (!interaction.isCommand()) return;
+                    // @ts-ignore
+                    const command = client.commands.get(interaction.commandName);
+                    if (!command) return;
+
+                    try {
+                        await command.execute(interaction);
+                    }
+                    catch (error) {
+                        console.log(error);
+                        // interaction.
+                        await interaction.reply({ content: "There was an error executing this command" });
+                    }
+                } catch (error) {
                     console.log(error);
-                    // interaction.
-                    await interaction.reply({ content: "There was an error executing this command" });
                 }
             });
 

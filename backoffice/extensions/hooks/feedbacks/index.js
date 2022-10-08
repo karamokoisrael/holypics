@@ -12,14 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 function default_1({ filter }, { database }) {
     return __awaiter(this, void 0, void 0, function* () {
         filter('feedbacks.items.read', (payload, meta, { accountability, schema }) => __awaiter(this, void 0, void 0, function* () {
-            if (payload.length == 1) {
+            if (payload.length == 1 && (accountability === null || accountability === void 0 ? void 0 : accountability.user) != null && accountability.user != undefined) {
                 try {
                     yield database("feedbacks").update({ seen: 1 }).where({ id: payload[0].id, seen: 0 });
-                    // const { admin_id } = await getAdminTokens(database)
-                    // const feedbacksService = new ItemsService("feedbacks", { knex: database as any, schema: schema as SchemaOverview, accountability: { ...accountability, admin: true } as  Accountability });
-                    // await feedbacksService.updateOne(payload[0].id, { seen: true })
                 }
                 catch (error) { }
+            }
+            if (!(accountability === null || accountability === void 0 ? void 0 : accountability.user)) {
+                const ids = payload.map((item) => item.id);
+                yield database("feedbacks").update({ downloaded_for_dataset: 1 }).whereIn("id", ids);
             }
             return payload;
         }));

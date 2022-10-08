@@ -8,6 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -19,6 +26,8 @@ const directus_1 = require("directus");
 const axios_1 = __importDefault(require("axios"));
 const auth_1 = require("../../helpers/auth");
 const utils_1 = require("../../helpers/utils");
+const fs = require("fs");
+const readline = require('readline');
 function default_1(router, { database, emitter }) {
     router.get('/holypics-unsplash', (req, res) => __awaiter(this, void 0, void 0, function* () {
         var _a;
@@ -62,6 +71,82 @@ function default_1(router, { database, emitter }) {
             }
             yield configsService.upsertSingleton({ unsplash_settings: Object.assign(Object.assign({}, updatePayload), { last_collection_page: updatePayload.last_collection_page + 1 }) });
             return res.json(Object.assign(Object.assign({}, updatePayload), { api_key: null }));
+        }
+        catch (error) {
+            console.log(error);
+            return (0, exceptions_1.throwError)(res, t("we_encountered_an_unexpected_error_during_the_operation"));
+        }
+    }));
+    router.get('/holypics-raw-data', (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { t } = yield (0, translation_1.getTranslator)(req, database);
+        try {
+            const { schema, accountability } = (0, request_handler_1.getRequestParams)(req, true);
+            const { admin_id } = yield (0, auth_1.getAdminTokens)(database);
+            const configsService = new directus_1.ItemsService("configurations", { schema, accountability: Object.assign(Object.assign({}, accountability), { user: admin_id }) });
+            const configs = yield configsService.readSingleton({});
+            const { items_per_page, prediction_sleep_ttl } = configs.raw_data_settings;
+            let { last_collection, last_collection_page, last_collection_total_pages } = configs.raw_data_settings;
+            fs.readdir('./extensions/static/txt', (err, collections) => __awaiter(this, void 0, void 0, function* () {
+                collections = collections.filter(item => ![".DS_Store"].includes(item));
+                let count = 0;
+                let processedCount = 0;
+                const fileStream = fs.createReadStream(`./extensions/static/txt/${collections[last_collection]}`);
+                const exec = require('child_process').exec;
+                exec(`wc -l ./extensions/static/txt/${collections[last_collection]}`, function (error, total) {
+                    var e_1, _a;
+                    return __awaiter(this, void 0, void 0, function* () {
+                        console.log(total);
+                        if (error)
+                            console.log(error);
+                        if (error)
+                            total = total;
+                        console.log("processing collection => ", collections[last_collection]);
+                        const readInterface = readline.createInterface({
+                            input: fileStream,
+                            crlfDelay: Infinity
+                        });
+                        try {
+                            for (var readInterface_1 = __asyncValues(readInterface), readInterface_1_1; readInterface_1_1 = yield readInterface_1.next(), !readInterface_1_1.done;) {
+                                const line = readInterface_1_1.value;
+                                try {
+                                    if (last_collection_page > total || count > total) {
+                                        last_collection++;
+                                        last_collection_page = 1;
+                                        break;
+                                    }
+                                    if (processedCount > items_per_page) {
+                                        last_collection_page++;
+                                        break;
+                                    }
+                                    if (count > last_collection_page) {
+                                        processedCount++;
+                                        console.log(`${count} => ${line}`);
+                                        emitter.emitAction("holypics_predict_url", { imageUrl: line }, {});
+                                        if (prediction_sleep_ttl != 0)
+                                            yield (0, utils_1.sleep)(prediction_sleep_ttl);
+                                    }
+                                }
+                                catch (error) { }
+                                finally {
+                                    count++;
+                                }
+                            }
+                        }
+                        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                        finally {
+                            try {
+                                if (readInterface_1_1 && !readInterface_1_1.done && (_a = readInterface_1.return)) yield _a.call(readInterface_1);
+                            }
+                            finally { if (e_1) throw e_1.error; }
+                        }
+                        const updatePayload = configs.raw_data_settings;
+                        updatePayload.last_collection_page = count;
+                        updatePayload.last_collection = last_collection;
+                        yield configsService.upsertSingleton({ raw_data_settings: updatePayload });
+                    });
+                });
+            }));
+            return res.json({});
         }
         catch (error) {
             console.log(error);
