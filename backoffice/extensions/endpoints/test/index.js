@@ -37,7 +37,7 @@ function default_1(router, { database, emitter }) {
             const collections = collectionsReq.data.results.map((item) => item.id);
             if (last_collection == "")
                 last_collection = collections[0];
-            const collectionsPhotosReq = yield axios_1.default.get(`https://api.unsplash.com/collections/${last_collection}/photos?page=${last_collection_page}&per_page=${items_per_page}`, { headers });
+            let collectionsPhotosReq = yield axios_1.default.get(`https://api.unsplash.com/collections/${last_collection}/photos?page=${last_collection_page}&per_page=${items_per_page}`, { headers });
             const updatePayload = configs.unsplash_settings;
             if (parseInt(collectionsPhotosReq.headers["x-total"]) < last_collection_page * items_per_page) {
                 const collectionIndex = collections.findIndex(item => item == last_collection);
@@ -46,7 +46,8 @@ function default_1(router, { database, emitter }) {
                     yield configsService.upsertSingleton({
                         unsplash_settings: Object.assign(Object.assign({}, updatePayload), { last_collection: nextCollection, last_collection_page: 1, preprocessed_collections: [...preprocessed_collections, last_collection], last_collection_total_pages: Math.round(parseInt(collectionsPhotosReq.headers["x-total"]) / items_per_page) })
                     });
-                    return (0, exceptions_1.successMessage)(res, "moving to new collection");
+                    collectionsPhotosReq = yield axios_1.default.get(`https://api.unsplash.com/collections/${last_collection}/photos?page=${last_collection_page}&per_page=${items_per_page}`, { headers });
+                    // return successMessage(res, "moving to new collection");
                 }
                 else {
                     return (0, exceptions_1.throwError)(res, t("last_item_reached"));

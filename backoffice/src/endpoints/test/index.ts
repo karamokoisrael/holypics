@@ -39,8 +39,8 @@ export default function (router: Router, { database, emitter }: ExtendedApiExten
             const headers = { Authorization: `Client-ID ${api_key}` }
             const collectionsReq = await axios.get(`https://api.unsplash.com/search/collections?page=${last_collection_req_page}&per_page=${last_collection_req_items_per_page}&query=${collection_req_query}`, { headers })
             const collections: string[] = collectionsReq.data.results.map((item: any) => item.id);
-            if(last_collection ==  "") last_collection = collections[0];
-            const collectionsPhotosReq = await axios.get(`https://api.unsplash.com/collections/${last_collection}/photos?page=${last_collection_page}&per_page=${items_per_page}`, { headers })
+            if (last_collection == "") last_collection = collections[0];
+            let collectionsPhotosReq = await axios.get(`https://api.unsplash.com/collections/${last_collection}/photos?page=${last_collection_page}&per_page=${items_per_page}`, { headers })
             const updatePayload = configs.unsplash_settings;
             if (parseInt(collectionsPhotosReq.headers["x-total"]) < last_collection_page * items_per_page) {
                 const collectionIndex = collections.findIndex(item => item == last_collection);
@@ -55,7 +55,8 @@ export default function (router: Router, { database, emitter }: ExtendedApiExten
                             last_collection_total_pages: Math.round(parseInt(collectionsPhotosReq.headers["x-total"]) / items_per_page)
                         }
                     });
-                    return successMessage(res, "moving to new collection");
+                    collectionsPhotosReq = await axios.get(`https://api.unsplash.com/collections/${last_collection}/photos?page=${last_collection_page}&per_page=${items_per_page}`, { headers })
+                    // return successMessage(res, "moving to new collection");
                 } else {
                     return throwError(res, t("last_item_reached"));
                 }
@@ -63,8 +64,8 @@ export default function (router: Router, { database, emitter }: ExtendedApiExten
             for (const imageData of collectionsPhotosReq.data) {
                 try {
                     const image_url = imageData?.urls?.small;
-                    emitter.emitAction("holypics_predict_url",  { imageUrl: image_url }, {} as EventContext)
-                    if(prediction_sleep_ttl != 0) await sleep(prediction_sleep_ttl);
+                    emitter.emitAction("holypics_predict_url", { imageUrl: image_url }, {} as EventContext)
+                    if (prediction_sleep_ttl != 0) await sleep(prediction_sleep_ttl);
                     // const base64 = await imageToBase64(image_url);
                     // const predictionReq = await axios.post(`${process.env.TF_SERVING_API_URL as string}${model_path}`,
                     //     { instances: [base64] }
@@ -92,7 +93,7 @@ export default function (router: Router, { database, emitter }: ExtendedApiExten
         }
 
     });
-    
+
 }
 
 
