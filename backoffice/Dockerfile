@@ -11,7 +11,7 @@ RUN \
 
 ENV NODE_ENV=production
 # RUN npm install 
-RUN npm i --only=production --no-package-lock
+RUN npm i --omit=dev --no-package-lock
 
 RUN \
     # Upgrade system and install 'ssmtp' to be able to send mails

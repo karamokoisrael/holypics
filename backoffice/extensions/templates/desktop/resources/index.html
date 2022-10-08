@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loading</title>
+  </head>
+  <style>
+    *,
+    html {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      height: 100vh;
+      width: 100% !important;
+      flex-direction: column;
+      background-color: #fcfefc;
+    }
+
+    img {
+      width: 180px;
+      height: 180px;
+    }
+  </style>
+  <body>
+    <img src="../assets/icons/gif/loader.gif" />
+
+    <script>
+      //   try {
+      //       const { fork } = require("child_process");
+      //     const sleep = (milliseconds) => {
+      //   return new Promise(resolve => setTimeout(resolve, milliseconds))
+      // }
+      // async function createServer() {
+      //   return new Promise(async(resolve, reject) => {
+      //     try {
+      //       const serverProcess = fork(
+      //         `../../../../node_modules/directus/dist/start.js`
+      //       );
+      //       await sleep(10000)
+      //       resolve(true);
+      //     } catch (error) {
+      //       reject(error);
+      //     }
+      //   });
+      // }
+      // await createServer();
+      //   } catch (error) {
+      //     console.log(error);
+      //   }
+      //   window.location.href = "http://localhost:8055";
+      document.write(
+        "Node version in use: <strong>" + process.version + "</strong>"
+      );
+
+      // Accessing NW.js's API to open the developer tools
+      nw.Window.get().showDevTools();
+    //   window.location.href = "https://google.com";
+    </script>
+  </body>
+</html>

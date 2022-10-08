@@ -21,6 +21,8 @@ const axios_1 = __importDefault(require("axios"));
 const directus_1 = require("directus");
 const auth_1 = require("../../helpers/auth");
 const uuid_1 = require("uuid");
+const { Readable } = require('stream');
+const fs = require("");
 function default_1({ action }, { database, emitter }) {
     action('server.start', (meta, { accountability, schema }) => __awaiter(this, void 0, void 0, function* () {
         try {
@@ -75,12 +77,23 @@ function default_1({ action }, { database, emitter }) {
                     if (test_channels.includes(message.channel.id))
                         yield message.reply(predictionMessage);
                     if (predictionData[neutral_class] <= neutral_class_danger_probability) {
-                        const imageId = yield filesService.importOne(url, { title: `${(0, uuid_1.v4)()}}` });
-                        yield database("feedbacks").insert({
-                            image: imageId,
-                            image_url: url,
-                            prediction_data: JSON.stringify(predictionData),
-                        });
+                        const fileName = `ds_pred_${(0, uuid_1.v4)()}`;
+                        const fileDownloadName = `${fileName}.jpg`;
+                        fs.writeFile(`./uploads/${fileDownloadName}`, base64, 'base64', (err) => __awaiter(this, void 0, void 0, function* () {
+                            if (err)
+                                return;
+                            yield database("directus_files").insert({
+                                storage: "local",
+                                filename_disk: fileDownloadName,
+                                filename_download: fileDownloadName,
+                                title: fileDownloadName
+                            });
+                            yield database("feedbacks").insert({
+                                image: fileName,
+                                image_url: url,
+                                prediction_data: JSON.stringify(predictionData),
+                            });
+                        }));
                     }
                 }
                 catch (error) {
@@ -96,15 +109,11 @@ function default_1({ action }, { database, emitter }) {
                         .catch(console.log);
                 }
                 emitter.onAction("holypics_predict_url", (meta) => __awaiter(this, void 0, void 0, function* () {
-                    // const channel = await client.channels.fetch('Channel Id');
-                    const channel = client.channels.cache.get(test_channels[0]);
+                    const channel = yield client.channels.fetch(test_channels[0]);
+                    // const channel = client.channels.cache.get(test_channels[0]);
                     // @ts-ignore
                     channel.send({ content: meta.imageUrl });
                 }));
-                // emitter.on("image_prediction_url", (args)=>{
-                //     console.log("new event emitted");
-                //     console.log(args);
-                // })
             });
             client.on('messageCreate', (message) => __awaiter(this, void 0, void 0, function* () {
                 if (message.content != null && message.content != undefined && message.content != "" && message.content.startsWith("http") && isValidUrl(message.content))

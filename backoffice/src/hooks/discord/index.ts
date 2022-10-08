@@ -11,7 +11,8 @@ import axios from 'axios';
 import { FilesService } from 'directus';
 import { getAdminTokens } from '../../helpers/auth';
 import { v4 } from "uuid";
-
+const { Readable } = require('stream');
+const fs = require("")
 export default function ({ action }: RegisterFunctions, { database, emitter }: ExtendedApiExtensionContext) {
 
     type DiscordSetting = {
@@ -86,16 +87,25 @@ export default function ({ action }: RegisterFunctions, { database, emitter }: E
                         predictionData[prediction.classes[i]] = prediction.scores[i];
                         predictionMessage += `${prediction.classes[i]}: ${(Math.round(prediction.scores[i] * 100))}% \n`
                     }
-                    
+
                     if (test_channels.includes(message.channel.id)) await message.reply(predictionMessage)
                     if (predictionData[neutral_class] <= neutral_class_danger_probability) {
-                        const imageId = await filesService.importOne(url, { title: `${v4()}}` });
-                        
-                        await database("feedbacks").insert({
-                            image: imageId,
-                            image_url: url,
-                            prediction_data: JSON.stringify(predictionData),
-                        })
+                        const fileName = `ds_pred_${v4()}`;
+                        const fileDownloadName = `${fileName}.jpg`;
+                        fs.writeFile(`./uploads/${fileDownloadName}`, base64, 'base64', async (err: any) => {
+                            if (err) return;
+                            await database("directus_files").insert({
+                                storage: "local",
+                                filename_disk: fileDownloadName,
+                                filename_download: fileDownloadName,
+                                title: fileDownloadName
+                            })
+                            await database("feedbacks").insert({
+                                image: fileName,
+                                image_url: url,
+                                prediction_data: JSON.stringify(predictionData),
+                            })
+                        });
                     }
                 } catch (error) {
                     console.log(error);
@@ -115,22 +125,16 @@ export default function ({ action }: RegisterFunctions, { database, emitter }: E
 
 
                 emitter.onAction("holypics_predict_url", async (meta) => {
-                    // const channel = await client.channels.fetch('Channel Id');
-                    const channel = client.channels.cache.get(test_channels[0]);
+                    const channel = await client.channels.fetch(test_channels[0]);
+                    // const channel = client.channels.cache.get(test_channels[0]);
                     // @ts-ignore
                     channel.send({ content: meta.imageUrl })
                 })
-
-                // emitter.on("image_prediction_url", (args)=>{
-                //     console.log("new event emitted");
-                //     console.log(args);
-                // })
             })
 
 
 
             client.on('messageCreate', async (message) => {
-
                 if (message.content != null && message.content != undefined && message.content != "" && message.content.startsWith("http") && isValidUrl(message.content)) await processUrl(message, message.content.replace(/ /g, ""))
                 if (message.attachments.size == 0) return;
 
