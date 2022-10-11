@@ -31,7 +31,7 @@ export default function Footer() {
           !SMALL_SCREEN ?
             <Appbar.Header style={{ backgroundColor: "transparent" }}>
               <Appbar.Action icon="web" onPress={async () => await openUrl(environment.websiteUrl)} />
-              <Appbar.Action icon="github" onPress={async () => await openUrl("htttps://github.com/karamokoisrael")} />
+              <Appbar.Action icon="github" onPress={async () => await openUrl("https://github.com/karamokoisrael")} />
               <Appbar.Action icon="twitter" onPress={async () => await openUrl("https://twitter.com/IsraelKaramoko")} />
             </Appbar.Header> :
             null
