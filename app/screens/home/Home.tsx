@@ -110,7 +110,7 @@ export default function Home() {
 
           <View style={tw`mt-10 flex items-center flex-row w-full`}>
 
-            <Button disabled={pageRef.current >= limitRef.current} onPress={() => {
+            <Button mode="contained" disabled={pageRef.current >= limitRef.current} onPress={() => {
               pageRef.current = pageRef.current + 1
               dataCtrl.mutate()
             }}>Load more</Button>

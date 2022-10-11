@@ -29,6 +29,7 @@ export type RootStackParamList = {
   Security: NavigatorScreenParams<RootTabParamList> | undefined;
   TermsAndUse: NavigatorScreenParams<RootTabParamList> | undefined;
   NotFound: NavigatorScreenParams<RootTabParamList> | undefined;
+  Apps: NavigatorScreenParams<RootTabParamList> | undefined;
 
   Model: NavigatorScreenParams<RootTabParamList> | undefined;
   Holipics: NavigatorScreenParams<RootTabParamList> | undefined;

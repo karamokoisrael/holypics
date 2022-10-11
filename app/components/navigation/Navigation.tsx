@@ -16,6 +16,7 @@ import Account from "../../screens/account/Account";
 import I18n from "i18n-js";
 import StableDiffusion from "../../screens/ai/StableDiffusion";
 import Model from "../../screens/ai/Model";
+import Apps from "../../screens/apps/Apps";
 
 
 export type CustomRoute = {
@@ -38,6 +39,7 @@ export const linking: LinkingOptions<RootStackParamList> = {
       OnBoarding: "/on-boarding",
       Home: '/',
       Model: '/model',
+      Apps: '/apps',
       StableDiffusion: '/stable-diffusion',
       Account: '/me',
       Error: '/error',
@@ -95,6 +97,7 @@ export default function Navigation({ colorScheme }: NavigationProps) {
         })}
       >
         <Drawer.Screen name="Home" component={Home} options={{ ...defaultScreenOptions, title: "home", drawerLabel: t("home"), ...{ back: false } }} />
+        <Drawer.Screen name="Apps" component={Apps} options={{ ...defaultScreenOptions, title: "apps", drawerLabel: "Apps" }} />
         <Drawer.Screen name="OnBoarding" component={OnBoarding} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: t("on_boarding"), headerShown: false }} />
         <Drawer.Screen name="Account" component={Account} options={{ ...defaultScreenOptions, title: "account", drawerLabel: t("account"), headerTitle: t("account") }} />
         <Drawer.Screen name="StableDiffusion" component={StableDiffusion} options={{ ...defaultScreenOptions, title: "stable_diffusion", drawerLabel: "Stable Diffusion" }} />
