@@ -94,8 +94,8 @@ export default function Navigation({ colorScheme }: NavigationProps) {
           },
         })}
       >
-        <Drawer.Screen name="OnBoarding" component={OnBoarding} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: t("on_boarding"), headerShown: false }} />
         <Drawer.Screen name="Home" component={Home} options={{ ...defaultScreenOptions, title: "home", drawerLabel: t("home"), ...{ back: false } }} />
+        <Drawer.Screen name="OnBoarding" component={OnBoarding} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: t("on_boarding"), headerShown: false }} />
         <Drawer.Screen name="Account" component={Account} options={{ ...defaultScreenOptions, title: "account", drawerLabel: t("account"), headerTitle: t("account") }} />
         <Drawer.Screen name="StableDiffusion" component={StableDiffusion} options={{ ...defaultScreenOptions, title: "stable_diffusion", drawerLabel: "Stable Diffusion" }} />
         <Drawer.Screen name="Model" component={Model} options={{ ...defaultScreenOptions, ...drawerHiddenOptions, title: "model" }} />
