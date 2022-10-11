@@ -59,7 +59,7 @@ export default function Apps() {
         <Layout hideHeader>
             <View style={{ ...tw`flex flex-col w-full items-center justify-center`, height: WINDOW_HEIGHT }}>
                 <View style={tw`mt-10`}>
-                    <Text variant="titleMedium" style={{ ...tw`ml-2 mb-10 font-bold`, fontSize: 30 }}>Access our apps on several devices</Text>
+                    <Text variant="titleMedium" style={{ ...tw`ml-2 mb-10 font-bold text-center leading-10`, fontSize: 30 }}>Access our apps on several devices</Text>
                 </View>
                 <FlatList
                     contentContainerStyle={{ width: SMALL_SCREEN ? FULL_WIDTH : 400 }}

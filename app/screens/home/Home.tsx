@@ -108,7 +108,7 @@ export default function Home() {
               null
           }
 
-          <View style={tw`mt-10 flex items-center flex-row w-full`}>
+          <View style={tw`ml-4 mt-10 flex items-center flex-row w-full`}>
 
             <Button mode="contained" disabled={pageRef.current >= limitRef.current} onPress={() => {
               pageRef.current = pageRef.current + 1

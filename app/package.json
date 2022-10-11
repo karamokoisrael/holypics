@@ -7,7 +7,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "build": "expo build:web && rm -r website/ && mv web-build/ website/ && python3 prepare-for-deskop.py && rm -r ../desktop/website && cp -r website ../desktop",
+    "build": "expo build:web && rm -r website/ && mv web-build/ website/ && rm -r ../desktop/website && cp -r website ../desktop",
     "build:web": "expo build:web",
     "build:android": "eas build --platform=android",
     "eject": "expo eject",
