@@ -99,10 +99,10 @@ services:
       - ${JUPYTERLAB_PORT}:8888
     volumes:
       - ./data/datasets:/datasets
-      - ./data/datasets/notebooks:/notebooks
+      - ./data/notebooks:/notebooks
     env_file:
       - .env
-      
+
 volumes:
   backoffice_uploads:
   backoffice_migration:
