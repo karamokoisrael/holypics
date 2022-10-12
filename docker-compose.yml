@@ -98,8 +98,7 @@ services:
     ports:
       - ${JUPYTERLAB_PORT}:8888
     volumes:
-      - ./data/datasets:/datasets
-      - ./data/notebooks:/notebooks
+      - ./data:/work
     env_file:
       - .env
 
