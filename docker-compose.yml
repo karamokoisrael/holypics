@@ -93,18 +93,16 @@ services:
     restart: always
 
   jupyterlab:
-    build:
-      dockerfile: Dockerfile
-      context: ./config/jupyterlab
+    image: jupyter/base-notebook
     container_name: ${JUPYTERLAB_CONTAINER_NAME}
     ports:
       - ${JUPYTERLAB_PORT}:8888
     volumes:
-      - ./data:/opt/app/data
+      - ./data/datasets:/datasets
+      - ./data/datasets/notebooks:/notebooks
     env_file:
       - .env
-    entrypoint: sh -c 'jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --notebook-dir=/opt/app/data --allow-root'
-
+      
 volumes:
   backoffice_uploads:
   backoffice_migration:
