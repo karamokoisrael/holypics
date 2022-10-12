@@ -93,7 +93,9 @@ services:
     restart: always
 
   jupyterlab:
-    build: ./jupyterlab
+    build:
+      dockerfile: Dockerfile
+      context: ./config/jupyterlab
     container_name: ${JUPYTERLAB_CONTAINER_NAME}
     ports:
       - ${JUPYTERLAB_PORT}:8888
