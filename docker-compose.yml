@@ -92,15 +92,15 @@ services:
       - FB_BASEURL=/filebrowser
     restart: always
 
-  jupyterlab:
-    image: jupyter/tensorflow-notebook
-    container_name: ${JUPYTERLAB_CONTAINER_NAME}
-    ports:
-      - ${JUPYTERLAB_PORT}:8888
-    volumes:
-      - ./data:/work
-    env_file:
-      - .env
+  # jupyterlab:
+  #   image: jupyter/tensorflow-notebook
+  #   container_name: ${JUPYTERLAB_CONTAINER_NAME}
+  #   ports:
+  #     - ${JUPYTERLAB_PORT}:8888
+  #   volumes:
+  #     - ./data:/work
+  #   env_file:
+  #     - .env
 
 volumes:
   backoffice_uploads:
