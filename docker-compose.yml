@@ -24,7 +24,7 @@ services:
     container_name: ${BACKOFFICE_CONTAINER_NAME}
     restart: always
     # image: directus/directus:latest
-    build: 
+    build:
       dockerfile: Dockerfile
       context: backoffice
     env_file:
@@ -39,7 +39,6 @@ services:
       - ./backoffice/extensions:/app/extensions
       - backoffice_migration:/app/migration
       - backoffice_uploads:/app/uploads
-      
     networks:
       - directus
 
@@ -74,7 +73,35 @@ services:
       - ${TF_SERVING_PORT}:8501
     volumes:
       - './config/tf-serving/models:/models'
+    env_file:
+      - .env
     command: --model_config_file=/models/models.config
+
+  filebrowser:
+    image: hurlenko/filebrowser
+    container_name: ${FILEBROWSER_CONTAINER_NAME}
+    user: "${FILEBROWSER_UID}:${FILEBROWSER_GID}"
+    ports:
+      - ${FILEBROWSER_PORT}:8080
+    volumes:
+      - ./data:/data
+      # - /CONFIG_DIR:/config
+    env_file:
+      - .env
+    environment:
+      - FB_BASEURL=/filebrowser
+    restart: always
+
+  jupyterlab:
+    build: ./jupyterlab
+    container_name: ${JUPYTERLAB_CONTAINER_NAME}
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./data:/opt/app/data
+    env_file:
+      - .env
+    entrypoint: sh -c 'jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --notebook-dir=/opt/app/data --allow-root'
 
 volumes:
   backoffice_uploads:

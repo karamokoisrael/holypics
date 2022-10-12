@@ -1,10 +1,8 @@
 import { Appbar, Avatar, Text } from "react-native-paper";
-import { Linking, Platform, TouchableOpacity, View } from "react-native";
+import { Platform, TouchableOpacity, View } from "react-native";
 import { FULL_WIDTH, SMALL_SCREEN, WINDOW_WIDTH } from "../../constants/layout";
-import I18n from "i18n-js";
 import theme from "../../constants/theme";
 import React from "react";
-import useStore from "../../stores/store";
 import tw from "../../helpers/tailwind";
 import { useNavigation } from "@react-navigation/native";
 import environment from "../../constants/environment";
