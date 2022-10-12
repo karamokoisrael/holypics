@@ -96,7 +96,7 @@ services:
     build: ./jupyterlab
     container_name: ${JUPYTERLAB_CONTAINER_NAME}
     ports:
-      - "8888:8888"
+      - ${JUPYTERLAB_PORT}:8888
     volumes:
       - ./data:/opt/app/data
     env_file:
