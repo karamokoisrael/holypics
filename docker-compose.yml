@@ -14,6 +14,7 @@ services:
 
   cache:
     container_name: ${CACHE_CONTAINER_NAME}
+    restart: always
     image: redis:6
     env_file:
       - .env
@@ -76,9 +77,12 @@ services:
     env_file:
       - .env
     command: --model_config_file=/models/models.config
+    restart: always
+
 
   filebrowser:
     image: hurlenko/filebrowser
+    restart: always
     container_name: ${FILEBROWSER_CONTAINER_NAME}
     user: "${FILEBROWSER_UID}:${FILEBROWSER_GID}"
     ports:
@@ -90,17 +94,20 @@ services:
       - .env
     environment:
       - FB_BASEURL=/filebrowser
-    restart: always
+    
 
-  # jupyterlab:
-  #   image: jupyter/tensorflow-notebook
-  #   container_name: ${JUPYTERLAB_CONTAINER_NAME}
-  #   ports:
-  #     - ${JUPYTERLAB_PORT}:8888
-  #   volumes:
-  #     - ./data:/work
-  #   env_file:
-  #     - .env
+  jupyterlab:
+    image: jupyter/tensorflow-notebook
+    restart: always
+    container_name: ${JUPYTERLAB_CONTAINER_NAME}
+    ports:
+      - ${JUPYTERLAB_PORT}:8888
+    volumes:
+      - ./data:/home/jovyan/work
+    env_file:
+      - .env
+  # https://jupyter-docker-stacks.readthedocs.io/en/latest/using/running.html
+  # sudo docker run -it -p 8888:8888 -v "${PWD}":/home/jovyan/work --restart=always --name=mgx_jupyterlab jupyter/scipy-notebook:9e63909e0317  
 
 volumes:
   backoffice_uploads:
