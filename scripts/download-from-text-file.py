@@ -3,7 +3,7 @@ import os
 import sys
 from utility import download_images, remove_duplicates, remove_small_files, rename_all_files, delete_unreadable_images
 txt_files_path = "../nsfw-content-moderation-data/raw_data"
-dataset_path = "../data/datasets/nsfw-content-moderation/images"
+dataset_path = "../data/datasets/nsfw-content-moderation/tmp"
 if __name__ == "__main__":
     download_data = {
         "classes": sys.argv[1].split(","),

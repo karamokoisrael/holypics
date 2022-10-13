@@ -1,9 +1,9 @@
 
 import os
 import sys
-from utility import download_images, remove_duplicates, remove_small_files, rename_all_files, delete_unreadable_images
+from utility import remove_duplicates, remove_small_files, rename_all_files, delete_unreadable_images
 txt_files_path = "../nsfw-content-moderation-data/raw_data"
-dataset_path = "../data/datasets/nsfw-content-moderation"
+dataset_path = "../data/datasets/nsfw-content-moderation/tmp"
 if __name__ == "__main__":
     download_data = {
         "remove_duplicates": True if len(sys.argv) < 3 else bool(sys.argv[2]),
@@ -11,7 +11,6 @@ if __name__ == "__main__":
         "rename_all_files": False if len(sys.argv) < 5 else bool(sys.argv[4]),
         "delete_unreadable_images": True if len(sys.argv) < 6 else bool(sys.argv[5])
     }
-
     for path in download_data["classes"]:
         try:
             data_path = os.path.join(txt_files_path, path)
