@@ -27,7 +27,7 @@ export default function Home() {
   const fetcher = async (key: string) => {
     try {
       setLoadingStatus(true)
-      const limit = 6
+      const limit = 4
       const query: Record<string, any> = { filter: { status: "published" }, page: pageRef.current, limit, meta: "*" };
       if (searchText != "") query.search = searchText;
       const models = await axios.get(formatUrl("items/models"), {
