@@ -14,4 +14,4 @@ EXPOSE 8501
 ENTRYPOINT ["/usr/bin/tf_serving_entrypoint.sh"]
 
 # CMD
-CMD ["--model_name=nsfw_content_moderator", "--model_base_path=/tf_serving", "--model_config_file=/models/models.config"]
+CMD ["--model_base_path=/tf_serving", "--model_config_file=/models/models.config"]
