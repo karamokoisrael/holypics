@@ -66,31 +66,32 @@ function default_1({ action }, { database, emitter }) {
             const processUrl = (message, url) => __awaiter(this, void 0, void 0, function* () {
                 try {
                     const base64 = yield imageToBase64(url);
-                    const predictionReq = yield axios_1.default.post(`${process.env.TF_SERVING_API_URL}${nfsw_model_path}`, { instances: [base64] });
-                    const prediction = predictionReq.data.predictions[0];
+                    const reqParams = new URLSearchParams();
+                    reqParams.append("base64", base64);
+                    const prediction = yield axios_1.default.post(`${process.env.PUBLIC_URL}/holypics/predict`, reqParams, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
                     const predictionData = {};
                     let predictionMessage = "";
                     const uuid = (0, uuid_1.v4)();
                     const actionRow = new discord_js_1.MessageActionRow();
-                    for (let i = 0; i < prediction.scores.length; i++) {
-                        predictionData[prediction.classes[i]] = prediction.scores[i];
-                        predictionMessage += `${prediction.classes[i]}: ${(Math.round(prediction.scores[i] * 100))}% \n`;
+                    for (const key of Object.keys(prediction.data[0])) {
+                        predictionData[key] = prediction.data[0][key];
+                        predictionMessage += `${key}: ${(Math.round(prediction.data[0][key] * 100))}% \n`;
                         actionRow.addComponents(new discord_js_1.MessageButton()
                             .setStyle("PRIMARY")
-                            .setLabel(`${prediction.classes[i]}`)
-                            .setCustomId(`${bot_custom_id}_class_${prediction.classes[i]}_id_${uuid}`));
+                            .setLabel(`${key}`)
+                            .setCustomId(`${bot_custom_id}_class_${key}_id_${uuid}`));
                     }
                     const utilityRow = new discord_js_1.MessageActionRow().addComponents(new discord_js_1.MessageButton()
                         .setStyle("LINK")
                         .setLabel("See image")
                         // .setCustomId(`${bot_custom_id}_download_image_btn`)
-                        .setURL((predictionData[neutral_class] <= neutral_class_danger_probability || store_all_predictions) ? `${process.env.PUBLIC_URL}/file/${uuid}` : url)
+                        .setURL((store_all_predictions) ? `${process.env.PUBLIC_URL}/file/${uuid}` : url)
                         .setDisabled(false));
                     if (test_channels.includes(message.channel.id))
                         yield message.reply({
                             content: predictionMessage, components: [actionRow, utilityRow]
                         });
-                    if (predictionData[neutral_class] <= neutral_class_danger_probability || store_all_predictions) {
+                    if (store_all_predictions) {
                         const fileName = `${bot_custom_id}_pred_${uuid}`;
                         const fileDownloadName = `${fileName}.jpg`;
                         fs.writeFile(`./uploads/${fileDownloadName}`, base64, { encoding: 'base64' }, (err) => __awaiter(this, void 0, void 0, function* () {
@@ -123,7 +124,7 @@ function default_1({ action }, { database, emitter }) {
                     }
                 }
                 catch (error) {
-                    // console.log(error);
+                    console.log(error);
                 }
             });
             client.on("ready", () => {
@@ -188,7 +189,7 @@ function default_1({ action }, { database, emitter }) {
                     }
                 }
                 catch (error) {
-                    console.log(error);
+                    // console.log(error);
                 }
             }));
             client.login(bot_token);

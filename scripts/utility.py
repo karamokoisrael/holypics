@@ -2,10 +2,63 @@ import hashlib
 import os
 from pathlib import Path
 import random
-from urllib import request
 from urllib.request import urlopen
 import uuid
 from PIL import Image
+import requests
+from dotenv import load_dotenv, find_dotenv
+import time
+load_dotenv(find_dotenv())
+
+def download_collection_from_unsplash(query="sun", store="", perPage=30, page=1, image_width=224, image_height=224, fit="crop", count_set=0, limit=-1, small=True, sleep_timeout=10):
+    api_key = os.getenv("UNSPLASH_API_KEY")
+    # ua = UserAgent()
+    # headers = {'User-Agent': ua.random, 'Authorization': "Client-ID {}".format(api_key)}
+    headers = {
+        'Authorization': "Client-ID {}".format(api_key),
+    }
+    count = 0
+    total = 0
+    total_pages = 3
+    current_page = page
+    while True:
+        print("processing page ", current_page, "/", total_pages)
+        try:
+            url = "https://api.unsplash.com/search/photos?query={0}&page={1}&per_page={2}".format(query, current_page, perPage)
+            response = requests.get(url, headers=headers)
+            response_json = response.json()
+            total = response_json["total"]
+            total_pages = response_json["total_pages"]
+            if current_page > total_pages:
+                return None
+            for image_data in response_json["results"]:
+                print("downloading image ", count+1, "/", total)
+                if count < count_set:
+                    print("skipping")
+                    continue
+                if limit != -1 and count > limit:
+                    print("stopping")
+                    return None
+                try:
+                    export_path = os.path.join(store, str(uuid.uuid1())+".jpg") 
+                    
+                    #raw,full, regular, small, thumb, small_s3
+                    url = image_data["urls"]["small"] if small else image_data["urls"]["raw"]+"&w={0}&h={1}&fit={2}".format(image_width, image_height, fit)
+                    response = urlopen(url, timeout=3)
+                    with open(export_path, 'wb') as f:
+                        f.write(response.read())
+
+                except Exception as wrong:
+                    print(wrong)
+                    print("error while downloading image")
+                count += 1
+            if sleep_timeout != -1:
+                print("sleeping")
+                time.sleep(sleep_timeout)
+                print("awaken")
+        except Exception as wrong:
+            print("error while loading collections photos")
+        current_page += 1
 
 
 def hashFile(filename):

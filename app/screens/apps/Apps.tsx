@@ -14,7 +14,6 @@ import theme from "../../constants/theme";
 export default function Apps() {
     const navigation = useNavigation();
     const onBoardingPassed = useStore(state => state.onBoardingPassed);
-    const store = useStore();
     useEffect(() => {
         if (onBoardingPassed) navigation.navigate("Home");
     }, [onBoardingPassed])
@@ -56,7 +55,7 @@ export default function Apps() {
         }
     ]
     return (
-        <Layout hideHeader>
+        <Layout hideHeader noScrollView>
             <View style={{ ...tw`flex flex-col w-full items-center justify-center`, height: WINDOW_HEIGHT }}>
                 <View style={tw`mt-10`}>
                     <Text variant="titleMedium" style={{ ...tw`ml-2 mb-10 font-bold text-center leading-10`, fontSize: 30 }}>Access our apps on several devices</Text>

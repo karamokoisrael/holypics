@@ -1,8 +1,13 @@
-import { Router } from "express";
 import { ApiExtensionContext } from '@directus/shared/types';
 import proxy from 'express-http-proxy';
 import { getRequestParams } from '../../helpers/request-handler';
-import express from "express";
+import express, { Request, Response, Router } from "express";
+import axios from 'axios';
+import { throwError } from '../../helpers/exceptions';
+import { getTranslator } from '../../helpers/translation';
+import { ItemsService } from 'directus';
+import { getAdminTokens } from '../../helpers/auth';
+const imageToBase64 = require('image-to-base64');
 
 export default function (router: Router, { database }: ApiExtensionContext) {
 
@@ -32,7 +37,7 @@ export default function (router: Router, { database }: ApiExtensionContext) {
                         if (bodyContent.instance) bodyContent.instances = [bodyContent.instance]
                         return bodyContent;
                 },
-                
+
                 proxyReqPathResolver: function (req) {
                         return new Promise(async function (resolve, reject) {
                                 try {

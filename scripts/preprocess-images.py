@@ -6,6 +6,7 @@ txt_files_path = "../nsfw-content-moderation-data/raw_data"
 dataset_path = "../data/datasets/nsfw-content-moderation/tmp"
 if __name__ == "__main__":
     download_data = {
+        "classes": sys.argv[1].split(","),
         "remove_duplicates": True if len(sys.argv) < 3 else bool(sys.argv[2]),
         "remove_small_files": True if len(sys.argv) < 4 else bool(sys.argv[3]),
         "rename_all_files": False if len(sys.argv) < 5 else bool(sys.argv[4]),

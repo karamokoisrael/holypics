@@ -82,22 +82,26 @@ export default function ({ action }: RegisterFunctions, { database, emitter }: E
             const processUrl = async (message: Message, url: string) => {
                 try {
                     const base64 = await imageToBase64(url);
-                    const predictionReq = await axios.post(`${process.env.TF_SERVING_API_URL as string}${nfsw_model_path}`,
-                        { instances: [base64] }
+                    const reqParams = new URLSearchParams();
+                    reqParams.append("base64", base64)
+                    const prediction = await axios.post(`${process.env.PUBLIC_URL as string}/holypics/predict`,
+                        reqParams,
+                        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
                     )
-                    const prediction = predictionReq.data.predictions[0];
+
                     const predictionData = {} as Record<string, any>;
                     let predictionMessage = "";
                     const uuid = v4();
                     const actionRow = new MessageActionRow()
-                    for (let i = 0; i < prediction.scores.length; i++) {
-                        predictionData[prediction.classes[i]] = prediction.scores[i];
-                        predictionMessage += `${prediction.classes[i]}: ${(Math.round(prediction.scores[i] * 100))}% \n`
+
+                    for (const key of Object.keys(prediction.data[0])) {
+                        predictionData[key] = prediction.data[0][key];
+                        predictionMessage += `${key}: ${(Math.round(prediction.data[0][key] * 100))}% \n`
                         actionRow.addComponents(
                             new MessageButton()
                                 .setStyle("PRIMARY")
-                                .setLabel(`${prediction.classes[i]}`)
-                                .setCustomId(`${bot_custom_id}_class_${prediction.classes[i]}_id_${uuid}`));
+                                .setLabel(`${key}`)
+                                .setCustomId(`${bot_custom_id}_class_${key}_id_${uuid}`));
                     }
 
                     const utilityRow = new MessageActionRow().addComponents(
@@ -105,7 +109,7 @@ export default function ({ action }: RegisterFunctions, { database, emitter }: E
                             .setStyle("LINK")
                             .setLabel("See image")
                             // .setCustomId(`${bot_custom_id}_download_image_btn`)
-                            .setURL((predictionData[neutral_class] <= neutral_class_danger_probability || store_all_predictions) ? `${process.env.PUBLIC_URL}/file/${uuid}` : url)
+                            .setURL((store_all_predictions) ? `${process.env.PUBLIC_URL}/file/${uuid}` : url)
                             .setDisabled(false))
 
 
@@ -113,7 +117,7 @@ export default function ({ action }: RegisterFunctions, { database, emitter }: E
                         content: predictionMessage, components: [actionRow, utilityRow]
                     })
 
-                    if (predictionData[neutral_class] <= neutral_class_danger_probability || store_all_predictions) {
+                    if (store_all_predictions) {
                         const fileName = `${bot_custom_id}_pred_${uuid}`;
                         const fileDownloadName = `${fileName}.jpg`;
 
@@ -148,7 +152,7 @@ export default function ({ action }: RegisterFunctions, { database, emitter }: E
                         });
                     }
                 } catch (error) {
-                    // console.log(error);
+                    console.log(error);
                 }
             }
 
@@ -223,7 +227,7 @@ export default function ({ action }: RegisterFunctions, { database, emitter }: E
                         await interaction.reply({ content: "There was an error executing this command" });
                     }
                 } catch (error) {
-                    console.log(error);
+                    // console.log(error);
                 }
             });
 

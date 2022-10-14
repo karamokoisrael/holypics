@@ -30,6 +30,7 @@ export type RootStackParamList = {
   TermsAndUse: NavigatorScreenParams<RootTabParamList> | undefined;
   NotFound: NavigatorScreenParams<RootTabParamList> | undefined;
   Apps: NavigatorScreenParams<RootTabParamList> | undefined;
+  WebView: NavigatorScreenParams<RootTabParamList> | undefined;
 
   Model: NavigatorScreenParams<RootTabParamList> | undefined;
   Holipics: NavigatorScreenParams<RootTabParamList> | undefined;

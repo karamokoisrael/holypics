@@ -53,8 +53,10 @@ export default function Model({ route }) {
             <Paragraph style={tw`p-2`}>{safelyGetProp(dataCtrl?.data, ((item: any) => item.translations[0].description))}</Paragraph>
             <View style={tw`flex flex-row justify-around`}>
               <Button style={{ marginTop: 10 }} onPress={() => {
-                if (dataCtrl.data?.available_locally) return navigation.navigate(dataCtrl?.data?.test_url)
-                WebBrowser.openBrowserAsync(dataCtrl?.data?.test_url)
+                if (dataCtrl.data?.available_locally) return navigation.navigate(dataCtrl?.data?.test_url)                
+                // @ts-ignore
+                if(Platform.OS != "web" ) return navigation.navigate("WebView", { url: dataCtrl?.data?.test_url });
+                WebBrowser.openBrowserAsync(dataCtrl?.data?.test_url)                
               }}>Test AI</Button>
               <Button style={{ marginTop: 10 }} onPress={() => WebBrowser.openBrowserAsync(dataCtrl?.data?.doc_url)}>{I18n.t("see_documentation")}</Button>
             </View>

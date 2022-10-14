@@ -36,6 +36,7 @@ export default function Header(props: Record<string, any>) {
         {!props.options?.back ? <Appbar.Action icon="menu" onPress={() => (navigation as Record<string, any>).toggleDrawer()} /> : null}
         <Appbar.Content title={props.options.headerTitle != undefined ? props.options.headerTitle : ""} />
         {!props.options?.back ? <Appbar.Action icon="account" onPress={() => navigation.navigate("Account")} /> : null}
+        {!props.options?.headerRight ? <Appbar.Action icon="account" onPress={() => navigation.navigate("Account")} /> : null}
       </Appbar.Header>
     </>
   )

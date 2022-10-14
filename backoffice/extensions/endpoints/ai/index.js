@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_http_proxy_1 = __importDefault(require("express-http-proxy"));
 const request_handler_1 = require("../../helpers/request-handler");
 const express_1 = __importDefault(require("express"));
+const imageToBase64 = require('image-to-base64');
 function default_1(router, { database }) {
     const accessForbiddenPath = "?access_token=XXXXXX";
     function selectProxyHost(req) {
