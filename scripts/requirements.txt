@@ -1,2 +1,3 @@
 kaggle
 python-dotenv
+pandas

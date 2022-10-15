@@ -3,7 +3,7 @@ import os
 import sys
 from utility import remove_duplicates, remove_small_files, rename_all_files, delete_unreadable_images, create_csv_history
 txt_files_path = "../nsfw-content-moderation-data/raw_data"
-dataset_path = "../data/datasets/nsfw-content-moderation/tmp"
+dataset_path = "../data/datasets/nsfw-content-moderation/images"
 csv_data_path = "../data/datasets/nsfw-content-moderation/data.csv"
 if __name__ == "__main__":
     download_data = {
