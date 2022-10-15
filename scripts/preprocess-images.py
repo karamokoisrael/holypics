@@ -1,9 +1,10 @@
 
 import os
 import sys
-from utility import remove_duplicates, remove_small_files, rename_all_files, delete_unreadable_images
+from utility import remove_duplicates, remove_small_files, rename_all_files, delete_unreadable_images, create_csv_history
 txt_files_path = "../nsfw-content-moderation-data/raw_data"
 dataset_path = "../data/datasets/nsfw-content-moderation/tmp"
+csv_data_path = "../data/datasets/nsfw-content-moderation/data.csv"
 if __name__ == "__main__":
     download_data = {
         "classes": sys.argv[1].split(","),
@@ -12,7 +13,9 @@ if __name__ == "__main__":
         "rename_all_files": False if len(sys.argv) < 5 else bool(sys.argv[4]),
         "delete_unreadable_images": True if len(sys.argv) < 6 else bool(sys.argv[5])
     }
-    for path in download_data["classes"]:
+    os.system("rm -r {}".format(os.path.join(dataset_path, ".DS_Store")))
+    data_dirs = os.listdir(dataset_path) if download_data["classes"][0] != "*" else download_data["classes"]
+    for path in data_dirs:
         try:
             data_path = os.path.join(txt_files_path, path)
             store_path = os.path.join(dataset_path, path)
@@ -25,6 +28,6 @@ if __name__ == "__main__":
                 remove_small_files(store_path)
             if download_data["rename_all_files"]:
                 rename_all_files(store_path)
-
         except Exception as wrong:
             print(wrong)
+    create_csv_history(csv_data_path, dataset_path)

@@ -2,6 +2,7 @@ import hashlib
 import os
 from pathlib import Path
 import random
+import pandas as pd
 from urllib.request import urlopen
 import uuid
 from PIL import Image
@@ -214,3 +215,47 @@ def remove_randomly_dir_files(dir, limit=2, percentage=0):
 
     print("Total deleted files {}".format(count))
     print("Total files remaining {}".format(len(os.listdir(dir))))
+
+def create_csv_history(csv_store, store, use_relashionship=0):
+    os.system("touch {}".format(csv_store))
+    classes_meta = {
+    #     "female_nudity": {
+    #         "childs":["general_nsfw"]
+    #     },
+        
+    #     "general_nsfw":{
+    #         "childs": ["female_nudity"]
+    #     },
+        
+    #     "female_underwear":{
+    #         "childs": ["male_underwear"]
+    #     },
+    #     "male_underwear":{
+    #         "childs": ["female_underwear"]
+    #     }
+    }
+
+    data_dir = store
+    data = []
+    data_sub_directories = os.listdir(data_dir)
+    for data_sub_directory in data_sub_directories:
+        files = os.listdir(os.path.join(data_dir, data_sub_directory))
+        for file in files:
+            file_meta = {}
+            file_meta["filenames"]=os.path.join(data_sub_directory, file)
+            
+            class_childs = []
+            if data_sub_directory in classes_meta and use_relashionship:
+                class_childs = classes_meta[data_sub_directory]["childs"]
+
+            for current_class_name in data_sub_directories:
+                if current_class_name == data_sub_directory or current_class_name in class_childs:
+                    file_meta[current_class_name] = str(1).replace(".0", "")                        
+                else:
+                    file_meta[current_class_name] = str(0)
+            data.append(file_meta)
+
+    df = pd.DataFrame(data)
+    df.to_csv(csv_store, encoding='utf-8', index=False)
+    print("done => ", len(data))
+    df.describe()
