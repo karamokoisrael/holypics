@@ -13,7 +13,7 @@ if __name__ == "__main__":
         "rename_all_files": False if len(sys.argv) < 5 else bool(sys.argv[4]),
         "delete_unreadable_images": True if len(sys.argv) < 6 else bool(sys.argv[5])
     }
-    os.system("rm -r {}".format(os.path.join(dataset_path, ".DS_Store")))
+    os.system("sudo rm -r {}".format(os.path.join(dataset_path, ".DS_Store")))
     data_dirs = os.listdir(dataset_path) if download_data["classes"][0] != "*" else download_data["classes"]
     for path in data_dirs:
         try:
