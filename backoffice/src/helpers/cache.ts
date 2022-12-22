@@ -1,18 +1,25 @@
-import NodeCache from 'node-cache';
-export const createCache = (stdTTL= 0, checkPeriod = 600)=>{
-    return new NodeCache({ stdTTL: stdTTL, checkperiod: checkPeriod });
+import { createClient } from 'redis';
+
+export const createCacheClient = async (url = process.env.CACHE_REDIS) => {
+    const client = createClient({ url });
+    await client.connect();
 }
-export const getCacheValue = function<T>(key: string){
-    const cache = createCache();
-    return cache.get<T>(key);
+export const disposeCacheClient = async (client: any) => await client.close()
+
+export const getCacheValue = async (key: string, providedClient: any = null) => {
+    try {
+        const client = providedClient != null ? providedClient : await createCacheClient();
+        return await client.get(key);
+    } catch (error) {
+        return null
+    }
 }
 
-export const setCacheValue = (key: string, value: any, stdTTL= 0, checkPeriod = 600)=>{
-    const cache = createCache(stdTTL, checkPeriod);    
-    return cache.set(key, value, stdTTL);
-}
-
-export const deleteCacheValue = (key: string)=>{
-    const cache = createCache();
-    return cache.del(key);
+export const setCacheValue = async (key: string, value: any, providedClient: any = null) => {
+    try {
+        const client = providedClient != null ? providedClient : await createCacheClient();
+        return await client.set(key, value);
+    } catch (error) {
+        return false
+    }
 }

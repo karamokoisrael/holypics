@@ -14,15 +14,15 @@ export const getAdminTokens = async (database: any): Promise<AdminTokens>=>{
     let accessToken = "";
     let adminId: string | undefined = "";
     try {
-        const cachedToken = getCacheValue<string>(ADMIN_ACCESS_TOKEN_CACHE_KEY)
-        const cachedId = getCacheValue<string>(ADMIN_ID_CACHE_KEY)
+        const cachedToken = await getCacheValue(ADMIN_ACCESS_TOKEN_CACHE_KEY)
+        const cachedId = await getCacheValue(ADMIN_ID_CACHE_KEY)
         if(cachedToken != null && cachedToken!= undefined && cachedId != null && cachedId!= undefined){
             accessToken = cachedToken; 
             adminId = cachedId;
         }else{
             const [[{token, id}]] = await database.raw("SELECT directus_users.token, directus_users.id from directus_roles RIGHT JOIN directus_users ON directus_users.role = directus_roles.id AND directus_users.token IS NOT NULL WHERE directus_roles.admin_access=1 LIMIT 1");
             adminId = id;
-            setCacheValue(ADMIN_ACCESS_TOKEN_CACHE_KEY, token);
+            await setCacheValue(ADMIN_ACCESS_TOKEN_CACHE_KEY, token);
             accessToken = token 
         }
         return { access_token:  accessToken, admin_id: adminId };

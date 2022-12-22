@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { logInformation } from './logger';
-import { getCacheValue, setCacheValue, createCache } from './cache';
+import { getCacheValue, setCacheValue } from './cache';
 import { TRANSLATIONS_CACHE_KEY } from '../consts/global';
 
 
@@ -14,8 +14,8 @@ const getDefaultTranslation = (key: string, params: any[] | null = null) => form
 
 const getTranslationStrings = async (database: any) => {
     const [{ translation_strings }] = await database("directus_settings").select("translation_strings").limit(1);
-    const cache = createCache();
-    if (!cache.has(TRANSLATIONS_CACHE_KEY)) {
+    const cache = await getCacheValue(TRANSLATIONS_CACHE_KEY);
+    if (cache == null) {
         setCacheValue(TRANSLATIONS_CACHE_KEY, translation_strings);
     }
     return translation_strings !== undefined && translation_strings !== null ? JSON.parse(translation_strings) : []
@@ -44,7 +44,7 @@ export const getTranslator = async (req: Request, database: any) => {
     let translationStrings: Record<string, any>[] = [];
     try {
 
-        const cachedTranslationStrings = getCacheValue<string>(TRANSLATIONS_CACHE_KEY);
+        const cachedTranslationStrings = await getCacheValue(TRANSLATIONS_CACHE_KEY);
         if (cachedTranslationStrings != null && cachedTranslationStrings != undefined) {
             translationStrings = cachedTranslationStrings !== undefined && cachedTranslationStrings !== null ? JSON.parse(cachedTranslationStrings) : []
             console.log("cache loaded");

@@ -4,12 +4,10 @@ import { Request, Response, Router } from "express";
 import { ApiExtensionContext } from '@directus/shared/types';
 import { getTranslator } from '../../helpers/translation';
 import { ItemsService } from 'directus';
-import axios from 'axios';
 import { getAdminTokens } from '../../helpers/auth';
 import { TwitterApi } from 'twitter-api-v2';
 import { TwitterApiV2Settings } from 'twitter-api-v2';
-import Replicate from '../../helpers/replicate';
-// import { Replicate } from '../../helpers/replicate';
+import Replicate from '../../helpers/replicate'
 
 TwitterApiV2Settings.deprecationWarnings = false;
 const imageToBase64 = require('image-to-base64');
@@ -115,8 +113,6 @@ export default function (router: Router, { database }: ApiExtensionContext) {
             const configs = await configsService.readSingleton({});
             const { client_id, client_secret, refresh_token, openai_key, openai_organization, hugging_face_api_key, prompt_hints, replicate_api_key } = configs.twitter_settings as TwitterSetting;
 
-
-
             const twitterClient = new TwitterApi({
                 clientId: client_id,
                 clientSecret: client_secret,
@@ -129,34 +125,11 @@ export default function (router: Router, { database }: ApiExtensionContext) {
             } = await twitterClient.refreshOAuth2Token(refresh_token);
             await configsService.upsertSingleton({ twitter_settings: { ...configs.twitter_settings, access_token: accessToken, refresh_token: newRefreshToken } });
 
-            // const configuration = new Configuration({
-            //     organization: openai_organization,
-            //     apiKey: openai_key,
-            // });
-            // const openai = new OpenAIApi(configuration);
-            // const tweet = await openai.createCompletion('text-davinci-001', {
-            //     prompt: 'tweet something cool for #techtwitter',
-            //     max_tokens: 64,
-            // });
 
             const wordHint = prompt_hints[Math.floor(Math.random() * prompt_hints.length)]
-            // const promptReq = await axios.post('https://api-inference.huggingface.co/models/succinctly/text2image-prompt-generator', {
-            //     inputs: wordHint
-            // }, { headers: { "Authorization": `Bearer ${hugging_face_api_key}` } })
-
-            const generatedPrompt = wordHint //promptReq.data[0].generated_text
-
-            
-            
+            const generatedPrompt = wordHint 
             console.log("wordHint => ", wordHint);
-
             console.log("generated_text => ", generatedPrompt);
-
-            
-            // await refreshedClient.v2.tweet({
-            //     text: generatedPrompt
-            // });
-
             const replicate = new Replicate({ apiToken: replicate_api_key, pollingInterval: 5000 });
             const imagePredictionData = await replicate.predict("9e767fbac45bea05d5e1823f737f927856c613e18cbc8d9068bafdc6d600a0f7", {
                 prompt: generatedPrompt
