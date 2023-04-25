@@ -1,0 +1,65 @@
+{
+	"name": "@mgx/directus-extension-core",
+	"description": "Please enter a description for your extension",
+	"icon": "extension",
+	"version": "1.0.0",
+	"keywords": [
+		"directus",
+		"directus-extension",
+		"directus-custom-bundle"
+	],
+	"directus:extension": {
+		"type": "bundle",
+		"path": {
+			"app": "dist/app.js",
+			"api": "dist/api.js"
+		},
+		"entries": [
+			{
+				"type": "endpoint",
+				"name": "holypics",
+				"source": "src/endpoints/holypics/index.ts"
+			}
+		],
+		"host": "^9.22.4"
+	},
+	"scripts": {
+		"build": "directus-extension build",
+		"dev": "directus-extension build -w --no-minify",
+		"link": "directus-extension link",
+		"add": "directus-extension add",
+		"test": "jest"
+	},
+	"devDependencies": {
+		"@directus/extensions-sdk": "9.22.4",
+		"@types/express": "^4.17.13",
+		"@types/express-http-proxy": "^1.6.3",
+		"@types/jest": "^27.5.1",
+		"@types/jsonwebtoken": "^9.0.1",
+		"@types/uuid": "^9.0.1",
+		"@typescript-eslint/eslint-plugin": "^5.58.0",
+		"@typescript-eslint/parser": "^5.58.0"
+	},
+	"dependencies": {
+		"@directus/sdk": "^9.7.0",
+		"@discordjs/builders": "^1.2.0",
+		"@discordjs/rest": "^1.2.0",
+		"axios": "^0.27.2",
+		"directus": "^9.18.1",
+		"discord-api-types": "^0.37.12",
+		"discord.js": "^13.8.0",
+		"ejs": "^3.1.7",
+		"express-http-proxy": "^1.6.3",
+		"image-to-base64": "^2.2.0",
+		"jimp": "^0.16.2",
+		"joi": "^17.5.0",
+		"jsonwebtoken": "^8.5.1",
+		"knex": "^0.95.15",
+		"liquidjs": "^9.34.0",
+		"lodash": "^4.17.21",
+		"moment": "^2.29.4",
+		"openai": "^3.0.0",
+		"twitter-api-v2": "^1.12.7",
+		"uuid": "^9.0.0"
+	}
+}

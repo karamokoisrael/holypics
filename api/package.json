@@ -1,0 +1,17 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "don't forget to add static token, public url for every instance of this project",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx directus start",
+    "dev": "cd extensions/core && npm run dev",
+    "build": "cd extensions/core && npm run build"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mgx/directus-extension-core": "file:extensions/core",
+    "directus": "^9.24.0"
+  }
+}

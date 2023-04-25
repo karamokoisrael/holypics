@@ -11,3 +11,22 @@ services:
       - .env
     command: --model_config_file=/models/models.config
     restart: always
+  api:
+    container_name: ${API_CONTAINER_NAME}
+    build:
+      dockerfile: Dockerfile
+      context: .
+    restart: always
+    ports:
+      - '${API_PORT}:8055'
+    volumes:
+      - ./api/extensions:/app/extensions
+      - api_uploads:/app/uploads
+      # env_file:
+      #   - ./environment/api.env
+    environment:
+      PORT: 8055
+volumes:
+  api_uploads:
+
+
