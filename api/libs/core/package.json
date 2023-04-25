@@ -24,10 +24,10 @@
 		"host": "^9.22.1"
 	},
 	"scripts": {
-		"build": "npx directus-extension build",
-		"dev": "npx directus-extension build -w --no-minify",
-		"link": "npx directus-extension link",
-		"add": "npx directus-extension add",
+		"build": "directus-extension build",
+		"dev": "directus-extension build -w --no-minify",
+		"link": "directus-extension link",
+		"add": "directus-extension add",
 		"test": "jest"
 	},
 	"devDependencies": {
