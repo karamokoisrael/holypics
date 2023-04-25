@@ -1,0 +1,5 @@
+"browser_specific_settings": {
+        "gecko": {
+          "id": "dr-karamoko.site/holypics"
+        }
+      }

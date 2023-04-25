@@ -154,3 +154,4 @@ config/portainer-data/*
 data/nsfw-content-moderation-data/*
 !data/nsfw-content-moderation-data/data.csv
 flagged/
+environment/*.env
