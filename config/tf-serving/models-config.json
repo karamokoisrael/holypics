@@ -1,0 +1,19 @@
+[
+    {
+        "name": "nsfw_detector",
+        "base_class": "general_nsfw",
+        "classes": [
+            "general_nsfw",
+            "general_suggestive",
+            "general_not_nsfw_not_suggestive"
+        ],
+        "class_names": [
+            "general_nsfw",
+            "general_suggestive",
+            "general_not_nsfw_not_suggestive"
+        ],
+        "sensitive_class_indexes": [
+            0
+        ]
+    }
+]
