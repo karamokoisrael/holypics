@@ -6,7 +6,7 @@ ARG TARGETPLATFORM
 
 WORKDIR /app
 RUN npm i -g pnpm@7.26.1
-ENV NODE_ENV=production
+# ENV NODE_ENV=production
 COPY . /app
 
 RUN \
