@@ -1,19 +1,29 @@
 [
     {
         "name": "nsfw_detector",
+        "path": "nsfw_model.h5",
         "base_class": "general_nsfw",
+        "dimensions": [
+            224,
+            224
+        ],
         "classes": [
-            "general_nsfw",
-            "general_suggestive",
-            "general_not_nsfw_not_suggestive"
+            "porn",
+            "sexy",
+            "neutral",
+            "hentai",
+            "drawings"
         ],
         "class_names": [
-            "general_nsfw",
-            "general_suggestive",
-            "general_not_nsfw_not_suggestive"
+            "porn",
+            "sexy",
+            "neutral",
+            "hentai",
+            "drawings"
         ],
         "sensitive_class_indexes": [
-            0
+            0,
+            2
         ]
     }
 ]

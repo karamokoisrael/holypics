@@ -1,12 +1,13 @@
 import base64
+import tensorflow as tf
 
 
 @tf.function
-def decode_img_bytes(img):
+def decode_img_bytes(img, dimensions):
     img = tf.strings.regex_replace(img, "\+", "-")
     img = tf.strings.regex_replace(img, "\/", "_")
     image = tf.image.decode_jpeg(tf.io.decode_base64(img), channels=3)
-    image = tf.image.convert_image_dtype(image, dtype=tf.float32)  # 0-1
+    image = tf.image.convert_image_dtype(image, dtype=tf.float32)
     image = tf.image.resize(images=image, size=dimensions)
     return image
 
@@ -21,9 +22,8 @@ class ExportModel(tf.keras.Model):
         tf.TensorSpec(shape=(None,), dtype=tf.string, name="base64")
     ])
     def serving_fn(self, base64):
-        #a = np.array([x.lower() if isinstance(x, str) else x for x in arr])
         base64_image = tf.map_fn(lambda x: decode_img_bytes(
-            x), base64, fn_output_signature=tf.float32)
+            x, self.model_configs["dimensions"]), base64, fn_output_signature=tf.float32)
         scores = self.model.call(base64_image)
         labels = tf.constant([self.model_configs["class_names"]])
         return {

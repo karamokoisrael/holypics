@@ -1,6 +1,6 @@
 ARG NODE_VERSION=18.10.0
 
-FROM node:${NODE_VERSION} as builder
+FROM node:${NODE_VERSION} AS builder
 
 ARG TARGETPLATFORM
 
