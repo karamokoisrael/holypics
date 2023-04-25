@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@mgx/directus-extension-core": "file:extensions/core",
+    "@mgx/directus-extension-api-core": "workspace:^1.0.0",
     "directus": "^9.24.0"
   }
 }

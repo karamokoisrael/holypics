@@ -1,6 +1,14 @@
-FROM node:16-alpine
+ARG NODE_VERSION=18.10.0
+
+FROM node:${NODE_VERSION} as builder
+
+ARG TARGETPLATFORM
+
 WORKDIR /app
-COPY package.json package-lock.json /app/
+RUN npm i -g pnpm@7.26.1
+ENV NODE_ENV=production
+COPY . /app
+
 RUN \
     if [ "$TARGETPLATFORM" = 'linux/arm64' ]; then \
     apk --no-cache add \
@@ -8,22 +16,46 @@ RUN \
     build-base \
     && ln -sf /usr/bin/python3 /usr/bin/python \
     ; fi
+RUN pnpm install
+RUN pnpm run build
+# RUN pnpm prune --prod
 
-ENV NODE_ENV=production
-RUN npm install 
-RUN npm run build
 
-RUN \
-    # Upgrade system and install 'ssmtp' to be able to send mails
-    apk upgrade --no-cache && apk add --no-cache \
-    ssmtp \
-    # Add support for specifying the timezone of the container
-    # using the "TZ" environment variable.
-    tzdata 
+
+# Directus image
+FROM node:${NODE_VERSION}
+
+ARG VERSION
+ARG REPOSITORY=directus/directus
+
+LABEL directus.version="${VERSION}"
+
+# Default environment variables
+# (see https://docs.directus.io/reference/environment-variables/)
+ENV \
+    EXTENSIONS_PATH="/app/extensions" \
+    STORAGE_LOCAL_ROOT="/app/uploads"
+
+
+
+# Switch to user 'node' and directory '/directus'
+USER node
+WORKDIR /app
 
 # disable npm update warnings
 RUN echo "update-notifier=false" >> ~/.npmrc
+# RUN mkdir -p /app/extensions/displays \
+#     /app/extensions/endpoints \
+#     /app/extensions/hooks \
+#     /app/extensions/interfaces \ 
+#     /app/extensions/modules \ 
+#     /app/extensions/operations \ 
+#     /app/extensions/panels 
 
-RUN chmod -R 755 /app
+COPY --from=builder --chown=node:node /app .
+
+RUN chown node:node /app/uploads
+RUN chown node:node /app/extensions
+
 EXPOSE 8055
-CMD ["npm", "start"]
+CMD npm start

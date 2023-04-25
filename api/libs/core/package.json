@@ -1,5 +1,5 @@
 {
-	"name": "@mgx/directus-extension-core",
+	"name": "@mgx/directus-extension-api-core",
 	"description": "Please enter a description for your extension",
 	"icon": "extension",
 	"version": "1.0.0",
