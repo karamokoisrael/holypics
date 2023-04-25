@@ -44,18 +44,18 @@ WORKDIR /app
 
 # disable npm update warnings
 RUN echo "update-notifier=false" >> ~/.npmrc
-# RUN mkdir -p /app/extensions/displays \
-#     /app/extensions/endpoints \
-#     /app/extensions/hooks \
-#     /app/extensions/interfaces \ 
-#     /app/extensions/modules \ 
-#     /app/extensions/operations \ 
-#     /app/extensions/panels 
+RUN mkdir -p /app/extensions/displays \
+    /app/extensions/endpoints \
+    /app/extensions/hooks \
+    /app/extensions/interfaces \ 
+    /app/extensions/modules \ 
+    /app/extensions/operations \ 
+    /app/extensions/panels ; exit 0
 
 COPY --from=builder --chown=node:node /app .
 
-RUN chown node:node /app/uploads
-RUN chown node:node /app/extensions
+RUN chown node:node /app/uploads ; exit 0
+RUN chown node:node /app/extensions ; exit 0
 
 EXPOSE 8055
 CMD npm start
