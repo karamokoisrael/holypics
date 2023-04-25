@@ -24,8 +24,8 @@ services:
     volumes:
       - ./api/extensions:/app/extensions
       - api_uploads:/app/uploads
-      # env_file:
-      #   - ./environment/api.env
+    env_file:
+      - ./.env
     environment:
       PORT: 8055
 volumes:
