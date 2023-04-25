@@ -19,8 +19,6 @@ services:
     restart: always
     ports:
       - '${API_PORT}:8055'
-    env_file:
-      - .env
     volumes:
       - ./api/extensions:/app/extensions
       - api_uploads:/app/uploads
