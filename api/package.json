@@ -5,8 +5,14 @@
   "main": "index.js",
   "scripts": {
     "start": "npx directus start",
-    "dev": "cd extensions/core && npm run dev",
-    "build": "cd extensions/core && npm run build"
+    "start:api": "pnpm --stream --parallel --filter \"@mgx/api\" dev",
+    "dev": "pnpm --stream --parallel --filter ./libs/** dev",
+    "dev:tsoa": "pnpm --stream --parallel --filter ./libs/** dev:tsoa",
+    "build": "pnpm --stream --parallel --filter ./libs/** build",
+    "test": "jest",
+    "test:dev": "npm test -- --watch",
+    "lint": "eslint . --ext .ts",
+    "debug": "npx --node-options=--inspect directus start"
   },
   "author": "",
   "license": "ISC",
