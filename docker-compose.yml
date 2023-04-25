@@ -14,7 +14,7 @@ services:
   api:
     container_name: ${API_CONTAINER_NAME}
     build:
-      dockerfile: Dockerfile
+      dockerfile: ./api/Dockerfile
       context: .
     restart: always
     ports:
